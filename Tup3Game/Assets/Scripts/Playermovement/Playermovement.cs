@@ -21,8 +21,6 @@ public class Playermovement : MonoBehaviour
     [Header("공격설정")]
     public BoxCollider2D attackCollider;
     public float attackTime = 0.15f;
-
-    private bool canAttack = true;
     private bool isAttacking = false;
 
 
@@ -94,9 +92,9 @@ public class Playermovement : MonoBehaviour
             }
 
 
-            if (Input.GetKeyDown(KeyCode.C))
+            if (Input.GetKeyDown(KeyCode.C) && !isAttacking)
             {
-                Attack();
+                StartCoroutine(Attack());
             }
         }
 
@@ -227,36 +225,20 @@ public class Playermovement : MonoBehaviour
 
     private System.Collections.IEnumerator Attack()
     {
-        Vector3 pos = attackCollider.transform.localPosition;
+        isAttacking = true;
 
+        Vector2 pos = attackCollider.transform.localPosition;
         pos.x = Mathf.Abs(pos.x) * facingDirection;
-
         attackCollider.transform.localPosition = pos;
-        
-        DrawAttackBox();
 
         attackCollider.enabled = true;
 
         yield return new WaitForSeconds(attackTime);
 
         attackCollider.enabled = false;
-    }
 
-    private void DrawAttackBox()
-    {
-        BoxCollider2D box = attackCollider;
+        isAttacking = false;
 
-        Bounds bounds = box.bounds;
-
-        Vector3 topLeft = new Vector3(bounds.min.x, bounds.max.y);
-        Vector3 topRight = new Vector3(bounds.max.x, bounds.max.y);
-        Vector3 bottomLeft = new Vector3(bounds.min.x, bounds.min.y);
-        Vector3 bottomRight = new Vector3(bounds.max.x, bounds.min.y);
-
-        Debug.DrawLine(topLeft, topRight, Color.yellow, attackTime);
-        Debug.DrawLine(topRight, bottomRight, Color.yellow, attackTime);
-        Debug.DrawLine(bottomRight, bottomLeft, Color.yellow, attackTime);
-        Debug.DrawLine(bottomLeft, topLeft, Color.yellow, attackTime);
     }
 
 
