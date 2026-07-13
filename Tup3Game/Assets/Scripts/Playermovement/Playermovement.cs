@@ -18,6 +18,16 @@ public class Playermovement : MonoBehaviour
     public float dashDuration = 0.15f;
     public float dashCooldown = 1.0f;
 
+    [Header("공격설정")]
+    public BoxCollider2D attackCollider;
+    public float attackTime = 0.15f;
+
+    private bool canAttack = true;
+    private bool isAttacking = false;
+
+
+
+
     private BoxCollider2D col;
     private Vector2 velocity;
     
@@ -46,6 +56,7 @@ public class Playermovement : MonoBehaviour
     void Awake()
     {
         col = GetComponent<BoxCollider2D>();
+        attackCollider.enabled = false;
     }
     
     void Update()
@@ -65,7 +76,7 @@ public class Playermovement : MonoBehaviour
 
             if (collisions.below)
             {
-                velocity.y = -1f;
+                velocity.y = -0.3f;
             }
             else
             {
@@ -80,6 +91,12 @@ public class Playermovement : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Z) && canDash)
             {
                 StartCoroutine(DoDash());
+            }
+
+
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                Attack();
             }
         }
 
@@ -207,6 +224,43 @@ public class Playermovement : MonoBehaviour
         yield return new WaitForSeconds(dashCooldown);
         canDash = true;
     }
+
+    private System.Collections.IEnumerator Attack()
+    {
+        Vector3 pos = attackCollider.transform.localPosition;
+
+        pos.x = Mathf.Abs(pos.x) * facingDirection;
+
+        attackCollider.transform.localPosition = pos;
+        
+        DrawAttackBox();
+
+        attackCollider.enabled = true;
+
+        yield return new WaitForSeconds(attackTime);
+
+        attackCollider.enabled = false;
+    }
+
+    private void DrawAttackBox()
+    {
+        BoxCollider2D box = attackCollider;
+
+        Bounds bounds = box.bounds;
+
+        Vector3 topLeft = new Vector3(bounds.min.x, bounds.max.y);
+        Vector3 topRight = new Vector3(bounds.max.x, bounds.max.y);
+        Vector3 bottomLeft = new Vector3(bounds.min.x, bounds.min.y);
+        Vector3 bottomRight = new Vector3(bounds.max.x, bounds.min.y);
+
+        Debug.DrawLine(topLeft, topRight, Color.yellow, attackTime);
+        Debug.DrawLine(topRight, bottomRight, Color.yellow, attackTime);
+        Debug.DrawLine(bottomRight, bottomLeft, Color.yellow, attackTime);
+        Debug.DrawLine(bottomLeft, topLeft, Color.yellow, attackTime);
+    }
+
+
+
 
     public bool IsDashing() => isDashing;
     public float GetFacingDirection() => facingDirection;
