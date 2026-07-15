@@ -1,8 +1,16 @@
-using UnityEngine;
 using System.Collections;
+using TMPro;
+using Unity.Burst.Intrinsics;
+using Unity.VisualScripting;
+using UnityEngine;
 
 public class Playermovement : MonoBehaviour
 {
+    [Header("애니메이션")]
+    public Animator animator;
+    public SpriteRenderer spriteRenderer;
+
+
     [Header("레이캐스트 설정")]
     public LayerMask collisionMask;
     public int horizontalRayCount = 4;
@@ -14,6 +22,7 @@ public class Playermovement : MonoBehaviour
     public float jumpForce = 16f;
     public float gravity = -40f;
     public int maxJumpCount = 2;
+    public float fallGravityMultiplier = 1f;
 
     private int jumpCount;
 
@@ -21,17 +30,6 @@ public class Playermovement : MonoBehaviour
     public float dashSpeed = 25f;
     public float dashDuration = 0.15f;
     public float dashCooldown = 1.0f;
-
-    [Header("공격 설정")]
-    public BoxCollider2D attackCollider;
-    public float attackTime = 0.15f;       
-    public float comboDelay = 0.08f;      
-    public float comboInputWindow = 0.4f;
-    public int maxCombo = 3;             
-
-    private bool isAttacking = false;
-    private bool comboQueued = false;      
-    private int comboStep = 0;           
 
     private BoxCollider2D col;
     private Vector2 velocity;
@@ -45,8 +43,13 @@ public class Playermovement : MonoBehaviour
     {
         public Vector2 topLeft, topRight, bottomLeft, bottomRight;
     }
+
     private RaycastOrigins raycastOrigins;
 
+
+    public float BodySizeX => col.bounds.size.x;
+    public float BodySizeY => col.bounds.size.y;
+    private ComboAttack combo;
     public struct CollisionInfo
     {
         public bool above, below;
@@ -61,8 +64,10 @@ public class Playermovement : MonoBehaviour
     void Awake()
     {
         col = GetComponent<BoxCollider2D>();
-        attackCollider.enabled = false;
         jumpCount = maxJumpCount;
+        combo = GetComponent<ComboAttack>();
+        if (animator == null) animator = GetComponent<Animator>();
+        if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     void Update()
@@ -73,6 +78,11 @@ public class Playermovement : MonoBehaviour
         {
             facingDirection = horizontalInput > 0 ? 1f : -1f;
         }
+        if (spriteRenderer != null)
+            spriteRenderer.flipX = facingDirection < 0;
+
+
+        bool isAttacking = combo != null && combo.IsAttacking;
 
         if (!isDashing)
         {
@@ -85,7 +95,8 @@ public class Playermovement : MonoBehaviour
             }
             else
             {
-                velocity.y += gravity * Time.deltaTime;
+                float appliedGravity = (velocity.y > 0f) ? gravity : gravity * fallGravityMultiplier;
+                velocity.y += appliedGravity * Time.deltaTime;
                 if (!collisions.below && jumpCount == maxJumpCount)
                 {
                     jumpCount = maxJumpCount - 1;
@@ -107,21 +118,18 @@ public class Playermovement : MonoBehaviour
             // 공격 입력 처리:
             // - 공격 중이 아니면 콤보 시작
             // - 이미 공격 중이면 "다음 타 예약"만 해둔다 (선입력 버퍼)
-            if (Input.GetKeyDown(KeyCode.C))
-            {
-               
-                if (!isAttacking)
-                    StartCoroutine(ComboAttack());
-                else
-                    comboQueued = true;
-            }
         }
 
         if (!isDashing)
             Move(velocity * Time.deltaTime);
+        //애니메이션처리하는부분입니다
+
+        if (animator != null)
+            animator.SetFloat("Speed", Mathf.Abs(velocity.x));
+        
     }
 
-    private void Move(Vector2 moveAmount)
+    public void Move(Vector2 moveAmount)
     {
         UpdateRaycastOrigins();
         collisions.Reset();
@@ -238,91 +246,8 @@ public class Playermovement : MonoBehaviour
         canDash = true;
     }
 
-    private IEnumerator ComboAttack()
-    {
-        isAttacking = true;
-        comboStep = 0;
-        comboQueued = false;
-        try
-        {
-            while (true)
-            {
-                comboStep++;
-                Debug.Log("현재 콤보 수: " + comboStep);
-
-                // 바라보는 방향으로 공격
-                Vector2 pos = attackCollider.transform.localPosition;
-                pos.x = Mathf.Abs(pos.x) * facingDirection;
-                attackCollider.transform.localPosition = pos;
-
-                // 여기서 comboStep에 따라 애니메이션 트리거, 데미지, 히트박스 크기 등을 다르게 조작
-                attackCollider.enabled = true;
-                yield return new WaitForSeconds(attackTime);
-                attackCollider.enabled = false;
-
-                // 막타였으면 종료
-                if (comboStep >= maxCombo)
-                    break;
-                yield return new WaitForSeconds(comboDelay);
-
-                // 입력 대기 창: comboInputWindow (콤보공격인정시간) 안에 예약이 들어오면 다음 타로
-                float timer = 0f;
-                while (!comboQueued && timer < comboInputWindow)
-                {
-                    timer += Time.deltaTime;
-                    yield return null;
-                }
-
-                // 시간초과 > 콤보 종료
-                if (!comboQueued)
-                    break;
-                comboQueued = false;
-            }
-        }
-        finally
-        {
-            comboQueued = false;
-            comboStep = 0;
-            isAttacking = false;
-        }
-    }
-
-
-    private void OnDrawGizmos()
-    {
-        if (attackCollider == null) return;
-
-        
-        Vector2 center = attackCollider.transform.position;
-        center += (Vector2)attackCollider.offset;
-
-
-        if (Application.isPlaying && attackCollider.enabled)
-        {
-            Gizmos.DrawCube(center, attackCollider.size);
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireCube(center, attackCollider.size);
-        }
-        else if (comboStep == 2)
-        {
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireCube(center, attackCollider.size);
-        }
-        else if (comboStep == 3)
-        {
-            Gizmos.color = Color.blue;
-            Gizmos.DrawWireCube(center, attackCollider.size);
-        }
-        else
-        {
-            // 평소: 연한 초록 테두리만
-            Gizmos.color = new Color(0f, 1f, 0f, 0.6f);
-            Gizmos.DrawWireCube(center, attackCollider.size);
-        }
-    }
-
 
     public bool IsDashing() => isDashing;
+    public void ResetVerticalVelocity() => velocity.y = 0f;
     public float GetFacingDirection() => facingDirection;
-    public int GetComboStep() => comboStep;
 }
