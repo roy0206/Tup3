@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -20,7 +21,6 @@ public class UserDataManager : Singleton<UserDataManager>
     {
         base.Awake();
         _local = new LocalSaveBackend();
-        
     }
 
     public async Task LoadAsync()
@@ -34,11 +34,18 @@ public class UserDataManager : Singleton<UserDataManager>
 
     public async Task SaveAsync()
     {
-        string json = JsonConvert.SerializeObject(Data, Settings);
+        try
+        {
+            string json = JsonConvert.SerializeObject(Data, Settings);
+            Debug.Log($"[UserDataManager] Saving.");
+            await _local.SaveAsync(SaveKey, json);
 
-        await _local.SaveAsync(SaveKey, json);
-
-        Debug.Log("[UserDataManager] Saved.");
+            Debug.Log("[UserDataManager] Saved.");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[UserDataManager] 저장 실패. {e}");
+        }
     }
 
     static UserData Deserialize(string json)

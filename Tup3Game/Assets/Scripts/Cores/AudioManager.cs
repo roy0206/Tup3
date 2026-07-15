@@ -335,9 +335,8 @@ public class AudioManager : Singleton<AudioManager>, ISceneEventListener
         SoundsReady = false;
     }
 
-    public void OnSceneLoadStart(string sceneName) => DisableAllChannels();
     public void OnSceneLoadComplete(string sceneName) { }
-    public void OnSceneExit(string sceneName) { }
+    public void OnSceneExit(string sceneName) => DisableAllChannels();
 
     void DisableAllChannels()
     {

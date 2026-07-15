@@ -26,6 +26,22 @@ public class SceneController : Singleton<SceneController>
         BuildConfigMap();
         ScreenFader.Instance.SetInstant(0f);
     }
+
+    private IEnumerator Start()
+    {
+        // 첫 씬은 LoadSceneRoutine 을 거치지 않아 NotifyLoadComplete 가 호출되지 않는다.
+        // 여기서 직접 알리되, 모든 오브젝트의 Awake/Start 가 끝난 뒤(=async 로드 경로와 동일한 순서)
+        // 호출하기 위해 한 프레임 대기한다.
+        yield return null;
+        yield return LoadUserData();
+        NotifyLoadComplete(SceneManager.GetActiveScene().name);
+    }
+
+    private IEnumerator LoadUserData()
+    {
+        var task = UserDataManager.Instance.LoadAsync();
+        yield return new WaitUntil(() => task.IsCompleted);
+    }
     
     private void BuildConfigMap()
     {
@@ -85,8 +101,6 @@ public class SceneController : Singleton<SceneController>
         IsTransitioning = true;
         LoadingProgress = 0f;
 
-        NotifyLoadStart(config.targetSceneName);
-
         NotifySceneExit(SceneManager.GetActiveScene().name);
         UserDataManager.Instance.SaveAsync();
 
@@ -126,12 +140,12 @@ public class SceneController : Singleton<SceneController>
 
         asyncOp.allowSceneActivation = true;
         yield return asyncOp;
-
-        //DataManager.Instance.LoadGame();
+        yield return LoadUserData();
+        NotifyLoadComplete(config.targetSceneName);
         yield return StartCoroutine(PlayTransition(config.enterTransition, config.transitionDuration));
 
         IsTransitioning = false;
-        NotifyLoadComplete(config.targetSceneName);
+
     }
 
 
@@ -167,9 +181,6 @@ public class SceneController : Singleton<SceneController>
     }
 
 
-    private void NotifyLoadStart(string sceneName)
-        => Notify(sceneName, static (l, s) => l.OnSceneLoadStart(s));
-
     private void NotifyLoadComplete(string sceneName)
         => Notify(sceneName, static (l, s) => l.OnSceneLoadComplete(s));
 
@@ -196,8 +207,6 @@ public class SceneController : Singleton<SceneController>
 
 public interface ISceneEventListener
 {
-    public void OnSceneLoadStart(string sceneName);
-
     public void OnSceneLoadComplete(string sceneName);
     
     public void OnSceneExit(string sceneName);

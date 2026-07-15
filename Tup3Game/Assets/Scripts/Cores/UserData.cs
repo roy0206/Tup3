@@ -6,10 +6,11 @@ using UnityEngine;
 [Flags]
 public enum BossFlag
 {
-    Fire, 
-    Water,
-    Gold,
-    Earth
+    None  = 0,
+    Fire  = 1 << 0,
+    Water = 1 << 1,
+    Gold  = 1 << 2,
+    Earth = 1 << 3,
 }
 
 public class UserData
@@ -22,7 +23,7 @@ public class UserData
 
 public class PlayData
 {
-    public Vector2 position;
+    public SerializedVector position;
     public float health;
 
     public BossFlag clearedBosses = 0;

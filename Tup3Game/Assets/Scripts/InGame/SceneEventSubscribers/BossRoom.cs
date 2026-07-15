@@ -5,11 +5,7 @@ using UnityEngine.EventSystems;
 public class BossRoom : MonoBehaviour, ISceneEventListener
 {
     private Playermovement player;
-    [SerializeField] private int bossNum;
-    public void OnSceneLoadStart(string sceneName)
-    {
-
-    }
+    [SerializeField] private BossFlag boss;
 
     public void OnSceneLoadComplete(string sceneName)
     {
@@ -19,7 +15,10 @@ public class BossRoom : MonoBehaviour, ISceneEventListener
 
     public void OnSceneExit(string sceneName)
     {
-        UserDataManager.Instance.Data.Play.clearedBosses += (int)Mathf.Pow(2, bossNum);
+        UserDataManager.Instance.Data.Play.clearedBosses |= boss;
+        //체력 저장
+        UserDataManager.Instance.SaveAsync();
+        SceneController.Instance.UnregisterListener(this);
     }
 
     private void Awake()

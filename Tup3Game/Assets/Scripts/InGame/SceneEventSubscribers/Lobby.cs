@@ -5,22 +5,18 @@ using UnityEngine.EventSystems;
 public class Lobby : MonoBehaviour, ISceneEventListener
 {
     private Playermovement player;
-    public void OnSceneLoadStart(string sceneName)
-    {
-        
-    }
 
     public void OnSceneLoadComplete(string sceneName)
     {
-        UserDataManager.Instance.LoadAsync();
         player = FindObjectOfType<Playermovement>();
-        player.transform.position = UserDataManager.Instance.Data.Play.position;
+        if(UserDataManager.Instance.Data != null)
+            player.transform.position = UserDataManager.Instance.Data.Play.position.ToVector3();
         //Health 등도 동기화
     }
 
     public void OnSceneExit(string sceneName)
     {
-        UserDataManager.Instance.SaveAsync();
+        UserDataManager.Instance.Data.Play.position = player.transform.position.ToSerializedVector();
         SceneController.Instance.UnregisterListener(this);
     }
 
