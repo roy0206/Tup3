@@ -317,6 +317,9 @@ MonoBehaviour:
   dashCooldown: 1
   attackCollider: {fileID: 22487653}
   attackTime: 0.15
+  comboDelay: 0.08
+  comboInputWindow: 0.4
+  maxCombo: 3
 --- !u!61 &986648033
 BoxCollider2D:
   m_ObjectHideFlags: 0
