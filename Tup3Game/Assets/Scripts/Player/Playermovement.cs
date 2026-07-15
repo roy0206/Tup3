@@ -6,6 +6,11 @@ using UnityEngine;
 
 public class Playermovement : MonoBehaviour
 {
+    [Header("애니메이션")]
+    public Animator animator;
+    public SpriteRenderer spriteRenderer;
+
+
     [Header("레이캐스트 설정")]
     public LayerMask collisionMask;
     public int horizontalRayCount = 4;
@@ -61,6 +66,8 @@ public class Playermovement : MonoBehaviour
         col = GetComponent<BoxCollider2D>();
         jumpCount = maxJumpCount;
         combo = GetComponent<ComboAttack>();
+        if (animator == null) animator = GetComponent<Animator>();
+        if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     void Update()
@@ -71,7 +78,10 @@ public class Playermovement : MonoBehaviour
         {
             facingDirection = horizontalInput > 0 ? 1f : -1f;
         }
-        
+        if (spriteRenderer != null)
+            spriteRenderer.flipX = facingDirection < 0;
+
+
         bool isAttacking = combo != null && combo.IsAttacking;
 
         if (!isDashing)
@@ -112,6 +122,11 @@ public class Playermovement : MonoBehaviour
 
         if (!isDashing)
             Move(velocity * Time.deltaTime);
+        //애니메이션처리하는부분입니다
+
+        if (animator != null)
+            animator.SetFloat("Speed", Mathf.Abs(velocity.x));
+        
     }
 
     public void Move(Vector2 moveAmount)
