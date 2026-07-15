@@ -26,8 +26,7 @@ public class SceneController : Singleton<SceneController>
         BuildConfigMap();
         ScreenFader.Instance.SetInstant(0f);
     }
-
-    /// <summary>SceneSO 리스트를 딕셔너리로 변환합니다.</summary>
+    
     private void BuildConfigMap()
     {
         _configMap = new Dictionary<string, SceneSO>();
@@ -85,24 +84,23 @@ public class SceneController : Singleton<SceneController>
     {
         IsTransitioning = true;
         LoadingProgress = 0f;
-        // ── 1. 이벤트: 씬 로드 시작 ──
+
         NotifyLoadStart(config.targetSceneName);
-        //DataManager.Instance.SaveGame();
+
+        NotifySceneExit(SceneManager.GetActiveScene().name);
+        UserDataManager.Instance.SaveAsync();
 
 
-        // ── 2. 현재 씬 퇴장 전환 효과 ──
+
         yield return StartCoroutine(PlayTransition(config.exitTransition, config.transitionDuration));
-
-        // ── 3. 로딩씬 전환 ──
+        
         if (config.useLoadingScene && !string.IsNullOrEmpty(config.loadingSceneName))
         {
             yield return SceneManager.LoadSceneAsync(config.loadingSceneName, LoadSceneMode.Single);
-
-            // 로딩씬 진입 전환 효과 (화면을 다시 보여줌)
+            
             yield return StartCoroutine(PlayTransition(config.enterTransition, config.transitionDuration));
         }
-
-        // ── 4. 목표 씬 비동기 로드 (즉시 활성화 X) ──
+        
         var asyncOp = SceneManager.LoadSceneAsync(config.targetSceneName, LoadSceneMode.Single);
         asyncOp.allowSceneActivation = false;
 
@@ -111,8 +109,6 @@ public class SceneController : Singleton<SceneController>
         while (true)
         {
             elapsed += Time.deltaTime;
-
-            // AsyncOperation 은 allowSceneActivation = false 일 때 0.9 에서 멈춤
             LoadingProgress = Mathf.Clamp01(asyncOp.progress / 0.9f);
 
             bool loadDone = asyncOp.progress >= 0.9f;
@@ -172,17 +168,28 @@ public class SceneController : Singleton<SceneController>
 
 
     private void NotifyLoadStart(string sceneName)
-    {
-        var snapshot = new List<ISceneEventListener>(_listeners);
-        foreach (var listener in snapshot)
-            listener.OnSceneLoadStart(sceneName);
-    }
+        => Notify(sceneName, static (l, s) => l.OnSceneLoadStart(s));
 
     private void NotifyLoadComplete(string sceneName)
+        => Notify(sceneName, static (l, s) => l.OnSceneLoadComplete(s));
+
+    private void NotifySceneExit(string sceneName)
+        => Notify(sceneName, static (l, s) => l.OnSceneExit(s));
+    
+    private void Notify(string sceneName, System.Action<ISceneEventListener, string> callback)
     {
-        var snapshot = new List<ISceneEventListener>(_listeners);
-        foreach (var listener in snapshot)
-            listener.OnSceneLoadComplete(sceneName);
+        for (int i = _listeners.Count - 1; i >= 0; i--)
+        {
+            var listener = _listeners[i];
+            
+            if (listener is Object obj && obj == null)
+            {
+                _listeners.RemoveAt(i);
+                continue;
+            }
+
+            callback(listener, sceneName);
+        }
     }
 }
 
@@ -190,5 +197,8 @@ public class SceneController : Singleton<SceneController>
 public interface ISceneEventListener
 {
     public void OnSceneLoadStart(string sceneName);
+
     public void OnSceneLoadComplete(string sceneName);
+    
+    public void OnSceneExit(string sceneName);
 }

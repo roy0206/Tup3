@@ -1,0 +1,59 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+
+
+public class InteractionManager : DomainSingleton<InteractionManager>
+{
+    private List<InteractionBase> interactionObjects = new List<InteractionBase>();
+    private Playermovement player;
+
+
+    private InteractionBase currentInteraction = null;
+    private void Start()
+    {
+        player = FindFirstObjectByType<Playermovement>();
+        if (player == null)
+        {
+            Debug.LogError("No Playermovement component found on this gameobject");
+        }
+        
+        UserInput.Instance.AddKeyListener(KeyCode.V, KeyPhase.Down, ()=>currentInteraction?.OnInteract());
+    }
+
+    private void FixedUpdate()
+    {
+        var nearInteractions =
+            interactionObjects.OrderBy(x => (player.transform.position - x.transform.position).sqrMagnitude);
+        currentInteraction = null;
+        foreach (var interaction in nearInteractions)
+        {
+            if ((player.transform.position - interaction.transform.position).magnitude <=
+                interaction.InteractionDistance)
+            {
+                currentInteraction = interaction;
+                break;
+            }
+        }
+        if(currentInteraction == null) return;
+        Debug.Log(currentInteraction.name);
+    }
+
+    public bool Register(InteractionBase interactionBase)
+    {
+        if (interactionObjects.Contains(interactionBase))
+        {
+            Debug.LogWarning("Interaction object already exists " + interactionBase.name);
+            return false;
+        }
+        interactionObjects.Add(interactionBase);
+        return true;
+    }
+
+    public bool Unregister(InteractionBase interactionBase)
+    {
+        return interactionObjects.Remove(interactionBase);
+    }
+    
+}
