@@ -13,6 +13,9 @@ public class Playermovement : MonoBehaviour
     public float moveSpeed = 8f;
     public float jumpForce = 16f;
     public float gravity = -40f;
+    public int maxJumpCount = 2;
+
+    private int jumpCount;
 
     [Header("대쉬 설정")]
     public float dashSpeed = 25f;
@@ -59,6 +62,7 @@ public class Playermovement : MonoBehaviour
     {
         col = GetComponent<BoxCollider2D>();
         attackCollider.enabled = false;
+        jumpCount = maxJumpCount;
     }
 
     void Update()
@@ -77,15 +81,22 @@ public class Playermovement : MonoBehaviour
             if (collisions.below)
             {
                 velocity.y = -0.3f;
+                jumpCount = maxJumpCount;
             }
             else
             {
                 velocity.y += gravity * Time.deltaTime;
+                if (!collisions.below && jumpCount == maxJumpCount)
+                {
+                    jumpCount = maxJumpCount - 1;
+                }
             }
 
-            if (Input.GetKeyDown(KeyCode.X) && collisions.below)
+
+            if (Input.GetKeyDown(KeyCode.X) && jumpCount > 0)
             {
                 velocity.y = jumpForce;
+                jumpCount--;
             }
 
             if (Input.GetKeyDown(KeyCode.Z) && canDash)
@@ -226,6 +237,7 @@ public class Playermovement : MonoBehaviour
         yield return new WaitForSeconds(dashCooldown);
         canDash = true;
     }
+
     private IEnumerator ComboAttack()
     {
         isAttacking = true;
