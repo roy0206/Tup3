@@ -527,6 +527,8 @@ GameObject:
   - component: {fileID: 986648032}
   - component: {fileID: 986648033}
   - component: {fileID: 986648034}
+  - component: {fileID: 986648035}
+  - component: {fileID: 986648036}
   m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
@@ -583,7 +585,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Sprite: {fileID: -2311659948842064771, guid: 49c84b47e65891947a5b9849074e30c6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -603,7 +605,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -5.5376, y: 4.5265, z: 0}
-  m_LocalScale: {x: 1.0422589, y: 1.3856204, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 22487652}
@@ -631,14 +633,10 @@ MonoBehaviour:
   jumpForce: 15
   gravity: -40
   maxJumpCount: 2
+  fallGravityMultiplier: 1
   dashSpeed: 25
   dashDuration: 0.15
   dashCooldown: 1
-  attackCollider: {fileID: 22487653}
-  attackTime: 0.15
-  comboDelay: 0.08
-  comboInputWindow: 0.4
-  maxCombo: 3
 --- !u!61 &986648033
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -677,7 +675,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 1.11, y: 1.2}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -707,6 +705,51 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &986648035
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 986648029}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03cb6a6514dd57442925523d0cbcaf17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ComboAttack
+  maxCombo: 3
+  attackCollider: {fileID: 22487653}
+  attackTime: 0.15
+  comboDelay: 0.08
+  comboInputWindow: 0.4
+  attackPower: 10
+  attack1Distance: 0
+  attack2Distance: 0
+  attack3Distance: 0
+  attack1Duration: 0.15
+  attack2Duration: 0.15
+  attack3ChargeTime: 0.2
+  attack3Duration: 0.4
+--- !u!114 &986648036
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 986648029}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc4f40b7882762b49b155809961a0ba7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Skills
+  skill_1_increase: 1.5
+  skill_1_cool: 10
+  changed_skill_1_increase: 1.75
+  changed_skill_1_cool: 10
+  skill_2_haste: 3
+  skill_2_duration: 10
+  skill_2_cool: 10
+  changed_skill_2_cool: 10
 --- !u!1 &1404564058
 GameObject:
   m_ObjectHideFlags: 0
