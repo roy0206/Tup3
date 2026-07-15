@@ -16,10 +16,9 @@ public class ScreenFader : Singleton<ScreenFader>
     /// <summary>현재 페이드 알파(0=투명, 1=불투명).</summary>
     public float Alpha => _group != null ? _group.alpha : 0f;
 
-    protected override void Awake()
+    protected override void OnAwake()
     {
-        base.Awake();
-        if (ReferenceEquals(Instance, this)) EnsureOverlay();
+        EnsureOverlay();
     }
 
     void EnsureOverlay()

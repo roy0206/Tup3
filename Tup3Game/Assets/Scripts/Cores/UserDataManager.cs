@@ -17,9 +17,8 @@ public class UserDataManager : Singleton<UserDataManager>
     ISaveBackend _local;
     
 
-    protected override void Awake()
+    protected override void OnAwake()
     {
-        base.Awake();
         _local = new LocalSaveBackend();
     }
 

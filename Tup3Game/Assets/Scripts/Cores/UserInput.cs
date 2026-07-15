@@ -45,9 +45,8 @@ public class UserInput : Singleton<UserInput>
     private readonly bool[] dragging = new bool[3];
     private readonly Vector2[] dragOrigin = new Vector2[3];
 
-    protected override void Awake()
+    protected override void OnAwake()
     {
-        base.Awake();
         prevMousePosition = Input.mousePosition;
         MousePosition = prevMousePosition;
     }

@@ -20,18 +20,14 @@ public class SceneController : Singleton<SceneController>
     private readonly List<ISceneEventListener> _listeners = new();
 
 
-    new protected void Awake()
+    protected override void OnAwake()
     {
-        base.Awake();
         BuildConfigMap();
         ScreenFader.Instance.SetInstant(0f);
     }
 
     private IEnumerator Start()
     {
-        // 첫 씬은 LoadSceneRoutine 을 거치지 않아 NotifyLoadComplete 가 호출되지 않는다.
-        // 여기서 직접 알리되, 모든 오브젝트의 Awake/Start 가 끝난 뒤(=async 로드 경로와 동일한 순서)
-        // 호출하기 위해 한 프레임 대기한다.
         yield return null;
         yield return LoadUserData();
         NotifyLoadComplete(SceneManager.GetActiveScene().name);
