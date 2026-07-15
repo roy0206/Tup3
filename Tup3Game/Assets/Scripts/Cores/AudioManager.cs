@@ -25,7 +25,7 @@ public class AudioManager : Singleton<AudioManager>, ISceneEventListener
     [SerializeField] AudioMixerGroup bgmGroup;
 
     // 믹서 에셋에서 동일한 이름으로 노출해야 하는 파라미터 키
-    const string MasterParam = "MASTER";
+    const string MasterParam = "Master";
     const string SfxParam = "SFX";
     const string BgmParam = "BGM";
 
@@ -337,6 +337,7 @@ public class AudioManager : Singleton<AudioManager>, ISceneEventListener
 
     public void OnSceneLoadStart(string sceneName) => DisableAllChannels();
     public void OnSceneLoadComplete(string sceneName) { }
+    public void OnSceneExit(string sceneName) { }
 
     void DisableAllChannels()
     {

@@ -1,14 +1,32 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+[Flags]
+public enum BossFlag
+{
+    Fire, 
+    Water,
+    Gold,
+    Earth
+}
 
 public class UserData
 {
     public AchievementData      Achievements { get; set; } = new();
     public SettingsData         Settings     { get; set; } = new();
+    public PlayData          Play       { get; set; } = new();
 }
 
+
+public class PlayData
+{
+    public Vector2 position;
+    public float health;
+
+    public BossFlag clearedBosses = 0;
+}
 
 public class AchievementData
 {
