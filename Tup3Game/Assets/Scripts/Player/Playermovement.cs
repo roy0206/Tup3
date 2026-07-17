@@ -39,6 +39,7 @@ public class Playermovement : MonoBehaviour
     private float facingDirection = 1f;
     public CollisionInfo collisions;
 
+    private bool wasGrounded = true;
     private struct RaycastOrigins
     {
         public Vector2 topLeft, topRight, bottomLeft, bottomRight;
@@ -88,6 +89,8 @@ public class Playermovement : MonoBehaviour
         {
             velocity.x = horizontalInput * moveSpeed;
 
+           
+
             if (collisions.below)
             {
                 velocity.y = -0.3f;
@@ -106,6 +109,10 @@ public class Playermovement : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.X) && jumpCount > 0)
             {
+                if (animator != null)
+                {
+                    animator.Play("Jump", 0, 0f);
+                }
                 velocity.y = jumpForce;
                 jumpCount--;
             }
@@ -123,10 +130,26 @@ public class Playermovement : MonoBehaviour
         if (!isDashing)
             Move(velocity * Time.deltaTime);
         //애니메이션처리하는부분입니다
+        bool isGrounded = collisions.below;
+
+        if (!isGrounded && velocity.y < 0f)
+        {
+            if (animator != null)
+                animator.Play("Land", 0, 0f);
+        }
+
+        if (!wasGrounded && isGrounded)
+        {
+            if (animator != null)
+                animator.Play("Stand", 0, 0f); 
+        }
+
+        wasGrounded = isGrounded;
 
         if (animator != null)
             animator.SetFloat("Speed", Mathf.Abs(velocity.x));
-        
+        if (animator != null)
+            animator.SetFloat("y-velocity", velocity.y);
     }
 
     public void Move(Vector2 moveAmount)
@@ -239,7 +262,7 @@ public class Playermovement : MonoBehaviour
         while (timer < dashDuration)
         {
             Vector2 dashMove = new Vector2(facingDirection * dashSpeed * Time.deltaTime, 0f);
-            Move(dashMove);
+            Move(dashMove);     
             timer += Time.deltaTime;
             yield return null;
         }
