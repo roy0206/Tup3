@@ -50,7 +50,10 @@ public class Playermovement : MonoBehaviour
 
     public float BodySizeX => col.bounds.size.x;
     public float BodySizeY => col.bounds.size.y;
+
+    private Skills skills;
     private ComboAttack combo;
+
     public struct CollisionInfo
     {
         public bool above, below;
@@ -67,6 +70,7 @@ public class Playermovement : MonoBehaviour
         col = GetComponent<BoxCollider2D>();
         jumpCount = maxJumpCount;
         combo = GetComponent<ComboAttack>();
+        skills = GetComponent<Skills>();
         if (animator == null) animator = GetComponent<Animator>();
         if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
     }
@@ -74,8 +78,9 @@ public class Playermovement : MonoBehaviour
     void Update()
     {
         float horizontalInput = Input.GetAxisRaw("Horizontal");
+        bool isAiming = skills != null && skills.IsAiming;
 
-        if (horizontalInput != 0)
+        if (horizontalInput != 0 && !isAiming)
         {
             facingDirection = horizontalInput > 0 ? 1f : -1f;
         }
@@ -85,7 +90,7 @@ public class Playermovement : MonoBehaviour
 
         bool isAttacking = combo != null && combo.IsAttacking;
 
-        if (!isDashing)
+        if (!isDashing && !isAiming)
         {
             velocity.x = horizontalInput * moveSpeed;
 
@@ -120,6 +125,11 @@ public class Playermovement : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Z) && canDash)
             {
                 StartCoroutine(DoDash());
+            }
+
+            else if (isAiming)
+            {
+                velocity.x = 0f;
             }
 
             // 공격 입력 처리:
@@ -278,4 +288,5 @@ public class Playermovement : MonoBehaviour
     public bool IsDashing() => isDashing;
     public void ResetVerticalVelocity() => velocity.y = 0f;
     public float GetFacingDirection() => facingDirection;
+
 }
