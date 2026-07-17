@@ -27,7 +27,7 @@ public abstract class InteractionBase : MonoBehaviour
     public string InteractionFailSound => interactionFailSound;
     
     
-    private void Awake()
+    private void Start()
     {
         InteractionManager.Current.Register(this);
     }

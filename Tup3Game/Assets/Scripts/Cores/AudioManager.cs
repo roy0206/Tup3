@@ -76,12 +76,8 @@ public class AudioManager : Singleton<AudioManager>, ISceneEventListener
 
     public bool SoundsReady { get; private set; }
 
-    new void Awake()
+    protected override void OnAwake()
     {
-        base.Awake();
-        if (AudioManager.Instance != this)
-            return;
-
         _poolParent = transform;
 
         StartCoroutine(LoadAllSounds());
@@ -335,9 +331,8 @@ public class AudioManager : Singleton<AudioManager>, ISceneEventListener
         SoundsReady = false;
     }
 
-    public void OnSceneLoadStart(string sceneName) => DisableAllChannels();
     public void OnSceneLoadComplete(string sceneName) { }
-    public void OnSceneExit(string sceneName) { }
+    public void OnSceneExit(string sceneName) => DisableAllChannels();
 
     void DisableAllChannels()
     {
