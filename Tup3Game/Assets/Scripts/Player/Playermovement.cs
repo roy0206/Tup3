@@ -141,17 +141,19 @@ public class Playermovement : MonoBehaviour
             Move(velocity * Time.deltaTime);
         //애니메이션처리하는부분입니다
         bool isGrounded = collisions.below;
-
-        if (!isGrounded && velocity.y < 0f)
+        if (!isDashing)
         {
-            if (animator != null)
-                animator.Play("Land", 0, 0f);
-        }
+            if (!isGrounded && velocity.y < 0f)
+            {
+                if (animator != null)
+                    animator.Play("Land", 0, 0f);
+            }
 
-        if (!wasGrounded && isGrounded)
-        {
-            if (animator != null)
-                animator.Play("Stand", 0, 0f); 
+            if (!wasGrounded && isGrounded)
+            {
+                if (animator != null)
+                    animator.Play("Stand", 0, 0f);
+            }
         }
 
         wasGrounded = isGrounded;
@@ -265,7 +267,7 @@ public class Playermovement : MonoBehaviour
 
         if (animator != null)
         {
-            animator.SetTrigger("DashTrigger");
+            animator.Play("Dash", 0, 0f);
         }
 
         float timer = 0f;

@@ -658,6 +658,18 @@ PrefabInstance:
       propertyPath: attack3Duration
       value: 0.417
       objectReference: {fileID: 0}
+    - target: {fileID: 7688133843110150903, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
+      propertyPath: isTransformed
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7688133843110150903, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
+      propertyPath: skill_2_groundPrefab
+      value: 
+      objectReference: {fileID: 3380133263288657416, guid: c2ea03694011b3b49bf241d1fb89a714, type: 3}
+    - target: {fileID: 7688133843110150903, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
+      propertyPath: skill_2_groundMask.m_Bits
+      value: 64
+      objectReference: {fileID: 0}
     - target: {fileID: 8660705831248484078, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
       propertyPath: m_LocalPosition.x
       value: -5.5376
