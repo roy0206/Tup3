@@ -84,4 +84,6 @@ public class Skills : MonoBehaviour
        
         canUseSkill_2 = true;
     }
+
+
 }
