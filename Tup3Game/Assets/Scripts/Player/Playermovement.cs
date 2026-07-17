@@ -265,16 +265,13 @@ public class Playermovement : MonoBehaviour
         canDash = false;
         isDashing = true;
 
-        if (animator != null)
-        {
-            animator.Play("Dash", 0, 0f);
-        }
-
         float timer = 0f;
         while (timer < dashDuration)
         {
             Vector2 dashMove = new Vector2(facingDirection * dashSpeed * Time.deltaTime, 0f);
-            Move(dashMove);     
+            if (animator != null)
+                animator.Play("Dash", 0, 0f);
+            Move(dashMove);    
             timer += Time.deltaTime;
             yield return null;
         }
