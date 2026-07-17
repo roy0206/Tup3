@@ -50,7 +50,10 @@ public class Playermovement : MonoBehaviour
 
     public float BodySizeX => col.bounds.size.x;
     public float BodySizeY => col.bounds.size.y;
+
+    private Skills skills;
     private ComboAttack combo;
+
     public struct CollisionInfo
     {
         public bool above, below;
@@ -67,6 +70,7 @@ public class Playermovement : MonoBehaviour
         col = GetComponent<BoxCollider2D>();
         jumpCount = maxJumpCount;
         combo = GetComponent<ComboAttack>();
+        skills = GetComponent<Skills>();
         if (animator == null) animator = GetComponent<Animator>();
         if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
     }
@@ -74,8 +78,9 @@ public class Playermovement : MonoBehaviour
     void Update()
     {
         float horizontalInput = Input.GetAxisRaw("Horizontal");
+        bool isAiming = skills != null && skills.IsAiming;
 
-        if (horizontalInput != 0)
+        if (horizontalInput != 0 && !isAiming)
         {
             facingDirection = horizontalInput > 0 ? 1f : -1f;
         }
@@ -85,7 +90,7 @@ public class Playermovement : MonoBehaviour
 
         bool isAttacking = combo != null && combo.IsAttacking;
 
-        if (!isDashing)
+        if (!isDashing && !isAiming)
         {
             velocity.x = horizontalInput * moveSpeed;
 
@@ -122,6 +127,11 @@ public class Playermovement : MonoBehaviour
                 StartCoroutine(DoDash());
             }
 
+            else if (isAiming)
+            {
+                velocity.x = 0f;
+            }
+
             // 공격 입력 처리:
             // - 공격 중이 아니면 콤보 시작
             // - 이미 공격 중이면 "다음 타 예약"만 해둔다 (선입력 버퍼)
@@ -131,17 +141,19 @@ public class Playermovement : MonoBehaviour
             Move(velocity * Time.deltaTime);
         //애니메이션처리하는부분입니다
         bool isGrounded = collisions.below;
-
-        if (!isGrounded && velocity.y < 0f)
+        if (!isDashing)
         {
-            if (animator != null)
-                animator.Play("Land", 0, 0f);
-        }
+            if (!isGrounded && velocity.y < 0f)
+            {
+                if (animator != null)
+                    animator.Play("Land", 0, 0f);
+            }
 
-        if (!wasGrounded && isGrounded)
-        {
-            if (animator != null)
-                animator.Play("Stand", 0, 0f); 
+            if (!wasGrounded && isGrounded)
+            {
+                if (animator != null)
+                    animator.Play("Stand", 0, 0f);
+            }
         }
 
         wasGrounded = isGrounded;
@@ -253,8 +265,6 @@ public class Playermovement : MonoBehaviour
         canDash = false;
         isDashing = true;
 
-        
-
         float timer = 0f;
         while (timer < dashDuration)
         {
@@ -277,4 +287,5 @@ public class Playermovement : MonoBehaviour
     public bool IsDashing() => isDashing;
     public void ResetVerticalVelocity() => velocity.y = 0f;
     public float GetFacingDirection() => facingDirection;
+
 }
