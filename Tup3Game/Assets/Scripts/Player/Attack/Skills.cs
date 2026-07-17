@@ -135,7 +135,6 @@ public class Skills : MonoBehaviour
             movement.moveSpeed *= skill_2_haste;
             movement.fallGravityMultiplier *= skill_2_haste;
 
-            // 버프를 건 상태에서 조준 시작
             StartAimingSkill2();
 
             yield return new WaitForSeconds(skill_2_duration);
@@ -145,8 +144,6 @@ public class Skills : MonoBehaviour
             movement.moveSpeed = originalSpeed;
             movement.fallGravityMultiplier = originalGravity;
 
-            // 버프 지속시간이 끝날 때까지 S키를 계속 누르고 있었다면
-            // 조준 모드가 아직 안 끝났을 수 있으므로 여기서도 정리
             if (isAiming)
             {
                 isAiming = false;
