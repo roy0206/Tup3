@@ -8,7 +8,8 @@ public class InteractionManager : DomainSingleton<InteractionManager>
 {
     private List<InteractionBase> interactionObjects = new List<InteractionBase>();
     private Playermovement player;
-
+    private InteractionView view;
+    
 
     private InteractionBase currentInteraction = null;
     private void Start()
@@ -19,7 +20,15 @@ public class InteractionManager : DomainSingleton<InteractionManager>
             Debug.LogError("No Playermovement component found on this gameobject");
         }
         
-        UserInput.Instance.AddKeyListener(KeyCode.V, KeyPhase.Down, ()=>currentInteraction?.OnInteract());
+        UserInput.Instance.AddKeyListener(KeyCode.V, KeyPhase.Held, ()=>
+        {
+            currentInteraction?.OnInteract();
+        });
+        UserInput.Instance.AddKeyListener(KeyCode.V, KeyPhase.Up, ()=>
+        {
+            currentInteraction?.OnHoldUP();
+        });
+        view = FindAnyObjectByType<InteractionView>();
     }
 
     private void FixedUpdate()
@@ -36,8 +45,14 @@ public class InteractionManager : DomainSingleton<InteractionManager>
                 break;
             }
         }
-        if(currentInteraction == null) return;
-        Debug.Log(currentInteraction.name);
+        if(currentInteraction == null)
+        {
+            view.Disable();
+            return;
+        }
+
+        view.Enable();
+        view.SetPosition(currentInteraction.transform.position);
     }
 
     public bool Register(InteractionBase interactionBase)

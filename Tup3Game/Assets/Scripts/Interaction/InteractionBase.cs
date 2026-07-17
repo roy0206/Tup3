@@ -25,15 +25,28 @@ public abstract class InteractionBase : MonoBehaviour
     
     [SerializeField] private string interactionFailSound;
     public string InteractionFailSound => interactionFailSound;
+
+    private InteractionView view;
     
+
+    private float hold = 0;
     
     private void Start()
     {
         InteractionManager.Current.Register(this);
+        view = FindAnyObjectByType<InteractionView>();
+    }
+
+    private void Update()
+    {
     }
 
     public virtual bool OnInteract() //Call First
     {
+        hold += Time.deltaTime;
+        view.SetFill(hold/interactionDuration);
+        if(hold < interactionDuration) return false;
+        hold = 0;
         if (!CanInteract())
         {
             AudioManager.Instance.PlaySound(interactionFailSound);
@@ -44,6 +57,11 @@ public abstract class InteractionBase : MonoBehaviour
         if(interactOnce) InteractionManager.Current.Unregister(this);
         if(hideInteractionObjects) gameObject.GetComponent<SpriteRenderer>().enabled = false;
         return true;
+    }
+
+    public virtual void OnHoldUP()
+    {
+        hold = 0;
     }
     
     protected abstract bool CanInteract();
