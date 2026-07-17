@@ -230,6 +230,11 @@ public class Playermovement : MonoBehaviour
         canDash = false;
         isDashing = true;
 
+        if (animator != null)
+        {
+            animator.SetTrigger("DashTrigger");
+        }
+
         float timer = 0f;
         while (timer < dashDuration)
         {
