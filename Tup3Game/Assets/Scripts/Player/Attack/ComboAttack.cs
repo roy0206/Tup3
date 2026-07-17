@@ -5,6 +5,7 @@ using System.Collections;
 
 public class ComboAttack : MonoBehaviour
 {
+
     public float currentDamage { get; private set; }
     public int maxCombo = 3;
 
@@ -54,7 +55,11 @@ public class ComboAttack : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.C))
         {
             if (!isAttacking)
+            {
+             
                 StartCoroutine(Comboattack());
+                Debug.Log("콤보스탭은" + comboStep);
+            }
             else
                 comboQueued = true;
         }
@@ -71,8 +76,9 @@ public class ComboAttack : MonoBehaviour
                 comboStep++;
                 Debug.Log("현재 콤보 수: " + comboStep);
                 float facingDirection = movement.GetFacingDirection();
-
-
+                int num = comboStep;
+               
+                
                 // 바라보는 방향으로 공격
 
                 Vector2 pos = attackCollider.transform.localPosition;
@@ -82,18 +88,24 @@ public class ComboAttack : MonoBehaviour
                 // 여기서 comboStep에 따라 애니메이션 트리거, 데미지, 히트박스 크기 등을 다르게 조작
 
                 float bodyLength = movement.BodySizeX;
-
+                
                 switch (comboStep)
                 {
                     case 1:
+                        if (movement.animator != null)
+                            movement.animator.SetTrigger("Attack_num_1");
                         currentDamage = attackPower * 1.0f;
                         yield return StartCoroutine(DashForward(attack1Distance, attack1Duration, facingDirection));
                         break;
                     case 2:
+                        if (movement.animator != null)
+                            movement.animator.SetTrigger("Attack_num_2");
                         currentDamage = attackPower * 1.0f;
                         yield return StartCoroutine(DashForward(attack2Distance, attack2Duration, facingDirection));
                         break;
                     case 3:
+                        if (movement.animator != null)
+                            movement.animator.SetTrigger("Attack_num_3");
                         currentDamage = attackPower * 2.5f;
                         yield return new WaitForSeconds(attack3ChargeTime);
                         yield return StartCoroutine(DashForward(attack3Distance, attack3Duration, facingDirection));
