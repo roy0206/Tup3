@@ -6,6 +6,8 @@ using UnityEngine;
 
 public class Playermovement : MonoBehaviour
 {
+    public Dash_animation dashEffectController;
+
     [Header("애니메이션")]
     public Animator animator;
     public SpriteRenderer spriteRenderer;
@@ -79,6 +81,7 @@ public class Playermovement : MonoBehaviour
         float horizontalInput = Input.GetAxisRaw("Horizontal");
         
         bool isAiming = skills != null && skills.IsAiming;
+
 
         bool isLunging = combo != null && combo.IsLunging;
 
@@ -260,6 +263,14 @@ public class Playermovement : MonoBehaviour
         canDash = false;
         isDashing = true;
 
+        if (dashEffectController != null)
+        {
+            Vector2 pos = dashEffectController.transform.localPosition;
+            pos.x = Mathf.Abs(pos.x) * -facingDirection;
+            dashEffectController.transform.localPosition = pos;
+            dashEffectController.DashEffect(facingDirection);
+        }
+
         float timer = 0f;
         while (timer < dashDuration)
         {
@@ -273,7 +284,7 @@ public class Playermovement : MonoBehaviour
             timer += Time.deltaTime;
             yield return null;
         }
-
+        dashEffectController.HideEffect();
         isDashing = false;
         velocity.y = 0f;
 

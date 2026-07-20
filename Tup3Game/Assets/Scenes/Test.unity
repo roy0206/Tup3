@@ -487,16 +487,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!95 &1534719937 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 1511915125018066299, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
-  m_PrefabInstance: {fileID: 2515537328642029036}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &1534719943 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8660705831248484078, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
-  m_PrefabInstance: {fileID: 2515537328642029036}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2033925897
 GameObject:
   m_ObjectHideFlags: 0
@@ -635,37 +625,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1.1344824}
   m_EdgeRadius: 0
---- !u!1 &2047167567
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2047167568}
-  m_Layer: 7
-  m_Name: Dash
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2047167568
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2047167567}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.08, y: -0.19, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1534719943}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2515537328642029036
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -677,46 +636,6 @@ PrefabInstance:
     - target: {fileID: 1171085956890113137, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 4243287443365911484, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
-      propertyPath: animator
-      value: 
-      objectReference: {fileID: 1534719937}
-    - target: {fileID: 4243287443365911484, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
-      propertyPath: comboDelay
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 4243287443365911484, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
-      propertyPath: attack1Duration
-      value: 0.417
-      objectReference: {fileID: 0}
-    - target: {fileID: 4243287443365911484, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
-      propertyPath: attack2Duration
-      value: 0.417
-      objectReference: {fileID: 0}
-    - target: {fileID: 4243287443365911484, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
-      propertyPath: attack3Duration
-      value: 0.417
-      objectReference: {fileID: 0}
-    - target: {fileID: 4243287443365911484, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
-      propertyPath: comboInputWindow
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5130523561765730001, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
-      propertyPath: skinWidth
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 7688133843110150903, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
-      propertyPath: isTransformed
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7688133843110150903, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
-      propertyPath: skill_2_groundPrefab
-      value: 
-      objectReference: {fileID: 3380133263288657416, guid: c2ea03694011b3b49bf241d1fb89a714, type: 3}
-    - target: {fileID: 7688133843110150903, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
-      propertyPath: skill_2_groundMask.m_Bits
-      value: 64
       objectReference: {fileID: 0}
     - target: {fileID: 8660705831248484078, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
       propertyPath: m_LocalPosition.x
@@ -760,10 +679,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 8660705831248484078, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2047167568}
+    m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
 --- !u!1660057539 &9223372036854775807

@@ -9,6 +9,9 @@ public class ComboAttack : MonoBehaviour
     public float currentDamage { get; private set; }
     public int maxCombo = 3;
 
+    [Header("공격 이펙트")]
+    public Attack_animation attackEffect;
+
     [Header("공격 설정")]
     public BoxCollider2D attackCollider;
     public float comboDelay = 0.08f;
@@ -32,7 +35,6 @@ public class ComboAttack : MonoBehaviour
     private Playermovement movement;
 
     public bool IsLunging => isLunging;
-
     void Awake()
     {
         movement = GetComponent<Playermovement>();
@@ -93,18 +95,26 @@ public class ComboAttack : MonoBehaviour
                     movement.animator.SetTrigger("AttackTrigger");
                     movement.animator.SetInteger("AttackIndex", comboStep);
                 }
+
+                if (attackEffect != null)
+                {
+                    attackEffect.PlayEffect(comboStep, facingDirection);
+                }
+
                 switch (comboStep)
                 {
                     case 1:
                         currentDamage = attackPower * 1.0f;
                         isLunging = true;
                         yield return StartCoroutine(DashForward(attack1Distance, attack1Duration, facingDirection));
+                        attackEffect.HideEffect();
                         isLunging = false;
                         break;
                     case 2:
                         currentDamage = attackPower * 1.0f;
                         isLunging = true;
                         yield return StartCoroutine(DashForward(attack2Distance, attack2Duration, facingDirection));
+                        attackEffect.HideEffect();
                         isLunging = false;
                         break;
                     case 3:
@@ -112,6 +122,7 @@ public class ComboAttack : MonoBehaviour
                         isLunging = true;
                         yield return new WaitForSeconds(attack3ChargeTime);
                         yield return StartCoroutine(DashForward(attack3Distance, attack3Duration, facingDirection));
+                        attackEffect.HideEffect();
                         isLunging = false;
                         break;
 
@@ -138,6 +149,7 @@ public class ComboAttack : MonoBehaviour
         }
         finally
         {
+            attackEffect.HideEffect();
             comboQueued = false;
             comboStep = 0;
             isAttacking = false;
