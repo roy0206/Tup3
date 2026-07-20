@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.fluid.behavior-tree": {
+      "version": "2.3.0",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://registry.npmjs.org"
+    },
     "com.unity.2d.animation": {
       "version": "13.0.4",
       "depth": 0,
