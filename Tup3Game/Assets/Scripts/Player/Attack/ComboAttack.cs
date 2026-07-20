@@ -11,7 +11,6 @@ public class ComboAttack : MonoBehaviour
 
     [Header("공격 설정")]
     public BoxCollider2D attackCollider;
-    public float attackTime = 0.15f;
     public float comboDelay = 0.08f;
     public float comboInputWindow = 0.4f;
     public float attackPower = 10f;
@@ -26,13 +25,14 @@ public class ComboAttack : MonoBehaviour
     public float attack3Duration = 0.4f;
 
     private bool isAttacking = false;
+    private bool isLunging = false;
     private bool comboQueued = false;
     private int comboStep = 0;
 
     private Playermovement movement;
 
-    public bool IsAttacking => isAttacking;
-    
+    public bool IsLunging => isLunging;
+
     void Awake()
     {
         movement = GetComponent<Playermovement>();
@@ -88,27 +88,31 @@ public class ComboAttack : MonoBehaviour
                 // 여기서 comboStep에 따라 애니메이션 트리거, 데미지, 히트박스 크기 등을 다르게 조작
 
                 float bodyLength = movement.BodySizeX;
-                
+                if (movement.animator != null)
+                { 
+                    movement.animator.SetTrigger("AttackTrigger");
+                    movement.animator.SetInteger("AttackIndex", comboStep);
+                }
                 switch (comboStep)
                 {
                     case 1:
-                        if (movement.animator != null)
-                            movement.animator.SetTrigger("Attack_num_1");
                         currentDamage = attackPower * 1.0f;
+                        isLunging = true;
                         yield return StartCoroutine(DashForward(attack1Distance, attack1Duration, facingDirection));
+                        isLunging = false;
                         break;
                     case 2:
-                        if (movement.animator != null)
-                            movement.animator.SetTrigger("Attack_num_2");
                         currentDamage = attackPower * 1.0f;
+                        isLunging = true;
                         yield return StartCoroutine(DashForward(attack2Distance, attack2Duration, facingDirection));
+                        isLunging = false;
                         break;
                     case 3:
-                        if (movement.animator != null)
-                            movement.animator.SetTrigger("Attack_num_3");
                         currentDamage = attackPower * 2.5f;
+                        isLunging = true;
                         yield return new WaitForSeconds(attack3ChargeTime);
                         yield return StartCoroutine(DashForward(attack3Distance, attack3Duration, facingDirection));
+                        isLunging = false;
                         break;
 
                 }
@@ -158,7 +162,6 @@ public class ComboAttack : MonoBehaviour
             traveled += step;
             yield return null;
         }
-
         attackCollider.enabled = false;
     }
 }
