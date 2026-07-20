@@ -116,7 +116,7 @@ public class Skills : MonoBehaviour
         finally
         {
             movement.moveSpeed = originalSpeed;
-        movement.fallGravityMultiplier = originalGravity;
+            movement.fallGravityMultiplier = originalGravity;
         }
         yield return new WaitForSeconds(skill_2_cool);
        

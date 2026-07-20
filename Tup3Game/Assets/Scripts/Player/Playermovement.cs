@@ -39,7 +39,6 @@ public class Playermovement : MonoBehaviour
     private float facingDirection = 1f;
     public CollisionInfo collisions;
 
-    private bool wasGrounded = true;
     private struct RaycastOrigins
     {
         public Vector2 topLeft, topRight, bottomLeft, bottomRight;
@@ -78,31 +77,40 @@ public class Playermovement : MonoBehaviour
     void Update()
     {
         float horizontalInput = Input.GetAxisRaw("Horizontal");
+        
         bool isAiming = skills != null && skills.IsAiming;
 
-        if (horizontalInput != 0 && !isAiming)
+        bool isLunging = combo != null && combo.IsLunging;
+
+        if (horizontalInput != 0 && !isAiming && !isLunging)
         {
             facingDirection = horizontalInput > 0 ? 1f : -1f;
         }
         if (spriteRenderer != null)
             spriteRenderer.flipX = facingDirection < 0;
-
-
-        bool isAttacking = combo != null && combo.IsAttacking;
+       
 
         if (!isDashing && !isAiming)
         {
-            velocity.x = horizontalInput * moveSpeed;
-
-           
+            velocity.x = isLunging ? 0f : horizontalInput * moveSpeed;
 
             if (collisions.below)
             {
+                if (animator != null)
+                {
+                    animator.SetBool("IsGround",true);
+                }
+
                 velocity.y = -0.3f;
                 jumpCount = maxJumpCount;
             }
             else
             {
+                if (animator != null)
+                {
+                    animator.SetBool("IsGround", false); 
+                }
+
                 float appliedGravity = (velocity.y > 0f) ? gravity : gravity * fallGravityMultiplier;
                 velocity.y += appliedGravity * Time.deltaTime;
                 if (!collisions.below && jumpCount == maxJumpCount)
@@ -114,17 +122,19 @@ public class Playermovement : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.X) && jumpCount > 0)
             {
-                if (animator != null)
-                {
-                    animator.Play("Jump", 0, 0f);
-                }
+
                 velocity.y = jumpForce;
                 jumpCount--;
+                if (animator != null)
+                    animator.SetTrigger("JumpTrigger");
+
             }
 
             if (Input.GetKeyDown(KeyCode.Z) && canDash)
             {
                 StartCoroutine(DoDash());
+                if (animator != null)
+                    animator.SetTrigger("DashTrigger");
             }
 
             else if (isAiming)
@@ -137,31 +147,16 @@ public class Playermovement : MonoBehaviour
             // - 이미 공격 중이면 "다음 타 예약"만 해둔다 (선입력 버퍼)
         }
 
+        if (animator != null)
+        {
+            animator.SetFloat("Speed", Mathf.Abs(velocity.x));
+            animator.SetFloat("VerticalVelocity", velocity.y);
+        }
+
+
         if (!isDashing)
             Move(velocity * Time.deltaTime);
         //애니메이션처리하는부분입니다
-        bool isGrounded = collisions.below;
-        if (!isDashing)
-        {
-            if (!isGrounded && velocity.y < 0f)
-            {
-                if (animator != null)
-                    animator.Play("Land", 0, 0f);
-            }
-
-            if (!wasGrounded && isGrounded)
-            {
-                if (animator != null)
-                    animator.Play("Stand", 0, 0f);
-            }
-        }
-
-        wasGrounded = isGrounded;
-
-        if (animator != null)
-            animator.SetFloat("Speed", Mathf.Abs(velocity.x));
-        if (animator != null)
-            animator.SetFloat("y-velocity", velocity.y);
     }
 
     public void Move(Vector2 moveAmount)
@@ -268,9 +263,12 @@ public class Playermovement : MonoBehaviour
         float timer = 0f;
         while (timer < dashDuration)
         {
-            Vector2 dashMove = new Vector2(facingDirection * dashSpeed * Time.deltaTime, 0f);
             if (animator != null)
-                animator.Play("Dash", 0, 0f);
+            {
+                animator.Play("Dash");
+            }
+
+            Vector2 dashMove = new Vector2(facingDirection * dashSpeed * Time.deltaTime, 0f);
             Move(dashMove);    
             timer += Time.deltaTime;
             yield return null;
