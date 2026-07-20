@@ -58,10 +58,11 @@ public class Skills : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.A) && canUseSkill_2)
+        if (Input.GetKeyDown(KeyCode.A) && canUseSkill_1)
         {
             StartCoroutine(Do_skill_1());
         }
+
         if (Input.GetKeyDown(KeyCode.S) && canUseSkill_2)
         {
             if (isTransformed)
@@ -116,7 +117,7 @@ public class Skills : MonoBehaviour
         finally
         {
             movement.moveSpeed = originalSpeed;
-        movement.fallGravityMultiplier = originalGravity;
+            movement.fallGravityMultiplier = originalGravity;
         }
         yield return new WaitForSeconds(skill_2_cool);
        
