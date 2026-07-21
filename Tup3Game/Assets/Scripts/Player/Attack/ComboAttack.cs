@@ -39,8 +39,6 @@ public class ComboAttack : MonoBehaviour
     {
         movement = GetComponent<Playermovement>();
         attackCollider.enabled = false;
-
-
     }
     void Start()
     {
@@ -78,8 +76,6 @@ public class ComboAttack : MonoBehaviour
                 comboStep++;
                 Debug.Log("현재 콤보 수: " + comboStep);
                 float facingDirection = movement.GetFacingDirection();
-                int num = comboStep;
-               
                 
                 // 바라보는 방향으로 공격
 
@@ -96,24 +92,29 @@ public class ComboAttack : MonoBehaviour
                     movement.animator.SetInteger("AttackIndex", comboStep);
                 }
 
-                if (attackEffect != null)
+                float duration = comboStep switch
                 {
-                    attackEffect.PlayEffect(comboStep, facingDirection);
-                }
+                    1 => GetAdjustedDuration(attack1Duration),
+                    2 => GetAdjustedDuration(attack2Duration),
+                    3 => GetAdjustedDuration(attack3Duration),
+                    _ => 0.417f
+                };
+
+                attackEffect.PlayEffect(comboStep, facingDirection, duration);
 
                 switch (comboStep)
                 {
                     case 1:
                         currentDamage = attackPower * 1.0f;
                         isLunging = true;
-                        yield return StartCoroutine(DashForward(attack1Distance, attack1Duration, facingDirection));
+                        yield return StartCoroutine(DashForward(attack1Distance, duration, facingDirection));
                         attackEffect.HideEffect();
                         isLunging = false;
                         break;
                     case 2:
                         currentDamage = attackPower * 1.0f;
                         isLunging = true;
-                        yield return StartCoroutine(DashForward(attack2Distance, attack2Duration, facingDirection));
+                        yield return StartCoroutine(DashForward(attack2Distance, duration, facingDirection));
                         attackEffect.HideEffect();
                         isLunging = false;
                         break;
@@ -121,11 +122,25 @@ public class ComboAttack : MonoBehaviour
                         currentDamage = attackPower * 2.5f;
                         isLunging = true;
                         yield return new WaitForSeconds(attack3ChargeTime);
-                        yield return StartCoroutine(DashForward(attack3Distance, attack3Duration, facingDirection));
+
+                        if (cancelRequested)
+                        {
+                            isLunging = false;
+                            cancelRequested = false;
+                            yield break;
+                        }
+
+                        yield return StartCoroutine(DashForward(attack3Distance, duration, facingDirection));
                         attackEffect.HideEffect();
                         isLunging = false;
                         break;
 
+                }
+
+                if (cancelRequested)
+                {
+                    cancelRequested = false;
+                    yield break;
                 }
 
                 // 막타였으면 종료
@@ -133,7 +148,12 @@ public class ComboAttack : MonoBehaviour
                     break;
                 yield return new WaitForSeconds(comboDelay);
 
-                // 입력 대기 창: comboInputWindow (콤보공격인정시간) 안에 예약이 들어오면 다음 타로
+                if (cancelRequested)
+                {
+                    cancelRequested = false;
+                    yield break;
+                }
+
                 float timer = 0f;
                 while (!comboQueued && timer < comboInputWindow)
                 {
@@ -141,10 +161,22 @@ public class ComboAttack : MonoBehaviour
                     yield return null;
                 }
 
+                if (cancelRequested)
+                {
+                    cancelRequested = false;
+                    yield break;
+                }
+
                 // 시간초과 > 콤보 종료
                 if (!comboQueued)
                     break;
                 comboQueued = false;
+
+                if (cancelRequested)
+                {
+                    cancelRequested = false;
+                    yield break;                  
+                }
             }
         }
         finally
@@ -152,6 +184,7 @@ public class ComboAttack : MonoBehaviour
             attackEffect.HideEffect();
             comboQueued = false;
             comboStep = 0;
+            currentDamage = 0f;
             isAttacking = false;
         }
     }
@@ -175,5 +208,25 @@ public class ComboAttack : MonoBehaviour
             yield return null;
         }
         attackCollider.enabled = false;
+    }
+
+
+    private float attackSpeedMultiplier = 1f;
+
+    public void SetAttackSpeedMultiplier(float multiplier)
+    {
+        attackSpeedMultiplier = multiplier;
+    }
+
+    private float GetAdjustedDuration(float baseDuration)
+    {
+        return baseDuration / attackSpeedMultiplier;
+    }
+
+    private bool cancelRequested = false;
+
+    public void CancelCombo()
+    {
+        cancelRequested = true;
     }
 }

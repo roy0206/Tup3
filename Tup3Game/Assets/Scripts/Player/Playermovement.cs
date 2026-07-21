@@ -6,7 +6,16 @@ using UnityEngine;
 
 public class Playermovement : MonoBehaviour
 {
+    private const float DistanceEpsilon = 0.001f;
+
     public Dash_animation dashEffectController;
+    
+    [Header("벽 충돌 반동")]
+    public float wallBounceForce = 4f;
+    public float wallBounceDeceleration = 20f;
+
+    private bool isWallBounced = false;
+    private bool wasGroundedLastFrame = false;
 
     [Header("애니메이션")]
     public Animator animator;
@@ -85,18 +94,34 @@ public class Playermovement : MonoBehaviour
 
         bool isLunging = combo != null && combo.IsLunging;
 
-        if (horizontalInput != 0 && !isAiming && !isLunging)
+        if (horizontalInput != 0 && !isAiming && !isLunging && !isWallBounced)
         {
             facingDirection = horizontalInput > 0 ? 1f : -1f;
         }
+
         if (spriteRenderer != null)
             spriteRenderer.flipX = facingDirection < 0;
        
 
         if (!isDashing && !isAiming)
         {
-            velocity.x = isLunging ? 0f : horizontalInput * moveSpeed;
-
+            if (isWallBounced)
+            {
+                float decel = wallBounceDeceleration * Time.deltaTime;
+                if (Mathf.Abs(velocity.x) <= decel)
+                {
+                    velocity.x = 0f;
+                    isWallBounced = false;  
+                }
+                else
+                {
+                    velocity.x -= Mathf.Sign(velocity.x) * decel;
+                }
+            }
+            else
+            {
+                velocity.x = isLunging ? 0f : horizontalInput * moveSpeed;
+            }
             if (collisions.below)
             {
                 if (animator != null)
@@ -105,7 +130,12 @@ public class Playermovement : MonoBehaviour
                 }
 
                 velocity.y = -0.3f;
-                jumpCount = maxJumpCount;
+                jumpCount = maxJumpCount; 
+                
+                if (!wasGroundedLastFrame)
+                {
+                    isWallBounced = false;
+                }
             }
             else
             {
@@ -125,12 +155,13 @@ public class Playermovement : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.X) && jumpCount > 0)
             {
-
+                Debug.Log($"X pressed. jumpCount={jumpCount}, collisions.below={collisions.below}");
                 velocity.y = jumpForce;
                 jumpCount--;
                 if (animator != null)
                     animator.SetTrigger("JumpTrigger");
 
+                isWallBounced = false;
             }
 
             if (Input.GetKeyDown(KeyCode.Z) && canDash)
@@ -139,6 +170,7 @@ public class Playermovement : MonoBehaviour
                 if (animator != null)
                     animator.SetTrigger("DashTrigger");
             }
+
 
             else if (isAiming)
             {
@@ -159,7 +191,8 @@ public class Playermovement : MonoBehaviour
 
         if (!isDashing)
             Move(velocity * Time.deltaTime);
-        //애니메이션처리하는부분입니다
+
+        wasGroundedLastFrame = collisions.below;
     }
 
     public void Move(Vector2 moveAmount)
@@ -187,29 +220,26 @@ public class Playermovement : MonoBehaviour
         float directionX = Mathf.Sign(moveAmount.x);
         float rayLength = Mathf.Abs(moveAmount.x) + skinWidth;
 
-        float bottomOffset = col.bounds.size.y * 0.25f;
-        float usableHeight = col.bounds.size.y - bottomOffset;
-        float raySpacing = usableHeight / (horizontalRayCount - 1);
+        float raySpacing = (raycastOrigins.topLeft.y - raycastOrigins.bottomLeft.y) / (horizontalRayCount - 1);
 
         for (int i = 0; i < horizontalRayCount; i++)
         {
             Vector2 rayOrigin = (directionX == -1) ? raycastOrigins.bottomLeft : raycastOrigins.bottomRight;
-            rayOrigin += Vector2.up * (bottomOffset + i * raySpacing);
+            rayOrigin += Vector2.up * (i * raySpacing);
 
             RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * directionX, rayLength, collisionMask);
             Debug.DrawRay(rayOrigin, Vector2.right * directionX * rayLength, Color.red);
 
             if (hit)
             {
-                if (hit.distance == 0)
-                    continue;
-
                 float correctedDistance = Mathf.Max(hit.distance - skinWidth, 0f);
                 moveAmount.x = correctedDistance * directionX;
-                rayLength = hit.distance;
+                rayLength = Mathf.Max(hit.distance, skinWidth);
 
                 collisions.left = directionX == -1;
                 collisions.right = directionX == 1;
+
+                velocity.x = 0f;
             }
         }
     }
@@ -218,27 +248,20 @@ public class Playermovement : MonoBehaviour
     {
         float directionY = Mathf.Sign(moveAmount.y);
         float rayLength = Mathf.Abs(moveAmount.y) + skinWidth;
-
+        float raySpacing = (raycastOrigins.bottomRight.x - raycastOrigins.bottomLeft.x) / (verticalRayCount - 1);
         for (int i = 0; i < verticalRayCount; i++)
         {
             Vector2 rayOrigin = (directionY == -1) ? raycastOrigins.bottomLeft : raycastOrigins.topLeft;
-            rayOrigin += Vector2.right * (i * (col.bounds.size.x / (verticalRayCount - 1)) + moveAmount.x);
+            rayOrigin += Vector2.right * (i * raySpacing);
 
             RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.up * directionY, rayLength, collisionMask);
             Debug.DrawRay(rayOrigin, Vector2.up * directionY * rayLength, Color.red);
 
             if (hit)
             {
-                float correctedDistance = hit.distance - skinWidth;
-
-                if (correctedDistance < 0)
-                {
-                    correctedDistance = 0;
-                }
-
+                float correctedDistance = Mathf.Max(hit.distance - skinWidth, 0f);
                 moveAmount.y = correctedDistance * directionY;
-                rayLength = hit.distance;
-
+                rayLength = Mathf.Max(hit.distance, skinWidth);
                 collisions.below = directionY == -1;
                 collisions.above = directionY == 1;
 
@@ -297,4 +320,6 @@ public class Playermovement : MonoBehaviour
     public void ResetVerticalVelocity() => velocity.y = 0f;
     public float GetFacingDirection() => facingDirection;
 
+
+   
 }

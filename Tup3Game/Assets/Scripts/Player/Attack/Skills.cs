@@ -1,5 +1,6 @@
-using UnityEngine;
 using System.Collections;
+using Unity.Burst.Intrinsics;
+using UnityEngine;
 
 public class Skills : MonoBehaviour
 {
@@ -33,6 +34,13 @@ public class Skills : MonoBehaviour
     public float skill_2_spawnDelay = 0.5f;
     public Transform skill_2_aimMarker;
 
+    [Header("3번 스킬설정 (공격속도)")]
+    public float skill_3_attackSpeedMultiplier = 1.5f;
+    public float skill_3_duration = 5f;
+    public float skill_3_cool = 10f;
+    public ParticleSystem skill_3_auraEffect;
+    public bool IsSkill3Active { get; private set; }
+
     private bool canUseSkill_1 = true;
     private bool canUseSkill_2 = true;
     private bool canUseSkill_3 = true;
@@ -40,8 +48,6 @@ public class Skills : MonoBehaviour
     private bool canUse_Changed_Skill_2 = true;
     private bool canUse_Changed_Skill_3 = true;
 
-
-    
 
     private float skill_2_aimOffsetX = 0f;
     private Vector2 skill_2_currentAimPoint;
@@ -53,6 +59,7 @@ public class Skills : MonoBehaviour
     {
         movement = GetComponent<Playermovement>();
         attack = GetComponent<ComboAttack>();
+        skill_3_auraEffect.Stop(true, ParticleSystemStopBehavior.StopEmitting);
     }
 
     // Update is called once per frame
@@ -69,6 +76,10 @@ public class Skills : MonoBehaviour
                 StartCoroutine(Do_changed_skill_2());
             else
                 StartCoroutine(Do_skill_2());
+        }
+        if (Input.GetKeyDown(KeyCode.D) && canUseSkill_3)
+        {
+            StartCoroutine(Do_skill_3());
         }
 
         if (isAiming)
@@ -217,8 +228,38 @@ public class Skills : MonoBehaviour
 
         if (skill_2_groundPrefab != null)
         {
-            Instantiate(skill_2_groundPrefab, spawnPoint, Quaternion.identity);
+            GameObject spawnedGround = Instantiate(skill_2_groundPrefab, spawnPoint, Quaternion.identity);
+
+            yield return new WaitForSeconds(skill_2_duration);
+            if (spawnedGround != null)
+            {
+                Destroy(spawnedGround);
+            }
         }
+    }
+
+    private IEnumerator Do_skill_3()
+    {
+        canUseSkill_3 = false;
+        IsSkill3Active = true;
+
+        attack.SetAttackSpeedMultiplier(skill_3_attackSpeedMultiplier);
+
+        float originalDamage = attack.attackPower;
+
+        if (skill_3_auraEffect != null)
+            skill_3_auraEffect.Play();
+
+        yield return new WaitForSeconds(skill_3_duration);
+
+        attack.SetAttackSpeedMultiplier(1f);
+        IsSkill3Active = false;
+
+        if (skill_3_auraEffect != null)
+            skill_3_auraEffect.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+
+        yield return new WaitForSeconds(skill_3_cool);
+        canUseSkill_3 = true;
     }
     public bool IsAiming => isAiming;
 }

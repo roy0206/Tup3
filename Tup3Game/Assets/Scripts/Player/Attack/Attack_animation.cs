@@ -9,6 +9,9 @@ public class Attack_animation : MonoBehaviour
     private Animator animator;
     private SpriteRenderer spriteRenderer;
 
+    public float combo1ClipLength = 0.25f;
+    public float combo2ClipLength = 0.25f;
+    public float combo3ClipLength = 0.25f;
 
     private void Awake()
     {
@@ -16,10 +19,19 @@ public class Attack_animation : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    public void PlayEffect(int comboStep, float facingDirection)
+    public void PlayEffect(int comboStep, float facingDirection, float targetDuration)
     {
         spriteRenderer.enabled = true;
         spriteRenderer.flipX = facingDirection < 0;
+        float clipLength = comboStep switch
+        {
+            1 => combo1ClipLength,
+            2 => combo2ClipLength,
+            3 => combo3ClipLength,
+            _ => 1f
+        };
+        animator.speed = targetDuration > 0f ? clipLength / targetDuration : 1f;
+
         switch (comboStep)
         {
             case 1:
@@ -37,5 +49,6 @@ public class Attack_animation : MonoBehaviour
     public void HideEffect()
     {
         spriteRenderer.enabled = false;
+        animator.speed = 1f;
     }
 }
