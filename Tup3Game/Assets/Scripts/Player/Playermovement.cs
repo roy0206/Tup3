@@ -155,7 +155,7 @@ public class Playermovement : MonoBehaviour
                     animator.SetTrigger("JumpTrigger");
             }
 
-            if (Input.GetKeyDown(KeyCode.Z) && canDash)
+            if (Input.GetKeyDown(KeyCode.Z) && canDash && !isLunging)
             {
                 if (isLunging)
                 {
