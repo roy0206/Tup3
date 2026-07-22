@@ -439,62 +439,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!1 &676775760 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1171085956890113137, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
-  m_PrefabInstance: {fileID: 2515537328642029036}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &676775762 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4243287443365911484, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
-  m_PrefabInstance: {fileID: 2515537328642029036}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 676775760}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 03cb6a6514dd57442925523d0cbcaf17, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ComboAttack
---- !u!114 &676775765 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5130523561765730001, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
-  m_PrefabInstance: {fileID: 2515537328642029036}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 676775760}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 431f3d2a5585b394d9f3f3596a90cec2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Playermovement
---- !u!114 &676775768
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 676775760}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3a0f051de1dd83a4a92773169472d328, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerKnockBack
-  movement: {fileID: 676775765}
-  health: {fileID: 676775769}
-  combo: {fileID: 676775762}
-  invincibilityDuration: 0.5
---- !u!114 &676775769
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 676775760}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fddd1c6b099405c4787f6d0375bbdd2e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
-  maxHealth: 100
 --- !u!1 &1404564058
 GameObject:
   m_ObjectHideFlags: 0
@@ -871,21 +815,9 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 741062428388408831, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
-      propertyPath: m_Name
-      value: Skill_3
-      objectReference: {fileID: 0}
     - target: {fileID: 1171085956890113137, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 1171085956890113137, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
-      propertyPath: m_TagString
-      value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 1370892253116474458, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
-      propertyPath: m_Name
-      value: Attack
       objectReference: {fileID: 0}
     - target: {fileID: 8660705831248484078, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
       propertyPath: m_LocalPosition.x
@@ -930,13 +862,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1171085956890113137, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 676775769}
-    - targetCorrespondingSourceObject: {fileID: 1171085956890113137, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 676775768}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2447727491210074026}
   - component: {fileID: 1785424948777585926}
   m_Layer: 7
-  m_Name: Particle System
+  m_Name: Skill_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4851,9 +4851,11 @@ GameObject:
   - component: {fileID: 1511915125018066299}
   - component: {fileID: 4243287443365911484}
   - component: {fileID: 7688133843110150903}
+  - component: {fileID: 483271029826859299}
+  - component: {fileID: 3234327923423046461}
   m_Layer: 7
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4948,8 +4950,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Playermovement
   dashEffectController: {fileID: 5619284950695481464}
-  wallBounceForce: 2
-  wallBounceDeceleration: 20
   animator: {fileID: 0}
   spriteRenderer: {fileID: 0}
   collisionMask:
@@ -5095,6 +5095,35 @@ MonoBehaviour:
   skill_3_duration: 5
   skill_3_cool: 10
   skill_3_auraEffect: {fileID: 2447727491210074026}
+--- !u!114 &483271029826859299
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1171085956890113137}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fddd1c6b099405c4787f6d0375bbdd2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
+  maxHealth: 100
+--- !u!114 &3234327923423046461
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1171085956890113137}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a0f051de1dd83a4a92773169472d328, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerKnockBack
+  movement: {fileID: 5130523561765730001}
+  health: {fileID: 483271029826859299}
+  combo: {fileID: 4243287443365911484}
+  invincibilityDuration: 0.5
 --- !u!1 &1370892253116474458
 GameObject:
   m_ObjectHideFlags: 0
@@ -5111,7 +5140,7 @@ GameObject:
   - component: {fileID: 5262818231192816701}
   - component: {fileID: 2190212716159889321}
   m_Layer: 7
-  m_Name: attack
+  m_Name: Attack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
