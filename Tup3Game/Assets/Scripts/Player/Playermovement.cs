@@ -7,20 +7,11 @@ using UnityEngine;
 public class Playermovement : MonoBehaviour
 {
     private const float DistanceEpsilon = 0.001f;
-
     public Dash_animation dashEffectController;
     
-    [Header("벽 충돌 반동")]
-    public float wallBounceForce = 4f;
-    public float wallBounceDeceleration = 20f;
-
-    private bool isWallBounced = false;
-    private bool wasGroundedLastFrame = false;
-
     [Header("애니메이션")]
     public Animator animator;
     public SpriteRenderer spriteRenderer;
-
 
     [Header("레이캐스트 설정")]
     public LayerMask collisionMask;
@@ -94,7 +85,7 @@ public class Playermovement : MonoBehaviour
 
         bool isLunging = combo != null && combo.IsLunging;
 
-        if (horizontalInput != 0 && !isAiming && !isLunging && !isWallBounced)
+        if (horizontalInput != 0 && !isAiming && !isLunging)
         {
             facingDirection = horizontalInput > 0 ? 1f : -1f;
             if (isDashing)
@@ -110,13 +101,13 @@ public class Playermovement : MonoBehaviour
 
         if (!isDashing && !isAiming)
         {
-            if (isWallBounced)
+            if (isKnockedBack)
             {
-                float decel = wallBounceDeceleration * Time.deltaTime;
+                float decel = externalVelocityDecel * Time.deltaTime;
                 if (Mathf.Abs(velocity.x) <= decel)
                 {
                     velocity.x = 0f;
-                    isWallBounced = false;  
+                    isKnockedBack = false;
                 }
                 else
                 {
@@ -127,6 +118,7 @@ public class Playermovement : MonoBehaviour
             {
                 velocity.x = isLunging ? 0f : horizontalInput * moveSpeed;
             }
+
             if (collisions.below)
             {
                 if (animator != null)
@@ -137,10 +129,6 @@ public class Playermovement : MonoBehaviour
                 velocity.y = -0.3f;
                 jumpCount = maxJumpCount; 
                 
-                if (!wasGroundedLastFrame)
-                {
-                    isWallBounced = false;
-                }
             }
             else
             {
@@ -165,12 +153,18 @@ public class Playermovement : MonoBehaviour
                 jumpCount--;
                 if (animator != null)
                     animator.SetTrigger("JumpTrigger");
-
-                isWallBounced = false;
             }
 
             if (Input.GetKeyDown(KeyCode.Z) && canDash)
             {
+                if (isLunging)
+                {
+                    float Changeddirection = horizontalInput > 0 ? 1f : -1f;
+                    if (Changeddirection != facingDirection)
+                    {
+                        facingDirection = Changeddirection;
+                    }
+                }
                 StartCoroutine(DoDash());
                 if (animator != null)
                     animator.SetTrigger("DashTrigger");
@@ -192,12 +186,8 @@ public class Playermovement : MonoBehaviour
             animator.SetFloat("Speed", Mathf.Abs(velocity.x));
             animator.SetFloat("VerticalVelocity", velocity.y);
         }
-
-
         if (!isDashing)
             Move(velocity * Time.deltaTime);
-
-        wasGroundedLastFrame = collisions.below;
     }
 
     public void Move(Vector2 moveAmount)
@@ -319,6 +309,23 @@ public class Playermovement : MonoBehaviour
         yield return new WaitForSeconds(dashCooldown);
         canDash = true;
     }
+
+
+    /*적충돌*/
+    private float externalVelocityDecel = 25f;
+    private bool isKnockedBack = false;
+    public void ApplyKnockback(Vector2 force, float decelSpeed = 25f)
+    {
+        velocity = force;
+        externalVelocityDecel = decelSpeed;
+        isKnockedBack = true;
+    }
+    public bool IsKnockedBack => isKnockedBack;
+    public float GetVerticalVelocityForKnockback(float upwardRatio = 0.5f)
+    {
+        return jumpForce * upwardRatio;
+    }
+
 
 
     public bool IsDashing() => isDashing;

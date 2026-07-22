@@ -49,7 +49,8 @@ public class ComboAttack : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (movement.IsDashing())
+
+        if (movement.IsDashing() || movement.IsKnockedBack)
             return;
 
         if (Input.GetKeyDown(KeyCode.C))
@@ -199,6 +200,11 @@ public class ComboAttack : MonoBehaviour
 
         while (traveled < distance)
         {
+            if (cancelRequested)
+            {
+                attackCollider.enabled = false;
+                yield break;
+            }
             float step = speed * Time.deltaTime;
             step = Mathf.Min(step, distance - traveled);
 

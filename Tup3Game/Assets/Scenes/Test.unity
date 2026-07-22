@@ -251,7 +251,7 @@ Transform:
   m_GameObject: {fileID: 63906170}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 1, w: 0}
-  m_LocalPosition: {x: 0.19, y: -0.72, z: 0}
+  m_LocalPosition: {x: -0.62, y: 0.76, z: 0}
   m_LocalScale: {x: 8.9185, y: 1.7130277, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -268,6 +268,8 @@ GameObject:
   - component: {fileID: 484327057}
   - component: {fileID: 484327058}
   - component: {fileID: 484327059}
+  - component: {fileID: 484327060}
+  - component: {fileID: 484327061}
   m_Layer: 8
   m_Name: Boss
   m_TagString: Enemy
@@ -284,8 +286,8 @@ Transform:
   m_GameObject: {fileID: 484327056}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 6.61, y: 0.88, z: 0}
-  m_LocalScale: {x: 0.76908284, y: 0.6928102, z: 1}
+  m_LocalPosition: {x: 7.59, y: -1.18, z: 0}
+  m_LocalScale: {x: 0.3566237, y: 0.31044823, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -395,6 +397,104 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 11.52, y: 13.08}
   m_EdgeRadius: 0
+--- !u!114 &484327060
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 484327056}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0191c9e2cb3ac2f4ea638f4ac3363ac7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Dummy_Boss
+  knockbackForce: 10
+  damage: 15
+  hitCooldown: 1
+--- !u!50 &484327061
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 484327056}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
+--- !u!1 &676775760 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1171085956890113137, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
+  m_PrefabInstance: {fileID: 2515537328642029036}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &676775762 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4243287443365911484, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
+  m_PrefabInstance: {fileID: 2515537328642029036}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 676775760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03cb6a6514dd57442925523d0cbcaf17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ComboAttack
+--- !u!114 &676775765 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5130523561765730001, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
+  m_PrefabInstance: {fileID: 2515537328642029036}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 676775760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 431f3d2a5585b394d9f3f3596a90cec2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Playermovement
+--- !u!114 &676775768
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 676775760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a0f051de1dd83a4a92773169472d328, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerKnockBack
+  movement: {fileID: 676775765}
+  health: {fileID: 676775769}
+  combo: {fileID: 676775762}
+  invincibilityDuration: 0.5
+--- !u!114 &676775769
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 676775760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fddd1c6b099405c4787f6d0375bbdd2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
+  maxHealth: 100
 --- !u!1 &1404564058
 GameObject:
   m_ObjectHideFlags: 0
@@ -771,9 +871,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 741062428388408831, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
+      propertyPath: m_Name
+      value: Skill_3
+      objectReference: {fileID: 0}
     - target: {fileID: 1171085956890113137, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 1171085956890113137, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
+      propertyPath: m_TagString
+      value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 1370892253116474458, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
+      propertyPath: m_Name
+      value: Attack
       objectReference: {fileID: 0}
     - target: {fileID: 8660705831248484078, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
       propertyPath: m_LocalPosition.x
@@ -818,7 +930,13 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1171085956890113137, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 676775769}
+    - targetCorrespondingSourceObject: {fileID: 1171085956890113137, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 676775768}
   m_SourcePrefab: {fileID: 100100000, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

@@ -44,10 +44,6 @@ public class Skills : MonoBehaviour
     private bool canUseSkill_1 = true;
     private bool canUseSkill_2 = true;
     private bool canUseSkill_3 = true;
-    private bool canUse_Changed_Skill_1 = true;
-    private bool canUse_Changed_Skill_2 = true;
-    private bool canUse_Changed_Skill_3 = true;
-
 
     private float skill_2_aimOffsetX = 0f;
     private Vector2 skill_2_currentAimPoint;
