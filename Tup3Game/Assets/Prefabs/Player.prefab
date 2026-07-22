@@ -4961,9 +4961,9 @@ MonoBehaviour:
   moveSpeed: 8
   jumpForce: 15
   gravity: -40
-  maxJumpCount: 2
+  maxJumpCount: 1
   fallGravityMultiplier: 1
-  dashSpeed: 8
+  dashSpeed: 20
   dashDuration: 0.15
   dashCooldown: 1
 --- !u!61 &7619190873882549438
