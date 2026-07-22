@@ -97,11 +97,16 @@ public class Playermovement : MonoBehaviour
         if (horizontalInput != 0 && !isAiming && !isLunging && !isWallBounced)
         {
             facingDirection = horizontalInput > 0 ? 1f : -1f;
+            if (isDashing)
+            {
+                dashEffectController.Change_direction(facingDirection);
+            }
         }
 
         if (spriteRenderer != null)
             spriteRenderer.flipX = facingDirection < 0;
        
+        
 
         if (!isDashing && !isAiming)
         {

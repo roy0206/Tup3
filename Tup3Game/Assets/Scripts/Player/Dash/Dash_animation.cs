@@ -21,6 +21,14 @@ public class Dash_animation : MonoBehaviour
         animator.SetTrigger("DashTrigger");
     }
 
+    public void Change_direction (float facingDirection)
+    {
+        Vector2 pos = this.transform.localPosition;
+        pos.x = Mathf.Abs(pos.x) * -facingDirection;
+        this.transform.localPosition = pos;
+        spriteRenderer.flipX = facingDirection < 0;
+    }
+
     public void HideEffect()
     {
         spriteRenderer.enabled = false;
