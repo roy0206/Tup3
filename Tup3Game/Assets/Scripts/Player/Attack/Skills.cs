@@ -44,6 +44,7 @@ public class Skills : MonoBehaviour
     private bool canUseSkill_1 = true;
     private bool canUseSkill_2 = true;
     private bool canUseSkill_3 = true;
+    private bool canUseSkill_4 = true;
 
     private float skill_2_aimOffsetX = 0f;
     private Vector2 skill_2_currentAimPoint;
@@ -241,8 +242,6 @@ public class Skills : MonoBehaviour
 
         attack.SetAttackSpeedMultiplier(skill_3_attackSpeedMultiplier);
 
-        float originalDamage = attack.attackPower;
-
         if (skill_3_auraEffect != null)
             skill_3_auraEffect.Play();
 
@@ -257,5 +256,33 @@ public class Skills : MonoBehaviour
         yield return new WaitForSeconds(skill_3_cool);
         canUseSkill_3 = true;
     }
+
+
+/*    private IEnumerator Do_skill_4()
+    {
+        canUseSkill_4 = false;
+
+        public void Heal(float amount)
+    {
+        if (IsDead) return;
+        currentHealth = Mathf.Min(maxHealth, currentHealth + amount);
+        OnHealthChanged?.Invoke(currentHealth, maxHealth);
+    }
+
+        if (skill_3_auraEffect != null)
+            skill_3_auraEffect.Play();
+
+        yield return new WaitForSeconds(skill_3_duration);
+
+        attack.SetAttackSpeedMultiplier(1f);
+        IsSkill3Active = false;
+
+        if (skill_3_auraEffect != null)
+            skill_3_auraEffect.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+
+        yield return new WaitForSeconds(skill_3_cool);
+        canUseSkill_3 = true;
+    }*/
+
     public bool IsAiming => isAiming;
 }

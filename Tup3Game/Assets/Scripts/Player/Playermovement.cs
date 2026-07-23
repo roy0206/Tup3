@@ -33,6 +33,10 @@ public class Playermovement : MonoBehaviour
     public float dashDuration = 0.15f;
     public float dashCooldown = 1.0f;
 
+    [Header("점프 인정시간")]
+    public float coyoteTime = 0.15f;
+    private float coyoteTimer = 0f;
+
     private BoxCollider2D col;
     private Vector2 velocity;
 
@@ -127,8 +131,9 @@ public class Playermovement : MonoBehaviour
                 }
 
                 velocity.y = -0.3f;
-                jumpCount = maxJumpCount; 
-                
+                jumpCount = maxJumpCount;
+                coyoteTimer = coyoteTime;
+
             }
             else
             {
@@ -143,14 +148,24 @@ public class Playermovement : MonoBehaviour
                 {
                     jumpCount = maxJumpCount - 1;
                 }
+
+                coyoteTimer -= Time.deltaTime;
             }
 
 
-            if (Input.GetKeyDown(KeyCode.X) && jumpCount > 0)
+            if (Input.GetKeyDown(KeyCode.X) && (jumpCount > 0 || coyoteTimer > 0f))
             {
                 Debug.Log($"X pressed. jumpCount={jumpCount}, collisions.below={collisions.below}");
                 velocity.y = jumpForce;
-                jumpCount--;
+                if (coyoteTimer > 0f && jumpCount == maxJumpCount - 1)
+                {
+                    // 코요테 타임으로 발동된 첫 점프는 이단점프 자원을 소모하지 않음
+                }
+                else
+                {
+                    jumpCount--;
+                }
+                coyoteTimer = 0f;
                 if (animator != null)
                     animator.SetTrigger("JumpTrigger");
             }
