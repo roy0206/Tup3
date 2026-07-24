@@ -144,6 +144,13 @@ public class Playermovement : MonoBehaviour
 <<<<<<< Updated upstream
             if (Input.GetKeyDown(KeyCode.Z) && canDash)
 =======
+            if (Input.GetKeyUp(KeyCode.X) && velocity.y > 0f)
+            {
+                velocity.y *= jumpCutMultiplier;
+            }
+
+            if (Input.GetKeyDown(KeyCode.Z) && canDash && !isLunging)
+>>>>>>> Stashed changes
             {
                 StartCoroutine(DoDash());
                 if (animator != null)
