@@ -79,10 +79,7 @@ public class Skills : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.S) && canUseSkill_2)
         {
-            if (isTransformed)
-                StartCoroutine(Do_changed_skill_2());
-            else
-                StartCoroutine(Do_skill_2());
+            StartCoroutine(Do_changed_skill_2());
         }
         if (Input.GetKeyDown(KeyCode.D) && canUseSkill_3)
         {
@@ -120,32 +117,13 @@ public class Skills : MonoBehaviour
         {
         attack.attackPower = originalDamage;
         }
+
         yield return new WaitForSeconds(skill_1_cool);
 
         canUseSkill_1 = true;
     }
 
-    private IEnumerator Do_skill_2()
-    {
-        canUseSkill_2 = false;
-
-        float originalSpeed = movement.moveSpeed;
-        float originalGravity = movement.fallGravityMultiplier;
-        try
-        {
-            movement.moveSpeed *= skill_2_haste;
-            movement.fallGravityMultiplier *= skill_2_haste;
-        yield return new WaitForSeconds(skill_2_duration);
-        }
-        finally
-        {
-            movement.moveSpeed = originalSpeed;
-            movement.fallGravityMultiplier = originalGravity;
-        }
-        yield return new WaitForSeconds(skill_2_cool);
-       
-        canUseSkill_2 = true;
-    }
+   
 
 
     private IEnumerator Do_changed_skill_2()
@@ -277,18 +255,30 @@ public class Skills : MonoBehaviour
     private IEnumerator Do_skill_4()
     {
         canUseSkill_4 = false;
-
-        
-
         if (skill_4_HealEffect != null)
             skill_4_HealEffect.Play();
-        yield return new WaitForSeconds(skill_4_duration);
-        health.Heal(skill_4_healAmount);
+
+        float elapsed = 0f;
+        float tickInterval = 1f;
+        float nextTick = tickInterval;
+        float healPerTick = skill_4_healAmount / (skill_4_duration / tickInterval);
+
+        while (elapsed < skill_4_duration)
+        {
+            elapsed += Time.deltaTime;
+
+            if (elapsed >= nextTick)
+            {
+                health.Heal(healPerTick);
+                nextTick += tickInterval;
+            }
+
+            yield return null;
+        }
 
         if (skill_4_HealEffect != null)
             skill_4_HealEffect.Stop(true, ParticleSystemStopBehavior.StopEmitting);
-        yield return new WaitForSeconds(skill_4_cool);
-        
+
         canUseSkill_4 = true;
     }
 
