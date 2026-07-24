@@ -5664,6 +5664,18 @@ PrefabInstance:
       propertyPath: m_Size.x
       value: 2.5
       objectReference: {fileID: 0}
+    - target: {fileID: 4243287443365911484, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
+      propertyPath: dashSpeedCurve.m_Curve.Array.data[0].time
+      value: -0.029167175
+      objectReference: {fileID: 0}
+    - target: {fileID: 4243287443365911484, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
+      propertyPath: dashSpeedCurve.m_Curve.Array.data[0].value
+      value: 2.1457138
+      objectReference: {fileID: 0}
+    - target: {fileID: 7688133843110150903, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
+      propertyPath: skill_2_aimMarker
+      value: 
+      objectReference: {fileID: 1076716142188660530, guid: f547a20a91f54054fa092e93083f6e72, type: 3}
     - target: {fileID: 7688133843110150903, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
       propertyPath: skill_4_HealEffect
       value: 

@@ -279,6 +279,7 @@ public class Skills : MonoBehaviour
         if (skill_4_HealEffect != null)
             skill_4_HealEffect.Stop(true, ParticleSystemStopBehavior.StopEmitting);
 
+        yield return new WaitForSeconds(skill_4_cool);
         canUseSkill_4 = true;
     }
 

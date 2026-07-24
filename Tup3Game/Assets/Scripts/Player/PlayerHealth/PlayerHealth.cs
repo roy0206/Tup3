@@ -36,6 +36,7 @@ public class PlayerHealth : MonoBehaviour
     {
         if (IsDead) return;
         currentHealth = Mathf.Min(maxHealth, currentHealth + amount);
+        Debug.Log("플레이어의 현재체력" + currentHealth);
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
     }
 
