@@ -12,6 +12,7 @@ public class Skills : MonoBehaviour
     public float skill_1_increase = 1.5f;
     public float skill_1_duration = 10f;
     public float skill_1_cool = 10f;
+    public ParticleSystem skill_1_auraEffect;
 
     [Header("변환 1번 스킬 설정")]
     public float changed_skill_1_increase = 1.75f;
@@ -22,6 +23,7 @@ public class Skills : MonoBehaviour
     public float skill_2_haste = 1.2f;
     public float skill_2_duration = 10f;
     public float skill_2_cool = 10f;
+    public ParticleSystem skill_2_auraEffect;
 
     [Header("변환 2번 스킬 설정")]
     private bool isAiming = false;
@@ -64,6 +66,8 @@ public class Skills : MonoBehaviour
     {
         movement = GetComponent<Playermovement>();
         attack = GetComponent<ComboAttack>();
+        skill_1_auraEffect.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+        skill_2_auraEffect.Stop(true, ParticleSystemStopBehavior.StopEmitting);
         skill_3_auraEffect.Stop(true, ParticleSystemStopBehavior.StopEmitting);
         skill_4_HealEffect.Stop(true, ParticleSystemStopBehavior.StopEmitting);
         health = GetComponent<PlayerHealth>();
@@ -107,7 +111,12 @@ public class Skills : MonoBehaviour
     {
         canUseSkill_1 = false;
 
+
+        if (skill_1_auraEffect != null)
+            skill_1_auraEffect.Play();
+
         float originalDamage = attack.attackPower;
+       
         try
         {
             attack.attackPower *= skill_1_increase;
@@ -117,6 +126,9 @@ public class Skills : MonoBehaviour
         {
         attack.attackPower = originalDamage;
         }
+        
+        if (skill_1_auraEffect != null)
+            skill_1_auraEffect.Stop(true, ParticleSystemStopBehavior.StopEmitting);
 
         yield return new WaitForSeconds(skill_1_cool);
 
@@ -139,6 +151,8 @@ public class Skills : MonoBehaviour
 
             StartAimingSkill2();
 
+            if (skill_2_auraEffect != null)
+                skill_2_auraEffect.Play();
             yield return new WaitForSeconds(skill_2_duration);
         }
         finally
@@ -154,6 +168,8 @@ public class Skills : MonoBehaviour
             }
         }
 
+        if (skill_2_auraEffect != null)
+            skill_2_auraEffect.Stop(true, ParticleSystemStopBehavior.StopEmitting);
         yield return new WaitForSeconds(skill_2_cool);
         canUseSkill_2 = true;
     }
