@@ -37,6 +37,11 @@ public class Playermovement : MonoBehaviour
     public float coyoteTime = 0.15f;
     private float coyoteTimer = 0f;
 
+    [Header("가변 점프")]
+    [Range(0f, 1f)]
+    public float jumpCutMultiplier = 0.5f;
+
+
     private BoxCollider2D col;
     private Vector2 velocity;
 
@@ -168,6 +173,10 @@ public class Playermovement : MonoBehaviour
                 coyoteTimer = 0f;
                 if (animator != null)
                     animator.SetTrigger("JumpTrigger");
+            }
+            if (Input.GetKeyUp(KeyCode.X) && velocity.y > 0f)
+            {
+                velocity.y *= jumpCutMultiplier;
             }
 
             if (Input.GetKeyDown(KeyCode.Z) && canDash && !isLunging)
