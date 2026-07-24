@@ -6,6 +6,7 @@ public class Skills : MonoBehaviour
 {
     private Playermovement movement;
     private ComboAttack attack;
+    private PlayerHealth health;
 
     [Header("1번 스킬설정")]
     public float skill_1_increase = 1.5f;
@@ -41,6 +42,13 @@ public class Skills : MonoBehaviour
     public ParticleSystem skill_3_auraEffect;
     public bool IsSkill3Active { get; private set; }
 
+
+    [Header("4번 스킬설정 (힐량)")]
+    public float skill_4_healAmount = 5f;
+    public float skill_4_cool = 10f;
+    public float skill_4_duration = 5f;
+    public ParticleSystem skill_4_HealEffect;
+
     private bool canUseSkill_1 = true;
     private bool canUseSkill_2 = true;
     private bool canUseSkill_3 = true;
@@ -57,6 +65,8 @@ public class Skills : MonoBehaviour
         movement = GetComponent<Playermovement>();
         attack = GetComponent<ComboAttack>();
         skill_3_auraEffect.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+        skill_4_HealEffect.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+        health = GetComponent<PlayerHealth>();
     }
 
     // Update is called once per frame
@@ -77,6 +87,11 @@ public class Skills : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.D) && canUseSkill_3)
         {
             StartCoroutine(Do_skill_3());
+        }
+
+        if (Input.GetKeyDown(KeyCode.F) && canUseSkill_4)
+        {
+            StartCoroutine(Do_skill_4());
         }
 
         if (isAiming)
@@ -257,32 +272,32 @@ public class Skills : MonoBehaviour
         canUseSkill_3 = true;
     }
 
+   
 
-/*    private IEnumerator Do_skill_4()
+    private IEnumerator Do_skill_4()
     {
         canUseSkill_4 = false;
 
-        public void Heal(float amount)
-    {
-        if (IsDead) return;
-        currentHealth = Mathf.Min(maxHealth, currentHealth + amount);
-        OnHealthChanged?.Invoke(currentHealth, maxHealth);
+        
+
+        if (skill_4_HealEffect != null)
+            skill_4_HealEffect.Play();
+        yield return new WaitForSeconds(skill_4_duration);
+        health.Heal(skill_4_healAmount);
+
+        if (skill_4_HealEffect != null)
+            skill_4_HealEffect.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+        yield return new WaitForSeconds(skill_4_cool);
+        
+        canUseSkill_4 = true;
     }
 
-        if (skill_3_auraEffect != null)
-            skill_3_auraEffect.Play();
 
-        yield return new WaitForSeconds(skill_3_duration);
-
-        attack.SetAttackSpeedMultiplier(1f);
-        IsSkill3Active = false;
-
-        if (skill_3_auraEffect != null)
-            skill_3_auraEffect.Stop(true, ParticleSystemStopBehavior.StopEmitting);
-
-        yield return new WaitForSeconds(skill_3_cool);
-        canUseSkill_3 = true;
-    }*/
+    public void TryActivateSkill4()
+    {
+        if (!canUseSkill_4) return;
+        StartCoroutine(Do_skill_4());
+    }
 
     public bool IsAiming => isAiming;
 }

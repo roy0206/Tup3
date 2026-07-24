@@ -27,6 +27,9 @@ public class ComboAttack : MonoBehaviour
     public float attack3ChargeTime = 0.2f;  // 3단 준비 동작
     public float attack3Duration = 0.4f;
 
+    [Header("돌진 가속 곡선")]
+    public AnimationCurve dashSpeedCurve = AnimationCurve.EaseInOut(0f, 2f, 1f, 0.3f);
+
     private bool isAttacking = false;
     private bool isLunging = false;
     private bool comboQueued = false;
@@ -122,7 +125,6 @@ public class ComboAttack : MonoBehaviour
                     case 3:
                         currentDamage = attackPower * 2.5f;
                         isLunging = true;
-                        yield return new WaitForSeconds(attack3ChargeTime);
 
                         if (cancelRequested)
                         {
@@ -130,8 +132,8 @@ public class ComboAttack : MonoBehaviour
                             cancelRequested = false;
                             yield break;
                         }
-
                         yield return StartCoroutine(DashForward(attack3Distance, duration, facingDirection));
+                        yield return new WaitForSeconds(attack3ChargeTime);
                         attackEffect.HideEffect();
                         isLunging = false;
                         break;
@@ -196,7 +198,7 @@ public class ComboAttack : MonoBehaviour
         attackCollider.enabled = true;
 
         float traveled = 0f;
-        float speed = distance / duration;
+        float elapsed = 0f;
 
         while (traveled < distance)
         {
@@ -205,12 +207,18 @@ public class ComboAttack : MonoBehaviour
                 attackCollider.enabled = false;
                 yield break;
             }
-            float step = speed * Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            float speedMultiplier = dashSpeedCurve.Evaluate(t);
+            float baseSpeed = distance / duration;
+            float step = baseSpeed * speedMultiplier * Time.deltaTime;
             step = Mathf.Min(step, distance - traveled);
 
             movement.Move(new Vector2(direction * step, 0f));
 
             traveled += step;
+
+            elapsed += Time.deltaTime;
+
             yield return null;
         }
         attackCollider.enabled = false;
