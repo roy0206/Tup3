@@ -31,6 +31,17 @@ public class Playermovement : MonoBehaviour
     public float dashDuration = 0.15f;
     public float dashCooldown = 1.0f;
 
+<<<<<<< Updated upstream
+=======
+    [Header("점프 인정시간")]
+    public float coyoteTime = 0.15f;
+    private float coyoteTimer = 0f;
+
+    [Header("가변 점프")]
+    [Range(0f, 1f)]
+    public float jumpCutMultiplier = 0.5f;
+
+>>>>>>> Stashed changes
     private BoxCollider2D col;
     private Vector2 velocity;
 
@@ -130,7 +141,9 @@ public class Playermovement : MonoBehaviour
 
             }
 
+<<<<<<< Updated upstream
             if (Input.GetKeyDown(KeyCode.Z) && canDash)
+=======
             {
                 StartCoroutine(DoDash());
                 if (animator != null)
