@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/@Developer/ROYental/RoyScene.unity
     guid: 5f6b633301182944587b9bbc5524ba0b
   - enabled: 1
-    path: Assets/Scenes/Boss_Fire.unity
+    path: Assets/Scenes/Boss_Soil.unity
     guid: 9c2e3d9a247055b4688b42285ee67a72
   - enabled: 1
     path: Assets/Scenes/Game.unity

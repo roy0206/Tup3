@@ -10,20 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
-  m_Name: Sounds
+  m_Name: Soil
   m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
-  m_GroupName: Sounds
-  m_GUID: 50653995060d64c48a9bafd729199b39
+  m_GroupName: Soil
+  m_GUID: 28a58735ee857fd40b4b16464862e598
   m_SerializeEntries:
-  - m_GUID: a485170d6d7f13d438b4da209f0ff4b5
-    m_Address: ItemObtain
+  - m_GUID: 0bd38a67a2b9c1d4f9cadc6e852ca543
+    m_Address: SoilDrop
     m_ReadOnly: 0
     m_SerializedLabels:
-    - Sound
+    - BossAsset
+    - Pool
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 0a5bfcc833d0b0a4cadf2be628e75e99, type: 2}
   m_SchemaSet:
     m_Schemas:
-    - {fileID: 11400000, guid: 1f04dcf6045c47e469081651f4d7234a, type: 2}
-    - {fileID: 11400000, guid: 1b0b33f769c37d341ac35575772226f7, type: 2}
+    - {fileID: 11400000, guid: dacb7e641e27793478af37a0d0fb4189, type: 2}
+    - {fileID: 11400000, guid: 0c80f2951ddae4f469b20206389ad840, type: 2}
