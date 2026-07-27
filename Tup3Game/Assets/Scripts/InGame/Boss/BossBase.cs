@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using CleverCrow.Fluid.BTs.Tasks;
 using CleverCrow.Fluid.BTs.Trees;
@@ -16,19 +17,21 @@ public abstract class BossBase : MonoBehaviour
 
     private bool isDead = false;
     public bool IsDead => isDead;
-        
-    
+
+    protected void Awake()
+    {
+        hp = maxHp;
+    }
+
     public void DoDamage(float damage)
     {
         if(isDead) return;
         hp -= damage;
+        Debug.Log($"<color=green>Boss Hit! {hp} Left</color>");
         if (hp <= 0)
         {
-            OnDead();
             isDead = true;
         }
     }
-
-    protected abstract void OnDead();
 
 }

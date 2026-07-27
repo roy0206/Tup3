@@ -15,7 +15,7 @@ MonoBehaviour:
   m_DefaultGroup: 36258ad9a250c064181ae3f25bea26eb
   m_currentHash:
     serializedVersion: 2
-    Hash: 1c1773d11ef66e2b2e1ae2b8d3943dca
+    Hash: 00000000000000000000000000000000
   m_OptimizeCatalogSize: 0
   m_BuildRemoteCatalog: 0
   m_CatalogRequestsTimeout: 0
@@ -60,6 +60,7 @@ MonoBehaviour:
   m_BuildAddressablesWithPlayerBuild: 0
   m_overridePlayerVersion: '[UnityEditor.PlayerSettings.bundleVersion]'
   m_GroupAssets:
+  - {fileID: 11400000, guid: ec3e09987b8007544aaa2cee232a573f, type: 2}
   - {fileID: 11400000, guid: 344924f145e4c5b44a00a8491454615d, type: 2}
   - {fileID: 11400000, guid: 695101e485f139f4b9417b79df4189f8, type: 2}
   m_BuildSettings:
@@ -102,6 +103,8 @@ MonoBehaviour:
     m_LabelNames:
     - default
     - Sound
+    - BossAsset
+    - Pool
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: 0ff9b20da031b814a992446f49001fea, type: 2}

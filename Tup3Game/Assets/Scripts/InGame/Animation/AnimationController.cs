@@ -6,6 +6,7 @@ using System.Collections.Generic;
 public class AnimationController : MonoBehaviour
 {
     private Animation animation;
+    public Animation Animation => animation;
     [SerializeField] private List<AnimationClip> animationClips;
     private void Awake()
     {
@@ -20,7 +21,8 @@ public class AnimationController : MonoBehaviour
 
     public void Play(int num)
     {
-        animation.Play(animationClips[num].name);
+        if(animation.clip.name != animationClips[num].name)
+            animation.Play(animationClips[num].name);
     }
 
     public void Stop(int num)

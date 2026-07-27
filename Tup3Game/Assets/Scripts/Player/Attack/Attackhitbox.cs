@@ -14,16 +14,11 @@ public class Attackhitbox : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Enemy"))
+        if (other.TryGetComponent(out BossBase bossBase))
         {
             float damage = combo.currentDamage;
-            Debug.Log($"{other.name}에게 {damage} 데미지");
 
-            /*var enemyHealth = other.GetComponent<EnemyHealth>();  // 나중에 만들 적 체력 스크립트
-            if (enemyHealth != null)
-            {
-                enemyHealth.TakeDamage(damage);
-            }*/
+            bossBase.DoDamage(damage);
         }
     }
 }
