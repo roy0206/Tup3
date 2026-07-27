@@ -90,8 +90,6 @@ public class Playermovement : MonoBehaviour
         float horizontalInput = Input.GetAxisRaw("Horizontal");
         
         bool isAiming = skills != null && skills.IsAiming;
-
-
         bool isLunging = combo != null && combo.IsLunging;
 
         if (horizontalInput != 0 && !isAiming && !isLunging)
@@ -360,6 +358,10 @@ public class Playermovement : MonoBehaviour
         return jumpForce * upwardRatio;
     }
 
+    public void StopHorizontalMovement()
+    {
+        velocity.x = 0f;
+    }
 
 
     public bool IsDashing() => isDashing;
