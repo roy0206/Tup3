@@ -20,5 +20,11 @@ public class Attackhitbox : MonoBehaviour
 
             bossBase.DoDamage(damage);
         }
+        else if (other.TryGetComponent(out Water_eye eye))
+        {
+            float damage = combo.currentDamage;
+                
+            eye.DoDamage(damage);
+        }
     }
 }
