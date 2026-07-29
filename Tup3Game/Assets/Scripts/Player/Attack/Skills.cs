@@ -65,6 +65,11 @@ public class Skills : MonoBehaviour
     private Vector2 skill_2_currentAimPoint;
     private bool skill_2_hasValidAimPoint = false;
 
+    [Header("스킬 키 세팅")]
+    public KeyCode skill_1_key = KeyCode.A;
+    public KeyCode skill_2_key = KeyCode.S;
+    public KeyCode skill_3_key = KeyCode.D;
+    public KeyCode skill_4_key = KeyCode.F;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
@@ -86,21 +91,21 @@ public class Skills : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.A) && canUseSkill_1)
+        if (Input.GetKeyDown(skill_1_key) && canUseSkill_1)
         {
             StartCoroutine(Do_skill_1());
         }
 
-        if (Input.GetKeyDown(KeyCode.S) && canUseSkill_2)
+        if (Input.GetKeyDown(skill_2_key) && canUseSkill_2)
         {
             StartCoroutine(Do_changed_skill_2());
         }
-        if (Input.GetKeyDown(KeyCode.D) && canUseSkill_3)
+        if (Input.GetKeyDown(skill_3_key) && canUseSkill_3)
         {
             StartCoroutine(Do_skill_3());
         }
 
-        if (Input.GetKeyDown(KeyCode.F) && canUseSkill_4)
+        if (Input.GetKeyDown(skill_4_key) && canUseSkill_4)
         {
             StartCoroutine(Do_skill_4());
         }
@@ -109,7 +114,7 @@ public class Skills : MonoBehaviour
         {
             UpdateAimSkill2();
 
-            if (Input.GetKeyUp(KeyCode.S))
+            if (Input.GetKeyUp(skill_2_key))
             {
                 StopAimingAndSpawnSkill2();
             }

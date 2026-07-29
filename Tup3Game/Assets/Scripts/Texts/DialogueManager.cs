@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using static UnityEngine.EventSystems.EventTrigger;
@@ -216,6 +217,7 @@ public class DialogueManager : MonoBehaviour
         state = State.Inactive;
         if (playerPanel != null) playerPanel.SetActive(false);
         if (bossPanel != null) bossPanel.SetActive(false);
+        if (choicePanel != null) choicePanel.SetActive(false);
     }
 
     public void StartDialogueFromFile(string fileName)
@@ -315,7 +317,7 @@ public class DialogueManager : MonoBehaviour
     // 현재 선택된 것만 색 강조
     void UpdateChoiceHighlight()
     {
-        for (int i = 0; i < currentChoices.Count; i++)
+        for (int i = 0; i < Mathf.Min(currentChoices.Count, choiceTexts.Length);i++)
         {
             choiceTexts[i].color = (i == selectedIndex) ? selectedColor : normalColor;
         }
@@ -328,9 +330,14 @@ public class DialogueManager : MonoBehaviour
 
         choicePanel.SetActive(false);
 
-        // 3단계에서 여기에 GoToEntry(chosen.targetId) 넣을 예정
-        // 지금은 일단 대화 종료
-        EndDialogue();
+        if (string.IsNullOrWhiteSpace(chosen.targetId))
+        {
+            EndDialogue();
+        }
+        else
+        {
+            GoToEntry(chosen.targetId);
+        }
     }
 
 }
