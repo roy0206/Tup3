@@ -1,17 +1,17 @@
 using System;
 using UnityEngine;
 
-public class PlayerHealth : MonoBehaviour
+public class PlayerHealth : MonoBehaviour, IHealthUIEvent
 {
     [Header("체력 설정")]
     public float maxHealth = 100f;
     private float currentHealth;
+    private Action<float, float> _onHealthChanged;
 
     public float CurrentHealth => currentHealth;
     public float MaxHealth => maxHealth;
     public bool IsDead => currentHealth <= 0f;
-
-    public event Action<float, float> OnHealthChanged; 
+    
     public event Action OnDeath;
 
     private void Awake()
@@ -44,4 +44,6 @@ public class PlayerHealth : MonoBehaviour
     {
         OnDeath?.Invoke();
     }
+
+    public event Action<float, float> OnHealthChanged;
 }

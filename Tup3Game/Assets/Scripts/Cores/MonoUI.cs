@@ -9,7 +9,7 @@ public class MonoUI : MonoBehaviour
     protected Button button;
     [SerializeField] protected TMP_Text linkedText;
 
-    private void Awake()
+    protected void Awake()
     {
         rootCanvas = GetComponentInParent<Canvas>();
         image = GetComponent<Image>();

@@ -75,6 +75,7 @@ public class Soil : BossBase
 
 
         animationController.Play(0);
+        gameObject.layer = LayerMask.GetMask("Default");
 
         return TaskStatus.Success;
     }
@@ -97,7 +98,7 @@ public class Soil : BossBase
             curTimes[0] = 2;
             animationController.Play(1);
             isParrernSetup = true;
-            DOVirtual.DelayedCall(1f, () =>
+            DOVirtual.DelayedCall(0.11f, () =>
             {
                 hitboxTransforms[0].gameObject.SetActive(true);
             } );
@@ -234,4 +235,5 @@ public class Soil : BossBase
         verticalVelocity += gravity * Time.deltaTime;
         transform.Translate(Vector3.up * (verticalVelocity * Time.deltaTime), Space.World);
     }
+    
 }
