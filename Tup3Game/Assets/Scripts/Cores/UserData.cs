@@ -25,6 +25,7 @@ public class PlayData
 {
     public SerializedVector position;
     public float health;
+    public List<bool> skills = new();
 
     public BossFlag clearedBosses = 0;
 }

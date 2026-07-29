@@ -40,6 +40,12 @@ public class PlayerHealth : MonoBehaviour, IHealthUIEvent
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
     }
 
+    public void SetHealth(float amount)
+    {
+        currentHealth = amount;
+        currentHealth = Mathf.Min(maxHealth, currentHealth);
+    }
+
     private void Die()
     {
         OnDeath?.Invoke();

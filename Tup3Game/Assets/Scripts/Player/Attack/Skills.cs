@@ -1,5 +1,7 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 [RequireComponent(typeof(Playermovement))]
 [RequireComponent(typeof(ComboAttack))]
@@ -61,6 +63,12 @@ public class Skills : MonoBehaviour
     private bool canUseSkill_3 = true;
     private bool canUseSkill_4 = true;
 
+    [SerializeField] private List<bool> isSkillEquiped = new() {false, false, false, false};
+    public List<bool> IsSkillEquiped => isSkillEquiped;
+
+    public List<Action<float, float>> OnSkillsActive = new() { null, null, null, null };
+    
+
     private float skill_2_aimOffsetX = 0f;
     private Vector2 skill_2_currentAimPoint;
     private bool skill_2_hasValidAimPoint = false;
@@ -88,24 +96,29 @@ public class Skills : MonoBehaviour
             skill_4_HealEffect.Stop(true, ParticleSystemStopBehavior.StopEmitting);
     }
 
+    public void OptainSkill(int num)
+    {
+        isSkillEquiped[num] = true;
+    }
+
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(skill_1_key) && canUseSkill_1)
+        if (Input.GetKeyDown(skill_1_key) && canUseSkill_1 && isSkillEquiped[0])
         {
             StartCoroutine(Do_skill_1());
         }
 
-        if (Input.GetKeyDown(skill_2_key) && canUseSkill_2)
+        if (Input.GetKeyDown(skill_2_key) && canUseSkill_2 && isSkillEquiped[1])
         {
             StartCoroutine(Do_changed_skill_2());
         }
-        if (Input.GetKeyDown(skill_3_key) && canUseSkill_3)
+        if (Input.GetKeyDown(skill_3_key) && canUseSkill_3 &&  isSkillEquiped[2])
         {
             StartCoroutine(Do_skill_3());
         }
 
-        if (Input.GetKeyDown(skill_4_key) && canUseSkill_4)
+        if (Input.GetKeyDown(skill_4_key) && canUseSkill_4 &&  isSkillEquiped[3])
         {
             StartCoroutine(Do_skill_4());
         }
@@ -125,7 +138,7 @@ public class Skills : MonoBehaviour
     private IEnumerator Do_skill_1()
     {
         canUseSkill_1 = false;
-
+        OnSkillsActive[0].Invoke(skill_1_duration, skill_1_cool);
 
         if (skill_1_auraEffect != null)
             skill_1_auraEffect.Play();
@@ -156,6 +169,7 @@ public class Skills : MonoBehaviour
     private IEnumerator Do_changed_skill_2()
     {
         canUseSkill_2 = false;
+        OnSkillsActive[1].Invoke(skill_2_duration, skill_2_cool);
         float originalSpeed = movement.moveSpeed;
         float originalGravity = movement.fallGravityMultiplier;
 
@@ -278,6 +292,7 @@ public class Skills : MonoBehaviour
     {
         canUseSkill_3 = false;
         IsSkill3Active = true;
+        OnSkillsActive[2].Invoke(skill_3_duration, skill_3_cool);
 
         try
         {
@@ -307,6 +322,7 @@ public class Skills : MonoBehaviour
     private IEnumerator Do_skill_4()
     {
         canUseSkill_4 = false;
+        OnSkillsActive[3].Invoke(skill_4_duration, skill_4_cool);
         try
         {
             if (skill_4_HealEffect != null)
