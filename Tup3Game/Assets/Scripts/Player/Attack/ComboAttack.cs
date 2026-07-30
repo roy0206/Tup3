@@ -67,6 +67,7 @@ public class ComboAttack : MonoBehaviour
     private IEnumerator Comboattack()
     {
         isAttacking = true;
+        movement.animator.SetBool("IsAttacking", isAttacking);
         comboStep = 0;
         comboQueued = false;
         try
@@ -141,6 +142,7 @@ public class ComboAttack : MonoBehaviour
             comboQueued = false;
             comboStep = 0;
             isAttacking = false;
+            movement.animator.SetBool("IsAttacking", isAttacking);
         }
     }
 
