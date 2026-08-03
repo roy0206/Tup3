@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using CleverCrow.Fluid.BTs.Tasks;
 using CleverCrow.Fluid.BTs.Trees;
@@ -8,47 +9,45 @@ using DG.Tweening;
 public class Water : BossBase
 {
     private List<float> curTimes;
-    [SerializeField] List<Transform> hitboxTransforms = new List<Transform>();
     private GameObject player;
 
-    [Header("이동")]
-    [SerializeField] private float moveSpeed = 3f;
-    [SerializeField] private float attackRange = 3f;
-    [SerializeField] private float gravity = -40f;
-    [SerializeField] private LayerMask groundMask;
-    [SerializeField] private float groundCheckDistance = 0.1f;
+    [Header("빗방울(웅덩이) 패턴")]
+    [SerializeField] private WaterSpawnZone waterSpawnZone;
+    [SerializeField] private int rainSpawnCount = 3;
 
-    [SerializeField] private WaterSpawnZone Vertical_spawnZone;
-    [SerializeField] private WaterSpawnZone Horizontal_spawnZone;
+    [Header("얼음총알 패턴 (좌우 두 지점 중 랜덤)")]
+    [SerializeField] private IceBulletSpawnZone[] iceBulletSpawnZones = new IceBulletSpawnZone[2];
+    [SerializeField] private int iceBulletSpawnCount = 3;
 
-
-    private BoxCollider2D bodyCollider;
-    private float verticalVelocity;
+    [Header("Water Eye 소환")]
+    [SerializeField] private GameObject[] eyePrefab;
+    [SerializeField] private Transform[] eyeSpawnPoints; 
 
     new void Awake()
     {
         base.Awake();
         behaviorTree = new BehaviorTreeBuilder(gameObject)
             .Selector("Root")
-                .Sequence("DeadSecquence")
+                .Sequence("DeadSequence")
                     .Do("Dead", Dead)
                 .End()
                 .Selector("PatternSelector")
                     .Sequence("1")
                         .Do("Cool1", () => PatternStarter(1))
-                        .Do("A1", Pattern1)
+                        .Do("A1_IceBullet", Pattern1_IceBullet)
                     .End()
                     .Sequence("2")
                         .Do("Cool2", () => PatternStarter(2))
-                        .Do("A2", Pattern2)
+                        .Do("A2_WaterPump", Pattern2_WaterPump)
                     .End()
                     .Sequence("3")
                         .Do("Cool3", () => PatternStarter(3))
-                        .Do("A3", Pattern3)
+                        .Do("A3_Basic", Pattern3_Basic)
                     .End()
                 .End()
             .End()
             .Build();
+
         curTimes = new List<float>()
         {
             0, 0, 0, 0
@@ -56,7 +55,6 @@ public class Water : BossBase
 
         animationController = GetComponent<AnimationController>();
         player = GameObject.FindGameObjectWithTag("Player");
-        bodyCollider = boxColliders.Count > 0 ? boxColliders[0] : GetComponent<BoxCollider2D>();
     }
 
     private void Update()
@@ -68,39 +66,100 @@ public class Water : BossBase
         behaviorTree.Tick();
     }
 
-
     private TaskStatus Dead()
     {
         if (!IsDead) return TaskStatus.Failure;
+        gameObject.layer = LayerMask.GetMask("Default");
 
-
-        animationController.Play(0);
-
-        return TaskStatus.Success;
-    }
-
-
-    private TaskStatus Pattern1()
-    {
-        if (IsDead) return TaskStatus.Failure;
-        return TaskStatus.Success;
-    }
-
-    private TaskStatus Pattern2()
-    {
-        if (IsDead) return TaskStatus.Failure;
-        return TaskStatus.Success;
-    }
-    private TaskStatus Pattern3()
-    {
-        if (IsDead) return TaskStatus.Failure;
         return TaskStatus.Success;
     }
 
     private TaskStatus PatternStarter(int num)
     {
         if (curTimes[num] > 0) return TaskStatus.Failure;
-
         return TaskStatus.Success;
     }
+
+    private bool isPatternSetup;
+
+    private void SpawnEye(int patternIndex)
+    {
+        if (eyePrefab == null) return;
+        if (eyeSpawnPoints == null || patternIndex >= eyeSpawnPoints.Length || eyeSpawnPoints[patternIndex] == null) return;
+
+        Instantiate(eyePrefab[patternIndex], eyeSpawnPoints[patternIndex].position, Quaternion.identity);
+    }
+
+    private TaskStatus Pattern1_IceBullet()
+    {
+        if (IsDead) return TaskStatus.Failure;
+        if (!isPatternSetup)
+        {
+            curTimes[1] = 20f; // TODO: 쿨타임 값 조정
+            curTimes[0] = 4f; // TODO: 패턴 총 지속시간 (애니메이션 길이에 맞춰서)
+            isPatternSetup = true;
+            SpawnEye(0);
+
+            if (iceBulletSpawnZones != null && iceBulletSpawnZones.Length > 0)
+            {
+                IceBulletSpawnZone chosenZone = iceBulletSpawnZones[UnityEngine.Random.Range(0, iceBulletSpawnZones.Length)];
+                if (chosenZone != null)
+                {
+                    DOVirtual.DelayedCall(0.3f, () =>
+                    {
+                        chosenZone.SpawnIceBullets(iceBulletSpawnCount);
+                    });
+                }
+            }
+        }
+
+        if (curTimes[0] > 0) return TaskStatus.Continue;
+
+        isPatternSetup = false;
+        return TaskStatus.Success;
+    }
+
+    private TaskStatus Pattern2_WaterPump()
+    {
+        if (IsDead) return TaskStatus.Failure;
+        if (!isPatternSetup)
+        {
+            curTimes[2] = 20f; // TODO: 쿨타임 값 조정
+            curTimes[0] = 4f;  // TODO: 패턴 총 지속시간
+            isPatternSetup = true;
+            SpawnEye(1);
+
+            if (waterSpawnZone != null)
+            {
+                DOVirtual.DelayedCall(0.5f, () =>
+                {
+                    waterSpawnZone.SpawnWaterBullets(rainSpawnCount);
+                });
+            }
+        }
+
+        if (curTimes[0] > 0) return TaskStatus.Continue;
+
+        isPatternSetup = false;
+        return TaskStatus.Success;
+    }
+
+    // Pattern3: 기본 공격
+    private TaskStatus Pattern3_Basic()
+    {
+        if (IsDead) return TaskStatus.Failure;
+        if (!isPatternSetup)
+        {
+            curTimes[3] = 5f; // TODO: 쿨타임 값 조정
+            curTimes[0] = 1f; // TODO: 패턴 총 지속시간
+            isPatternSetup = true;
+            SpawnEye(3);
+        }
+
+        if (curTimes[0] > 0) return TaskStatus.Continue;
+
+        isPatternSetup = false;
+        return TaskStatus.Success;
+    }
+    
 }

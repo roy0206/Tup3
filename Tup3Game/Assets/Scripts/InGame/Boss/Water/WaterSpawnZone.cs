@@ -18,10 +18,6 @@ public class WaterSpawnZone : MonoBehaviour
     }
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            SpawnWaterBullets(SpawnNum);
-        }
     }
 
     void Set_spawnpoint()

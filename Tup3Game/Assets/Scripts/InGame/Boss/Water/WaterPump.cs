@@ -66,25 +66,32 @@ public class WaterPump : MonoBehaviour
 
     public void Launch(Vector2 dir)
     {
+        // 재사용(풀링) 대비: 이전 상태 초기화
+        StopAllCoroutines();
+        hasHit = false;
         isGrowing = false;
+        delayElapsed = 0f;
+        growTimer = 0f;
+
         direction = dir.normalized;
         transform.right = direction;
-        Destroy(gameObject, lifeTime);
+
+        StartCoroutine(LifeTimeRoutine());
         ShowPathPreview();
-        delayElapsed = 0f;
+    }
+
+    private IEnumerator LifeTimeRoutine()
+    {
+        yield return new WaitForSeconds(lifeTime);
+        Destroy(gameObject, lifeTime); // Destroy 대신 비활성화 (재사용 가능하게)
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (hasHit) return;
-        if (((1 << other.gameObject.layer) & hitMask) == 0) return;
-
         if (other.TryGetComponent(out PlayerKnockBack playerKnockback))
         {
-            playerKnockback.TakeHit(transform.position, 5f, (int)damage);
+            playerKnockback.TakeHit(this.transform.position, 0f, (int)damage);
         }
-
-        hasHit = true;
     }
 
     private void ShowPathPreview()
@@ -126,6 +133,10 @@ public class WaterPump : MonoBehaviour
         }
         pathSprite.gameObject.SetActive(false);
     }
+
+    // dir이 Vector2.up일 때 transform.right = direction으로 인해
+    // 로컬 X축 = 월드 위쪽(자라나는 방향), 로컬 Y축 = 월드 가로(폭) 이 됩니다.
+    // 그래서 "가로로 꽉 채우기"는 targetSize.y / pathWidth 쪽에 반영해야 합니다.
     public void SetTargetWidth(float width)
     {
         targetSize.y = width;

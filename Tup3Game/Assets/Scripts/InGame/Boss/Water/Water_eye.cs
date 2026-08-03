@@ -7,6 +7,11 @@ public class Water_eye : MonoBehaviour
     private float hp;
     public bool IsDead { get; private set; }
 
+
+    [Header("생존 시간")]
+    public float lifeTime = 5f;
+
+
     [Header("피격 연출")]
     public SpriteRenderer spriteRenderer;
     public float hitFlashDuration = 0.1f;
@@ -24,6 +29,10 @@ public class Water_eye : MonoBehaviour
         Water = GetComponent<BossBase>();
     }
 
+    private void Start()
+    {
+        Invoke(nameof(ExpireByTime), lifeTime);
+    }
     public void DoDamage(float amount)
     {
         if (IsDead) return;
@@ -55,9 +64,17 @@ public class Water_eye : MonoBehaviour
         yield return new WaitForSeconds(hitFlashDuration);
         spriteRenderer.color = original;
     }
+    private void ExpireByTime()
+    {
+        if (IsDead) return;
+        IsDead = true;
+        Die();
+    }
 
     private void Die()
     {
-        Debug.Log("Dummy Boss Died");
+        CancelInvoke(nameof(ExpireByTime)); // 체력으로 먼저 죽었으면 타임아웃 예약 취소
+        Debug.Log("Water Eye Destroyed");
+        Destroy(gameObject);
     }
 }

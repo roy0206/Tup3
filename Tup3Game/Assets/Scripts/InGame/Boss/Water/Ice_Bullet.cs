@@ -10,7 +10,7 @@ public class Ice_Bullet : MonoBehaviour
     [SerializeField] private float startDelay = 0.4f;
 
     [Header("피해")]
-    [SerializeField] private float damage = 10f;
+    [SerializeField] private float damage = 20f;
     [SerializeField] private LayerMask hitMask;
 
     [Header("경로 예고 (스프라이트 방식)")]
@@ -33,7 +33,7 @@ public class Ice_Bullet : MonoBehaviour
         Destroy(gameObject, lifeTime);
 
         ShowPathPreview();
-
+        hasHit = false;
         isLaunching = false;
         delayElapsed = 0f;
         elapsed = 0f;
@@ -65,13 +65,10 @@ public class Ice_Bullet : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (hasHit) return;
-        if (((1 << other.gameObject.layer) & hitMask) == 0) return;
-
         if (other.TryGetComponent(out PlayerKnockBack playerKnockback))
         {
-            playerKnockback.TakeHit(transform.position, 5f, (int)damage);
+            playerKnockback.TakeHit(transform.position, 10f, (int)damage);
         }
-
         hasHit = true;
         Destroy(gameObject, 0.05f);
     }

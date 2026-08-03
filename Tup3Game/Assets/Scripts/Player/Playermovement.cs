@@ -41,6 +41,10 @@ public class Playermovement : MonoBehaviour
     [Range(0f, 1f)]
     public float jumpCutMultiplier = 0.5f;
 
+    [Header("미끄러운 바닥")]
+    public float slipperyAcceleration = 10f;
+    private bool isOnSlippery = false;
+
 
     private BoxCollider2D col;
     private Vector2 velocity;
@@ -123,7 +127,10 @@ public class Playermovement : MonoBehaviour
             }
             else
             {
-                velocity.x = isLunging ? 0f : horizontalInput * moveSpeed;
+                float targetVelocityX = isLunging ? 0f : horizontalInput * moveSpeed;
+                velocity.x = isOnSlippery
+                    ? Mathf.MoveTowards(velocity.x, targetVelocityX, slipperyAcceleration * Time.deltaTime)
+                    : targetVelocityX;
             }
 
             if (collisions.below)
@@ -276,6 +283,10 @@ public class Playermovement : MonoBehaviour
         float directionY = Mathf.Sign(moveAmount.y);
         float rayLength = Mathf.Abs(moveAmount.y) + skinWidth;
         float raySpacing = (raycastOrigins.bottomRight.x - raycastOrigins.bottomLeft.x) / (verticalRayCount - 1);
+
+        if (directionY == -1)
+            isOnSlippery = false;
+
         for (int i = 0; i < verticalRayCount; i++)
         {
             Vector2 rayOrigin = (directionY == -1) ? raycastOrigins.bottomLeft : raycastOrigins.topLeft;
@@ -291,6 +302,9 @@ public class Playermovement : MonoBehaviour
                 rayLength = Mathf.Max(hit.distance, skinWidth);
                 collisions.below = directionY == -1;
                 collisions.above = directionY == 1;
+
+                if (directionY == -1)
+                    isOnSlippery = hit.collider.CompareTag("Slippery");
 
                 velocity.y = 0f;
             }
