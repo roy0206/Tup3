@@ -1,46 +1,39 @@
+using System.IO.Pipes;
 using UnityEngine;
 
-public class WaterSpawnZone : MonoBehaviour
+public class IceBulletSpawnZone : MonoBehaviour
 {
-    [Header("범위 설정")]
-    [SerializeField] private Transform startPoint; // 왼쪽 끝
-    [SerializeField] private Transform endPoint;
+    private enum FireDirection { Right, Left }
 
+    [SerializeField] private Transform startPoint;
+    [SerializeField] private float interval = 2f;
     [SerializeField] private Transform[] spawnPoints = new Transform[5];
-    [SerializeField] private GameObject WaterPump;
+    [SerializeField] private GameObject IceBullet;
     [SerializeField] private int SpawnNum = 3;
-    
-    private float segmentWidth;
+    [SerializeField] private FireDirection fireDirection = FireDirection.Right;
 
     void Start()
     {
         Set_spawnpoint();
     }
+
+
+    // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.T))
+        if (Input.GetKeyDown(KeyCode.Y))
         {
-            SpawnWaterBullets(SpawnNum);
+            SpawnIceBullets(SpawnNum);
         }
     }
 
     void Set_spawnpoint()
     {
-        float leftEdge = startPoint.position.x;
-        float rightEdge = endPoint.position.x;
-        float totalWidth = rightEdge - leftEdge;
-
-        segmentWidth = totalWidth / spawnPoints.Length;
-        float fixedY = startPoint.position.y;
-        float fixedZ = startPoint.position.z;
-
         for (int k = 0; k < spawnPoints.Length; k++)
         {
             GameObject point = new GameObject($"SpawnPoint_{k}");
             point.transform.parent = transform;
-            float x = leftEdge + segmentWidth * (k + 0.5f);
-            point.transform.position = new Vector3(x, fixedY, fixedZ);
-
+            point.transform.position = startPoint.position + Vector3.down * interval * k;
             spawnPoints[k] = point.transform;
         }
     }
@@ -65,15 +58,16 @@ public class WaterSpawnZone : MonoBehaviour
         return result;
     }
 
-    public void SpawnWaterBullets(int spawnNum)
+    public void SpawnIceBullets(int spawnNum)
     {
+        Vector2 dir = fireDirection == FireDirection.Right ? Vector2.right : Vector2.left;
+
         int[] selected = Get_random_index(spawnNum);
         foreach (int idx in selected)
         {
-            GameObject obj = Instantiate(WaterPump, spawnPoints[idx].position, Quaternion.identity);
-            WaterPump pump = obj.GetComponent<WaterPump>();
-            pump.SetTargetWidth(segmentWidth);
-            pump.Launch(Vector2.up);
+            GameObject obj = Instantiate(IceBullet, spawnPoints[idx].position, Quaternion.identity);
+            Ice_Bullet bullet = obj.GetComponent<Ice_Bullet>();
+            bullet.Launch(dir);
         }
     }
 }
