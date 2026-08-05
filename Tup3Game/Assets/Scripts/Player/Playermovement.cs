@@ -45,6 +45,12 @@ public class Playermovement : MonoBehaviour
     public float slipperyAcceleration = 10f;
     private bool isOnSlippery = false;
 
+    [Header("Water Swim Settings")]
+    [SerializeField] private bool isInWater = false;
+    [SerializeField] private float waterFlapForce = 8f;      // 점프키 눌렀을 때 위로 튀는 힘
+    [SerializeField] private float waterSinkSpeed = 2f;       // 물속 기본 하강 속도 (느리게)
+    [SerializeField] private float waterMaxFallSpeed = 3f;    // 하강 속도 상한선 (계속 빨라지지 않게)
+    [SerializeField] private float waterGravityMultiplier = 0.3f;
 
     private BoxCollider2D col;
     private Vector2 velocity;
@@ -132,56 +138,62 @@ public class Playermovement : MonoBehaviour
                     ? Mathf.MoveTowards(velocity.x, targetVelocityX, slipperyAcceleration * Time.deltaTime)
                     : targetVelocityX;
             }
-
-            if (collisions.below)
+            if (isInWater)
             {
-                if (animator != null)
-                {
-                    animator.SetBool("IsGround",true);
-                }
-
-                velocity.y = -0.3f;
-                jumpCount = maxJumpCount;
-                coyoteTimer = coyoteTime;
-
+                HandleWaterMovement();
             }
             else
             {
-                if (animator != null)
+                if (collisions.below)
                 {
-                    animator.SetBool("IsGround", false); 
-                }
+                    if (animator != null)
+                    {
+                        animator.SetBool("IsGround", true);
+                    }
 
-                float appliedGravity = (velocity.y > 0f) ? gravity : gravity * fallGravityMultiplier;
-                velocity.y += appliedGravity * Time.deltaTime;
-                if (!collisions.below && jumpCount == maxJumpCount)
-                {
-                    jumpCount = maxJumpCount - 1;
-                }
+                    velocity.y = -0.3f;
+                    jumpCount = maxJumpCount;
+                    coyoteTimer = coyoteTime;
 
-                coyoteTimer -= Time.deltaTime;
-            }
-
-
-            if (Input.GetKeyDown(KeyCode.X) && (jumpCount > 0 || coyoteTimer > 0f))
-            {
-                Debug.Log($"X pressed. jumpCount={jumpCount}, collisions.below={collisions.below}");
-                velocity.y = jumpForce;
-                if (coyoteTimer > 0f && jumpCount == maxJumpCount - 1)
-                {
-                    // 코요테 타임으로 발동된 첫 점프는 이단점프 자원을 소모하지 않음
                 }
                 else
                 {
-                    jumpCount--;
+                    if (animator != null)
+                    {
+                        animator.SetBool("IsGround", false);
+                    }
+
+                    float appliedGravity = (velocity.y > 0f) ? gravity : gravity * fallGravityMultiplier;
+                    velocity.y += appliedGravity * Time.deltaTime;
+                    if (!collisions.below && jumpCount == maxJumpCount)
+                    {
+                        jumpCount = maxJumpCount - 1;
+                    }
+
+                    coyoteTimer -= Time.deltaTime;
                 }
-                coyoteTimer = 0f;
-                if (animator != null)
-                    animator.SetTrigger("JumpTrigger");
-            }
-            if (Input.GetKeyUp(KeyCode.X) && velocity.y > 0f)
-            {
-                velocity.y *= jumpCutMultiplier;
+
+
+                if (Input.GetKeyDown(KeyCode.X) && (jumpCount > 0 || coyoteTimer > 0f))
+                {
+                    Debug.Log($"X pressed. jumpCount={jumpCount}, collisions.below={collisions.below}");
+                    velocity.y = jumpForce;
+                    if (coyoteTimer > 0f && jumpCount == maxJumpCount - 1)
+                    {
+                        // 코요테 타임으로 발동된 첫 점프는 이단점프 자원을 소모하지 않음
+                    }
+                    else
+                    {
+                        jumpCount--;
+                    }
+                    coyoteTimer = 0f;
+                    if (animator != null)
+                        animator.SetTrigger("JumpTrigger");
+                }
+                if (Input.GetKeyUp(KeyCode.X) && velocity.y > 0f)
+                {
+                    velocity.y *= jumpCutMultiplier;
+                }
             }
 
             if (Input.GetKeyDown(KeyCode.Z) && canDash && !isLunging)
@@ -360,6 +372,28 @@ public class Playermovement : MonoBehaviour
 
         yield return new WaitForSeconds(dashCooldown);
         canDash = true;
+    }
+
+    public void SetInWater(bool value)
+    {
+        isInWater = value;
+        if (value) velocity.y = 0f; // 물 진입 시 기존 속도 초기화 (자연스러운 진입감)
+    }
+
+    private void HandleWaterMovement()
+    {
+        if (Input.GetKeyDown(KeyCode.X)) // 기존 점프 입력 감지 변수 재활용
+        {
+            velocity.y = waterFlapForce; // 기존 velocity 무시하고 즉시 덮어씀 -> 플래피버드 느낌
+        }
+        else
+        {
+            // 물속 전용 중력: 기존 gravity보다 훨씬 약하게
+            velocity.y += gravity * waterGravityMultiplier * Time.deltaTime;
+
+            // 하강 속도 상한 (너무 빨리 가라앉지 않게 클램프)
+            velocity.y = Mathf.Max(velocity.y, -waterMaxFallSpeed);
+        }
     }
 
 
