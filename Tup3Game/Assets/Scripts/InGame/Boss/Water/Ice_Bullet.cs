@@ -67,10 +67,23 @@ public class Ice_Bullet : MonoBehaviour
         if (hasHit) return;
         if (other.TryGetComponent(out PlayerKnockBack playerKnockback))
         {
-            playerKnockback.TakeHit(transform.position, 10f, (int)damage);
+            playerKnockback.TakeHit(transform.position, 5f, (int)damage);
+            hasHit = true;
+            Destroy(gameObject, 0.05f);
         }
-        hasHit = true;
-        Destroy(gameObject, 0.05f);
+
+        if (other.CompareTag("ChangeablePlatform"))
+        {
+            other.gameObject.tag = "Slippery"; 
+            
+            if (other.TryGetComponent(out SpriteRenderer sprite))
+            {
+                sprite.color = Color.skyBlue;
+            }
+            
+            hasHit = true;
+            Destroy(gameObject, 0.05f);
+        }
     }
 
     private void ShowPathPreview()

@@ -21,8 +21,9 @@ public class Water : BossBase
 
     [Header("Water Eye 소환")]
     [SerializeField] private GameObject[] eyePrefab;
-    [SerializeField] private Transform[] eyeSpawnPoints; 
-
+    [SerializeField] private Transform[] eyeSpawnPoints;
+    private GameObject Eye;
+    
     new void Awake()
     {
         base.Awake();
@@ -87,7 +88,12 @@ public class Water : BossBase
         if (eyePrefab == null) return;
         if (eyeSpawnPoints == null || patternIndex >= eyeSpawnPoints.Length || eyeSpawnPoints[patternIndex] == null) return;
 
-        Instantiate(eyePrefab[patternIndex], eyeSpawnPoints[patternIndex].position, Quaternion.identity);
+        Eye = Instantiate(eyePrefab[patternIndex], eyeSpawnPoints[patternIndex].position, Quaternion.identity);
+
+        if (Eye.TryGetComponent(out Water_eye eyeComponent))
+        {
+            eyeComponent.Init(this); // this = Water(BossBase 상속) 자신을 넘김
+        }
     }
 
     private TaskStatus Pattern1_IceBullet()
@@ -96,10 +102,10 @@ public class Water : BossBase
         if (!isPatternSetup)
         {
             curTimes[1] = 20f; // TODO: 쿨타임 값 조정
-            curTimes[0] = 4f; // TODO: 패턴 총 지속시간 (애니메이션 길이에 맞춰서)
+            curTimes[0] = 10f; // TODO: 패턴 총 지속시간 (애니메이션 길이에 맞춰서)
             isPatternSetup = true;
             SpawnEye(0);
-
+            Destroy(Eye, curTimes[0]);
             if (iceBulletSpawnZones != null && iceBulletSpawnZones.Length > 0)
             {
                 IceBulletSpawnZone chosenZone = iceBulletSpawnZones[UnityEngine.Random.Range(0, iceBulletSpawnZones.Length)];
@@ -125,10 +131,10 @@ public class Water : BossBase
         if (!isPatternSetup)
         {
             curTimes[2] = 20f; // TODO: 쿨타임 값 조정
-            curTimes[0] = 4f;  // TODO: 패턴 총 지속시간
+            curTimes[0] = 10f;  // TODO: 패턴 총 지속시간
             isPatternSetup = true;
             SpawnEye(1);
-
+            Destroy(Eye, curTimes[0]);
             if (waterSpawnZone != null)
             {
                 DOVirtual.DelayedCall(0.5f, () =>
@@ -144,16 +150,16 @@ public class Water : BossBase
         return TaskStatus.Success;
     }
 
-    // Pattern3: 기본 공격
     private TaskStatus Pattern3_Basic()
     {
         if (IsDead) return TaskStatus.Failure;
         if (!isPatternSetup)
         {
-            curTimes[3] = 5f; // TODO: 쿨타임 값 조정
-            curTimes[0] = 1f; // TODO: 패턴 총 지속시간
+            curTimes[3] = 30f; // TODO: 쿨타임 값 조정
+            curTimes[0] = 10f; // TODO: 패턴 총 지속시간
             isPatternSetup = true;
-            SpawnEye(3);
+            SpawnEye(2);
+            Destroy(Eye, curTimes[0]);
         }
 
         if (curTimes[0] > 0) return TaskStatus.Continue;

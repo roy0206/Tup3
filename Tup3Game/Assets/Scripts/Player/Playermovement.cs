@@ -284,8 +284,8 @@ public class Playermovement : MonoBehaviour
         float rayLength = Mathf.Abs(moveAmount.y) + skinWidth;
         float raySpacing = (raycastOrigins.bottomRight.x - raycastOrigins.bottomLeft.x) / (verticalRayCount - 1);
 
-        if (directionY == -1)
-            isOnSlippery = false;
+        bool groundedThisCheck = false;
+        bool slipperyThisCheck = false;
 
         for (int i = 0; i < verticalRayCount; i++)
         {
@@ -304,11 +304,17 @@ public class Playermovement : MonoBehaviour
                 collisions.above = directionY == 1;
 
                 if (directionY == -1)
-                    isOnSlippery = hit.collider.CompareTag("Slippery");
+                {
+                    groundedThisCheck = true;
+                    if (hit.collider.CompareTag("Slippery"))
+                        slipperyThisCheck = true;
+                }
 
                 velocity.y = 0f;
             }
         }
+        if (directionY == -1 && groundedThisCheck)
+            isOnSlippery = slipperyThisCheck;
     }
 
     private void UpdateRaycastOrigins()
