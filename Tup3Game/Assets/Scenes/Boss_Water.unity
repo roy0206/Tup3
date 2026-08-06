@@ -477,6 +477,62 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &812660081
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 812660083}
+  - component: {fileID: 812660082}
+  m_Layer: 0
+  m_Name: Vertical_SpawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &812660082
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 812660081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69991a85a0b34c4448edac4f4e4344f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Dummy_2
+  startPoint: {fileID: 812660083}
+  interval: 1
+  spawnPoints:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  IceBullet: {fileID: 521257976468912241, guid: d90c6f3e68b21f041a5d1d2f8df51e8b, type: 3}
+  SpawnNum: 3
+  fireDirection: 0
+--- !u!4 &812660083
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 812660081}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -10, y: 1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1146329988
 GameObject:
   m_ObjectHideFlags: 0
@@ -524,7 +580,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1165065345
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -539,7 +595,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Water
   boxColliders: []
   maxHp: 200
-  waterSpawnZone: {fileID: 2002017500}
+  watersproutzone: {fileID: 0}
   rainSpawnCount: 3
   iceBulletSpawnZones:
   - {fileID: 636207158}
@@ -661,6 +717,57 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1165065346}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1925993340
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1925993342}
+  - component: {fileID: 1925993341}
+  m_Layer: 0
+  m_Name: Dummy
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1925993341
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1925993340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af09c51d74dafc047b45a1ac0486edd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WaterSpawnZone
+  startPoint: {fileID: 1925993342}
+  endPoint: {fileID: 1992423172}
+  height: 6
+  spawnPoints:
+  - {fileID: 0}
+  Water_Sprout: {fileID: 1920147821282040882, guid: d88e04e31d5004c4a9b16c6bf7c5e0e2, type: 3}
+  SpawnNum: 1
+--- !u!4 &1925993342
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1925993340}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -4, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1984640385
 GameObject:
   m_ObjectHideFlags: 0
@@ -691,6 +798,37 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1165065346}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1992423171
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1992423172}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1992423172
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1992423171}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1, y: -4, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2002017498
 GameObject:
@@ -738,13 +876,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   startPoint: {fileID: 2002017499}
   endPoint: {fileID: 1984640386}
+  height: 0
   spawnPoints:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  WaterPump: {fileID: 1920147821282040882, guid: d88e04e31d5004c4a9b16c6bf7c5e0e2, type: 3}
+  Water_Sprout: {fileID: 0}
   SpawnNum: 3
 --- !u!95 &2044486292 stripped
 Animator:
@@ -811,6 +950,18 @@ PrefabInstance:
       propertyPath: spriteRenderer
       value: 
       objectReference: {fileID: 2044486295}
+    - target: {fileID: 5130523561765730001, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
+      propertyPath: waterFlapForce
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5130523561765730001, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
+      propertyPath: waterSinkSpeed
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5130523561765730001, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
+      propertyPath: waterMaxFallSpeed
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 8660705831248484078, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.37
@@ -864,3 +1015,6 @@ SceneRoots:
   - {fileID: 663927094}
   - {fileID: 2102432293}
   - {fileID: 1165065346}
+  - {fileID: 1925993342}
+  - {fileID: 1992423172}
+  - {fileID: 812660083}

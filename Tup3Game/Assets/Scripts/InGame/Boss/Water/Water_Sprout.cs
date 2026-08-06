@@ -1,7 +1,8 @@
 using UnityEngine;
 using System.Collections;
 
-public class WaterPump : MonoBehaviour
+
+public class Water_Sprout: MonoBehaviour
 {
     [Header("딜레이")]
     [SerializeField] private float lifeTime = 5f;
@@ -23,16 +24,23 @@ public class WaterPump : MonoBehaviour
     [SerializeField] private float pathWidth = 0.2f; // SetTargetWidth로 덮어씀
     [SerializeField] private float pathFadeDuration = 0.4f;
 
+    private const float spriteNativeHeight = 5.6f; // waterspout_2 스프라이트 실제 높이(유닛), 피벗은 좌하단
+
     private Vector2 direction;
     private float delayElapsed = 0f;
     private bool hasHit;
     private bool isGrowing = false;
     private float growTimer = 0f;
+    private Animator Watersprout_Anmimation;
+    [SerializeField] private Transform Watersprout_render;
+
 
     private void Awake()
     {
         if (pathCollider != null)
             baseOffsetY = pathCollider.offset.y; // 원래 위치(높이) 저장
+        Watersprout_Anmimation = GetComponentInChildren<Animator>();
+        Watersprout_Anmimation.SetBool("On", false);
     }
 
     private void Update()
@@ -42,11 +50,10 @@ public class WaterPump : MonoBehaviour
             delayElapsed += Time.deltaTime;
             if (delayElapsed >= startDelay)
             {
-                isGrowing = true; // 정지 끝, 이제부터 가속 시작
+                isGrowing = true;
+                Watersprout_Anmimation.SetBool("On", true);
             }
-            return;
         }
-
         if (isGrowing)
         {
             growTimer += Time.deltaTime;
@@ -67,7 +74,7 @@ public class WaterPump : MonoBehaviour
     public void Launch(Vector2 dir)
     {
         // 재사용(풀링) 대비: 이전 상태 초기화
-        StopAllCoroutines();
+        StopAllCoroutines();  
         hasHit = false;
         isGrowing = false;
         delayElapsed = 0f;
@@ -83,7 +90,15 @@ public class WaterPump : MonoBehaviour
     private IEnumerator LifeTimeRoutine()
     {
         yield return new WaitForSeconds(lifeTime);
-        Destroy(gameObject, lifeTime); // Destroy 대신 비활성화 (재사용 가능하게)
+        Watersprout_Anmimation.SetBool("On", false);
+        if (pathCollider != null)
+            pathCollider.enabled = false;
+        yield return null;
+        float exitAnimLength = Watersprout_Anmimation.GetCurrentAnimatorStateInfo(0).length;
+        
+        yield return new WaitForSeconds(exitAnimLength);
+        
+        Destroy(gameObject);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -96,11 +111,12 @@ public class WaterPump : MonoBehaviour
 
     private void ShowPathPreview()
     {
+        Debug.Log("ShowPathPreview 호출됨. pathSprite null? " + (pathSprite == null));
         if (pathSprite == null) return;
         pathSprite.gameObject.SetActive(true);
 
         // x: 진행방향(로컬), y: 가로 폭 -> baseOffsetY로 세로(콜라이더 기준) 위치도 맞춰줌
-        pathSprite.transform.localPosition = new Vector3(-0.5f, baseOffsetY, 0f);
+        pathSprite.transform.localPosition = new Vector3(0f, baseOffsetY, 0f);
         pathSprite.transform.localRotation = Quaternion.identity;
         pathSprite.transform.localScale = new Vector3(pathLength, pathWidth, 1f);
 
@@ -139,8 +155,18 @@ public class WaterPump : MonoBehaviour
     // 그래서 "가로로 꽉 채우기"는 targetSize.y / pathWidth 쪽에 반영해야 합니다.
     public void SetTargetWidth(float width)
     {
+        Debug.Log($"SetTargetWidth 호출됨. 전달받은 width = {width}");
         targetSize.y = width;
         pathWidth = width;
+    }
+
+    public void SetTargetLength(float length)
+    {
+        Debug.Log($"SetTargetLength 호출됨. 전달받은 width = {length}");
+        targetSize.x = length;
+        pathLength = length;
+        Watersprout_render.localScale = new Vector3(pathWidth, length / spriteNativeHeight * 0.7f, 1f);
+        Watersprout_render.localPosition = new Vector3((length / spriteNativeHeight * 3.5f * 0.7f), 0, 0);
     }
 
     private void OnDrawGizmos()

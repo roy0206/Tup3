@@ -19,6 +19,9 @@ public class Ice_Bullet : MonoBehaviour
     [SerializeField] private float pathWidth = 0.2f;
     [SerializeField] private float pathFadeDuration = 0.4f;
 
+    [Header("생성 연출 (고드름 자라나는 효과)")]
+    [SerializeField] private Transform iceVisual; 
+    [SerializeField] private AnimationCurve growCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
     private Vector2 direction = Vector2.right;
     private float elapsed;
@@ -46,9 +49,19 @@ public class Ice_Bullet : MonoBehaviour
         if (!isLaunching)
         {
             delayElapsed += Time.deltaTime;
+            
+            if (iceVisual != null)
+            {
+                float growT = Mathf.Clamp01(delayElapsed / startDelay);
+                float scaleX = growCurve.Evaluate(growT);
+                iceVisual.localScale = new Vector3(scaleX, 1f, 1f);
+            }
+
             if (delayElapsed >= startDelay)
             {
                 isLaunching = true; // 정지 끝, 이제부터 가속 시작
+                if (iceVisual != null)
+                    iceVisual.localScale = Vector3.one;
             }
             return; // 정지 구간 동안은 이동 안 함
         }
@@ -56,7 +69,6 @@ public class Ice_Bullet : MonoBehaviour
         elapsed += Time.deltaTime;
         float t = Mathf.Clamp01(elapsed / accelDuration);
         float speed = speedCurve.Evaluate(t) * maxSpeed;
-
         transform.Translate(direction * speed * Time.deltaTime, Space.World);
     }
 

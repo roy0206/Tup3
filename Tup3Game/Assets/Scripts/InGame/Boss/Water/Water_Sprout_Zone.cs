@@ -1,13 +1,14 @@
+using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 
-public class WaterSpawnZone : MonoBehaviour
+public class Water_Sprout_Zone : MonoBehaviour
 {
     [Header("범위 설정")]
     [SerializeField] private Transform startPoint; // 왼쪽 끝
     [SerializeField] private Transform endPoint;
-
+    [SerializeField] private float height = 5;
     [SerializeField] private Transform[] spawnPoints = new Transform[5];
-    [SerializeField] private GameObject WaterPump;
+    [SerializeField] private GameObject Water_Sprout;
     [SerializeField] private int SpawnNum = 3;
     
     private float segmentWidth;
@@ -18,6 +19,10 @@ public class WaterSpawnZone : MonoBehaviour
     }
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Y))
+        {
+            SpawnWaterBullets(SpawnNum);
+        }
     }
 
     void Set_spawnpoint()
@@ -66,10 +71,11 @@ public class WaterSpawnZone : MonoBehaviour
         int[] selected = Get_random_index(spawnNum);
         foreach (int idx in selected)
         {
-            GameObject obj = Instantiate(WaterPump, spawnPoints[idx].position, Quaternion.identity);
-            WaterPump pump = obj.GetComponent<WaterPump>();
-            pump.SetTargetWidth(segmentWidth);
-            pump.Launch(Vector2.up);
+            GameObject obj = Instantiate(Water_Sprout, spawnPoints[idx].position, Quaternion.identity);
+            Water_Sprout sprout = obj.GetComponent<Water_Sprout>();
+            sprout.SetTargetWidth(segmentWidth);
+            sprout.SetTargetLength(height);
+            sprout.Launch(Vector2.up);
         }
     }
 }

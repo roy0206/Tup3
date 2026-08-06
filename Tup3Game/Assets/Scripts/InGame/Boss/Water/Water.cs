@@ -12,7 +12,7 @@ public class Water : BossBase
     private GameObject player;
 
     [Header("빗방울(웅덩이) 패턴")]
-    [SerializeField] private WaterSpawnZone waterSpawnZone;
+    [SerializeField] private Water_Sprout_Zone watersproutzone;
     [SerializeField] private int rainSpawnCount = 3;
 
     [Header("얼음총알 패턴 (좌우 두 지점 중 랜덤)")]
@@ -135,11 +135,11 @@ public class Water : BossBase
             isPatternSetup = true;
             SpawnEye(1);
             Destroy(Eye, curTimes[0]);
-            if (waterSpawnZone != null)
+            if (watersproutzone != null)
             {
                 DOVirtual.DelayedCall(0.5f, () =>
                 {
-                    waterSpawnZone.SpawnWaterBullets(rainSpawnCount);
+                    watersproutzone.SpawnWaterBullets(rainSpawnCount);
                 });
             }
         }
