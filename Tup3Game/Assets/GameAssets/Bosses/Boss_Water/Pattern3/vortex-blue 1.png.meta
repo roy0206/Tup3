@@ -103,45 +103,67 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: vortex-blue_0
+      name: vortex-blue 1_0
       rect:
         serializedVersion: 2
-        x: 179
-        y: 152
-        width: 896
-        height: 931
+        x: 0
+        y: 836
+        width: 1254
+        height: 418
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 833a3887d0da69960800000000000000
-      internalID: 7608458893857104696
+      spriteID: 068bcebc092537b4587ead59007d8e08
+      internalID: 673620273
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: vortex-blue_1
+      name: vortex-blue 1_1
       rect:
         serializedVersion: 2
-        x: 355
-        y: 920
-        width: 367
-        height: 178
+        x: 0
+        y: 418
+        width: 1254
+        height: 418
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 8995b222f22afb1a0800000000000000
-      internalID: -6791531389730989672
+      spriteID: b83bf7beed2497444bf6b27d462519bd
+      internalID: 797855729
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vortex-blue 1_2
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 1254
+        height: 418
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e87db37ce4261c54f9a7b6b85075496f
+      internalID: -1507563170
       vertices: []
       indices: 
       edges: []
@@ -150,7 +172,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 84f242b88ba7690449f880e0589947a7
     internalID: 0
     vertices: []
     indices: 
@@ -158,10 +180,13 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":3.0},"gridSpriteSize":{"x":1254.0,"y":418.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":2,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      vortex-blue_0: 7608458893857104696
-      vortex-blue_1: -6791531389730989672
+      vortex-blue 1_0: 673620273
+      vortex-blue 1_1: 797855729
+      vortex-blue 1_2: -1507563170
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

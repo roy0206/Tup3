@@ -2,51 +2,96 @@ using UnityEngine;
 
 public class Storm_animation : MonoBehaviour
 {
-    [Header("좌우 흔들림")]
-    [SerializeField] private float swayDistance = 0.08f;
-    [SerializeField] private float swaySpeed = 3f;
+    [Header("소용돌이 조각")]
+    [SerializeField] private Transform top;
+    [SerializeField] private Transform middle;
+    [SerializeField] private Transform bottom;
 
-    [Header("크기 변화")]
-    [SerializeField] private float widthPulse = 0.06f;
-    [SerializeField] private float heightPulse = 0.02f;
-    [SerializeField] private float pulseSpeed = 4f;
+    [Header("회전")]
+    [SerializeField] private float topAngle = 4f;
+    [SerializeField] private float middleAngle = 6f;
+    [SerializeField] private float bottomAngle = 8f;
+    [SerializeField] private float rotationSpeed = 4f;
 
-    [Header("상하 움직임")]
-    [SerializeField] private float floatDistance = 0.03f;
-    [SerializeField] private float floatSpeed = 2f;
+    [Header("좌우 움직임")]
+    [SerializeField] private float topMove = 0.08f;
+    [SerializeField] private float middleMove = 0.05f;
+    [SerializeField] private float bottomMove = 0.025f;
 
-    private Vector3 startPosition;
-    private Vector3 startScale;
+    [Header("폭 변화")]
+    [SerializeField] private float widthPulse = 0.04f;
+
+    private Vector3 topPosition;
+    private Vector3 middlePosition;
+    private Vector3 bottomPosition;
+
+    private Vector3 topScale;
+    private Vector3 middleScale;
+    private Vector3 bottomScale;
 
     private void Awake()
     {
-        startPosition = transform.localPosition;
-        startScale = transform.localScale;
+        topPosition = top.localPosition;
+        middlePosition = middle.localPosition;
+        bottomPosition = bottom.localPosition;
+
+        topScale = top.localScale;
+        middleScale = middle.localScale;
+        bottomScale = bottom.localScale;
     }
 
     private void Update()
     {
-        float time = Time.time;
+        float time = Time.time * rotationSpeed;
 
-        float sway =
-            Mathf.Sin(time * swaySpeed) * swayDistance;
+        AnimatePart(
+            top,
+            topPosition,
+            topScale,
+            Mathf.Sin(time),
+            topAngle,
+            topMove
+        );
 
-        float floating =
-            Mathf.Sin(time * floatSpeed) * floatDistance;
+        AnimatePart(
+            middle,
+            middlePosition,
+            middleScale,
+            Mathf.Sin(time + 2.1f),
+            middleAngle,
+            middleMove
+        );
 
-        transform.localPosition =
-            startPosition + new Vector3(sway, floating, 0f);
+        AnimatePart(
+            bottom,
+            bottomPosition,
+            bottomScale,
+            Mathf.Sin(time + 4.2f),
+            bottomAngle,
+            bottomMove
+        );
+    }
 
-        float scaleX =
-            1f + Mathf.Sin(time * pulseSpeed) * widthPulse;
+    private void AnimatePart(
+        Transform part,
+        Vector3 originalPosition,
+        Vector3 originalScale,
+        float wave,
+        float angle,
+        float moveDistance)
+    {
+        part.localRotation =
+            Quaternion.Euler(0f, 0f, wave * angle);
 
-        float scaleY =
-            1f + Mathf.Sin(time * pulseSpeed * 0.7f) * heightPulse;
+        part.localPosition =
+            originalPosition + Vector3.right * wave * moveDistance;
 
-        transform.localScale = new Vector3(
-            startScale.x * scaleX,
-            startScale.y * scaleY,
-            startScale.z
+        float scaleX = 1f + wave * widthPulse;
+
+        part.localScale = new Vector3(
+            originalScale.x * scaleX,
+            originalScale.y,
+            originalScale.z
         );
     }
 }
