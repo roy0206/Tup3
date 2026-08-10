@@ -558,7 +558,7 @@ Transform:
   m_GameObject: {fileID: 1146329988}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.47, y: -4.34, z: 0}
+  m_LocalPosition: {x: -5.37, y: -4.29, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -580,7 +580,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1165065345
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -595,20 +595,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Water
   boxColliders: []
   maxHp: 200
-  watersproutzone: {fileID: 0}
-  rainSpawnCount: 3
+  watersproutzone: {fileID: 2002017500}
+  WaterSprout_SpawnCount: 3
+  WaterSprout_DelayTime: 3
+  WaterSprout_CoolTime: 9
   iceBulletSpawnZones:
   - {fileID: 636207158}
   - {fileID: 1903119868}
-  iceBulletSpawnCount: 3
-  eyePrefab:
-  - {fileID: 2211376033529449236, guid: 44450669a317fa546ad34e4b0d7ec40d, type: 3}
-  - {fileID: 2211376033529449236, guid: 44450669a317fa546ad34e4b0d7ec40d, type: 3}
-  - {fileID: 2211376033529449236, guid: 44450669a317fa546ad34e4b0d7ec40d, type: 3}
+  iceBullet_SpawnCount: 3
+  iceBullet_DelayTime: 3
+  iceBullet_CoolTime: 6
+  eyePrefab: {fileID: 2211376033529449236, guid: 08135d686003638439d3d9766808f4fe, type: 3}
+  Scale:
+  - 2
+  - 1
+  - 1
   eyeSpawnPoints:
   - {fileID: 2092540026}
   - {fileID: 1654437364}
   - {fileID: 1146329989}
+  Storm_spawnpoint: {fileID: 0}
+  Storm_force: 0
+  telegraphDuration: 5
 --- !u!4 &1165065346
 Transform:
   m_ObjectHideFlags: 0
@@ -618,14 +626,13 @@ Transform:
   m_GameObject: {fileID: 1165065344}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 2.5, y: -1.36, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2002017499}
   - {fileID: 1903119869}
   - {fileID: 636207159}
-  - {fileID: 1984640386}
   - {fileID: 2092540026}
   - {fileID: 1654437364}
   - {fileID: 1146329989}
@@ -656,7 +663,7 @@ Transform:
   m_GameObject: {fileID: 1654437363}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.86, y: -4.32, z: 0}
+  m_LocalPosition: {x: 2.18, y: -4.24, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -746,13 +753,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af09c51d74dafc047b45a1ac0486edd3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaterSpawnZone
-  startPoint: {fileID: 1925993342}
-  endPoint: {fileID: 1992423172}
+  interval: 2
   height: 6
+  width: 1
+  startPoint: {fileID: 1925993342}
   spawnPoints:
   - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   Water_Sprout: {fileID: 1920147821282040882, guid: d88e04e31d5004c4a9b16c6bf7c5e0e2, type: 3}
-  SpawnNum: 1
+  SpawnNum: 2
 --- !u!4 &1925993342
 Transform:
   m_ObjectHideFlags: 0
@@ -762,69 +776,7 @@ Transform:
   m_GameObject: {fileID: 1925993340}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -4, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1984640385
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1984640386}
-  m_Layer: 0
-  m_Name: EndPoint
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1984640386
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1984640385}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 12.12776, y: -5.68884, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1165065346}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1992423171
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1992423172}
-  m_Layer: 0
-  m_Name: GameObject
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1992423172
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1992423171}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1, y: -4, z: 0}
+  m_LocalPosition: {x: -7.6, y: -4.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -856,7 +808,7 @@ Transform:
   m_GameObject: {fileID: 2002017498}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: -5.87224, y: -5.68884, z: 0}
+  m_LocalPosition: {x: -7.27, y: -4.52, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -874,16 +826,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af09c51d74dafc047b45a1ac0486edd3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  interval: 3
+  height: 5
+  width: 1
   startPoint: {fileID: 2002017499}
-  endPoint: {fileID: 1984640386}
-  height: 0
   spawnPoints:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  Water_Sprout: {fileID: 0}
+  Water_Sprout: {fileID: 1920147821282040882, guid: d88e04e31d5004c4a9b16c6bf7c5e0e2, type: 3}
   SpawnNum: 3
 --- !u!95 &2044486292 stripped
 Animator:
@@ -1016,5 +969,4 @@ SceneRoots:
   - {fileID: 2102432293}
   - {fileID: 1165065346}
   - {fileID: 1925993342}
-  - {fileID: 1992423172}
   - {fileID: 812660083}

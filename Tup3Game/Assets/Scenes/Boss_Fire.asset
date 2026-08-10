@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Boss_Fire
   m_EditorClassIdentifier: Assembly-CSharp::SceneSO
   targetSceneName: Boss_Fire
-  useLoadingScene: 1
+  useLoadingScene: 0
   loadingSceneName: Loading
   leastHoldingDuration: 3
   enterTransition: 1

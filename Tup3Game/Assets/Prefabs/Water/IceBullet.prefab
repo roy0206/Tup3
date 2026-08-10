@@ -107,8 +107,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 638401d7e8f38cd4994dfd4348c54bbd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Ice_Bullet
-  maxSpeed: 50
-  lifeTime: 2
+  maxSpeed: 30
+  lifeTime: 3
   speedCurve:
     serializedVersion: 2
     m_Curve:
@@ -134,13 +134,13 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   accelDuration: 1
-  startDelay: 0.4
+  startDelay: 0.8
   damage: 10
   hitMask:
     serializedVersion: 2
     m_Bits: 128
   pathSprite: {fileID: 1193188577515134286}
-  pathLength: 100
+  pathLength: 30
   pathWidth: 1
   pathFadeDuration: 0.5
   iceVisual: {fileID: 5892537651637583862}
@@ -233,7 +233,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 10.24, y: 10.24}
+    oldSize: {x: 2.56, y: 2.56}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0

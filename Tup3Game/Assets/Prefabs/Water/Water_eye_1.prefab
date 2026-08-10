@@ -172,7 +172,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Water_eye
   maxHp: 20
   lifeTime: 5
+  scale: 1
   spriteRenderer: {fileID: 6212733414637075623}
+  Collider: {fileID: 6127987679384564497}
   hitFlashDuration: 0.1
   hitFlashColor: {r: 1, g: 1, b: 1, a: 1}
   Damge_to_boss: 10
@@ -186,7 +188,7 @@ Animator:
   m_GameObject: {fileID: 2211376033529449236}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: cf7310bf7982ade4385c4f3fc4e48e51, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

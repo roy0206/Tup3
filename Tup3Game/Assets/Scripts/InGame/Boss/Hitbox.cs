@@ -3,12 +3,13 @@ using Unity.VisualScripting;
 using UnityEngine;
 public class Hitbox : MonoBehaviour
 {
-    [SerializeField] private float damage;
-    private void OnTriggerEnter2D(Collider2D other)
+    [SerializeField] private int damage;
+    [SerializeField] private float knockbackForce;
+    private void OnTriggerStay2D(Collider2D other)
     {
-        if (other.TryGetComponent(out PlayerHealth playerHealth))
+        if (other.TryGetComponent(out PlayerKnockBack playerHealth))
         {
-            playerHealth.TakeDamage(damage);
+            playerHealth.TakeHit(transform.position, knockbackForce, damage);
         }
     }
     

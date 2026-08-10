@@ -54,11 +54,15 @@ public class Playermovement : MonoBehaviour
 
     private BoxCollider2D col;
     private Vector2 velocity;
-
+    private Vector2 externalVelocity;
+    private Vector2 stormVelocity;
+    private float previous_y;
     private bool canDash = true;
     private bool isDashing = false;
     private float facingDirection = 1f;
     public CollisionInfo collisions;
+
+
 
     private struct RaycastOrigins
     {
@@ -134,6 +138,7 @@ public class Playermovement : MonoBehaviour
             else
             {
                 float targetVelocityX = isLunging ? 0f : horizontalInput * moveSpeed;
+
                 velocity.x = isOnSlippery
                     ? Mathf.MoveTowards(velocity.x, targetVelocityX, slipperyAcceleration * Time.deltaTime)
                     : targetVelocityX;
@@ -141,6 +146,18 @@ public class Playermovement : MonoBehaviour
             if (isInWater)
             {
                 HandleWaterMovement();
+                if (collisions.below)
+                {
+                    if (Mathf.Abs(transform.position.y - previous_y) < 0.001f)
+                    {
+                        if (animator != null)
+                        {
+                            animator.SetBool("IsGround", true);
+                        }
+                    }
+                }
+
+                previous_y = transform.position.y;
             }
             else
             {
@@ -165,6 +182,7 @@ public class Playermovement : MonoBehaviour
 
                     float appliedGravity = (velocity.y > 0f) ? gravity : gravity * fallGravityMultiplier;
                     velocity.y += appliedGravity * Time.deltaTime;
+
                     if (!collisions.below && jumpCount == maxJumpCount)
                     {
                         jumpCount = maxJumpCount - 1;
@@ -196,30 +214,19 @@ public class Playermovement : MonoBehaviour
                 }
             }
 
+            velocity += externalVelocity;
+            externalVelocity = Vector2.zero;
+
             if (Input.GetKeyDown(KeyCode.Z) && canDash && !isLunging)
             {
-                if (isLunging)
-                {
-                    float Changeddirection = horizontalInput > 0 ? 1f : -1f;
-                    if (Changeddirection != facingDirection)
-                    {
-                        facingDirection = Changeddirection;
-                    }
-                }
                 StartCoroutine(DoDash());
                 if (animator != null)
                     animator.SetTrigger("DashTrigger");
             }
-
-
-            else if (isAiming)
-            {
-                velocity.x = 0f;
-            }
-
-            // 공격 입력 처리:
-            // - 공격 중이 아니면 콤보 시작
-            // - 이미 공격 중이면 "다음 타 예약"만 해둔다 (선입력 버퍼)
+        }
+        else if (isAiming)
+        {
+            velocity.x = 0f;
         }
 
         if (animator != null)
@@ -238,7 +245,15 @@ public class Playermovement : MonoBehaviour
             }
         }
         if (!isDashing)
-            Move(velocity * Time.deltaTime);
+        {
+            Vector2 finalVelocity = velocity;
+
+            finalVelocity.x += stormVelocity.x;
+
+            Move(finalVelocity * Time.deltaTime);
+
+            stormVelocity = Vector2.zero;
+        }
     }
 
     public void Move(Vector2 moveAmount)
@@ -257,7 +272,6 @@ public class Playermovement : MonoBehaviour
         }
 
         transform.Translate(moveAmount, Space.World);
-
         Physics2D.SyncTransforms();
     }
 
@@ -366,7 +380,9 @@ public class Playermovement : MonoBehaviour
             timer += Time.deltaTime;
             yield return null;
         }
+        if (dashEffectController  != null)
         dashEffectController.HideEffect();
+        
         isDashing = false;
         velocity.y = 0f;
 
@@ -377,7 +393,16 @@ public class Playermovement : MonoBehaviour
     public void SetInWater(bool value)
     {
         isInWater = value;
-        if (value) velocity.y = 0f; // 물 진입 시 기존 속도 초기화 (자연스러운 진입감)
+        if (value)
+        {
+            velocity.y = 0f;
+            
+            if (animator != null)
+            {
+                animator.SetBool("IsGround", false);
+            }
+
+        }// 물 진입 시 기존 속도 초기화 (자연스러운 진입감)
     }
 
     private void HandleWaterMovement()
@@ -385,6 +410,8 @@ public class Playermovement : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.X)) // 기존 점프 입력 감지 변수 재활용
         {
             velocity.y = waterFlapForce; // 기존 velocity 무시하고 즉시 덮어씀 -> 플래피버드 느낌
+            if (animator != null)
+                animator.SetTrigger("JumpTrigger");
         }
         else
         {
@@ -417,6 +444,27 @@ public class Playermovement : MonoBehaviour
         velocity.x = 0f;
     }
 
+    public Vector3 GetCurrentPosition()
+    {
+        return transform.position;
+    }
+
+    public void ApplyGravityPull(Vector3 targetPosition, float pullPower)
+    {
+        float directionX = targetPosition.x - transform.position.x;
+
+        if (Mathf.Abs(directionX) < 0.01f)
+            return;
+
+        stormVelocity.x = Mathf.Sign(directionX) * pullPower;
+    }
+
+    private void OnValidate()
+    {
+        horizontalRayCount = Mathf.Max(2, horizontalRayCount);
+        verticalRayCount = Mathf.Max(2, verticalRayCount);
+        skinWidth = Mathf.Max(0.001f, skinWidth);
+    }
 
     public bool IsDashing() => isDashing;
     public void ResetVerticalVelocity() => velocity.y = 0f;

@@ -15,10 +15,12 @@ public class Soil : BossBase
 
     [Header("이동")]
     [SerializeField] private float moveSpeed = 3f;
-    [SerializeField] private float attackRange = 3f;
+
     [SerializeField] private float gravity = -40f;
     [SerializeField] private LayerMask groundMask;
     [SerializeField] private float groundCheckDistance = 0.1f;
+
+    private List<float> attackRange = new() { 0, 3, 100, 3, 3 };
 
     private BoxCollider2D bodyCollider;
     private float verticalVelocity;
@@ -83,21 +85,21 @@ public class Soil : BossBase
     private TaskStatus PatternStarter(int num)
     {
         if (curTimes[num] > 0) return TaskStatus.Failure;
-        if (HorizontalDistance > attackRange) return TaskStatus.Failure;
+        if (HorizontalDistance > attackRange[num]) return TaskStatus.Failure;
 
         return TaskStatus.Success;
     }
 
-    private bool isParrernSetup;
+    private bool isPatternSetup;
     private TaskStatus Pattern1()
     {
         if(IsDead) return TaskStatus.Failure;
-        if (!isParrernSetup)
+        if (!isPatternSetup)
         {
             curTimes[1] = 10;
             curTimes[0] = 2;
             animationController.Play(1);
-            isParrernSetup = true;
+            isPatternSetup = true;
             DOVirtual.DelayedCall(0.11f, () =>
             {
                 hitboxTransforms[0].gameObject.SetActive(true);
@@ -115,7 +117,7 @@ public class Soil : BossBase
                 hitboxTransforms[2].gameObject.SetActive(true);
                 hitboxTransforms[2]
                     .DOMoveX(hitboxTransforms[2].transform.position.x - hitboxTransforms[2].transform.right.x * 10, 1f)
-                    .OnComplete(() =>{ hitboxTransforms[2].gameObject.SetActive(false);hitboxTransforms[2].localPosition = new Vector3(0, 1.72f, 0); });
+                    .OnComplete(() =>{ hitboxTransforms[2].gameObject.SetActive(false);hitboxTransforms[2].localPosition = new Vector3(-2, 2f, 0); });
             } );
             DOVirtual.DelayedCall(0.9f, () =>
             {
@@ -124,7 +126,7 @@ public class Soil : BossBase
         }
         if (curTimes[0] > 0) return TaskStatus.Continue;
 
-        isParrernSetup = false;
+        isPatternSetup = false;
         return TaskStatus.Success;
 
     }
@@ -151,19 +153,19 @@ public class Soil : BossBase
     private TaskStatus Pattern2()
     {
         if(IsDead) return TaskStatus.Failure;
-        if (!isParrernSetup)
+        if (!isPatternSetup)
         {
             curTimes[2] = 20;
             curTimes[0] = 5;
             animationController.Play(2);
-            isParrernSetup = true;
+            isPatternSetup = true;
             DOVirtual.DelayedCall(0.5f, () => StartCoroutine(SoilDrop()));
             
 
         }
         if (curTimes[0] > 0) return TaskStatus.Continue;
 
-        isParrernSetup = false;
+        isPatternSetup = false;
         return TaskStatus.Success;
 
     }
@@ -172,12 +174,12 @@ public class Soil : BossBase
     private TaskStatus Pattern3()
     {
         if(IsDead) return TaskStatus.Failure;
-        if (!isParrernSetup)
+        if (!isPatternSetup)
         {
             curTimes[3] = 0;
             curTimes[0] = 2;
             animationController.Play(3);
-            isParrernSetup = true;
+            isPatternSetup = true;
             DOVirtual.DelayedCall(0.7f, () =>
             {
                 hitboxTransforms[3].gameObject.SetActive(true);
@@ -190,7 +192,7 @@ public class Soil : BossBase
         }
         if (curTimes[0] > 0) return TaskStatus.Continue;
 
-        isParrernSetup = false;
+        isPatternSetup = false;
         return TaskStatus.Success;
 
     }
@@ -199,7 +201,7 @@ public class Soil : BossBase
 
     private TaskStatus Move()
     {
-        if (HorizontalDistance <= attackRange) return TaskStatus.Failure;
+        if (HorizontalDistance <= attackRange[4]) return TaskStatus.Failure;
 
         animationController.Play(5);
         float dir = Mathf.Sign(player.transform.position.x - transform.position.x);

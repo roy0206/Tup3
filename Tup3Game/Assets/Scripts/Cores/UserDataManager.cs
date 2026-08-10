@@ -69,4 +69,9 @@ public class UserDataManager : Singleton<UserDataManager>
         await SaveAsync();
         Debug.Log("[UserDataManager] Reset.");
     }
+
+    public void ClearPlayData()
+    {
+        Data.Play =  new PlayData();
+    }
 }

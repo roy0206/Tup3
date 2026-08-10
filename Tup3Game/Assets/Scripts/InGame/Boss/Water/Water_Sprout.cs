@@ -5,7 +5,7 @@ using System.Collections;
 public class Water_Sprout: MonoBehaviour
 {
     [Header("딜레이")]
-    [SerializeField] private float lifeTime = 5f;
+    [SerializeField] private float lifeTime = 2f;
     [SerializeField] private float startDelay = 0.4f;
 
     [Header("Path Collider Growth")]
@@ -23,8 +23,14 @@ public class Water_Sprout: MonoBehaviour
     [SerializeField] private float pathLength = 15f;
     [SerializeField] private float pathWidth = 0.2f; // SetTargetWidth로 덮어씀
     [SerializeField] private float pathFadeDuration = 0.4f;
-
     private const float spriteNativeHeight = 5.6f; // waterspout_2 스프라이트 실제 높이(유닛), 피벗은 좌하단
+
+
+    [Header("생성 연출 (옆에서부터 자라나는 효과)")]
+    [SerializeField] private AnimationCurve growCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+    private float targetScaleY;  // SetTargetLength에서 계산된 최종 scale.y 캐싱
+    private float targetPosX;    // SetTargetLength에서 계산된 최종 localPosition.x 캐싱
+
 
     private Vector2 direction;
     private float delayElapsed = 0f;
@@ -48,6 +54,15 @@ public class Water_Sprout: MonoBehaviour
         if (!isGrowing)
         {
             delayElapsed += Time.deltaTime;
+
+            if (Watersprout_render != null)
+            {
+                float growT = Mathf.Clamp01(delayElapsed / startDelay);
+                float scaleT = growCurve.Evaluate(growT);
+                Watersprout_render.localScale = new Vector3(pathWidth, targetScaleY * scaleT, 1f);
+                Watersprout_render.localPosition = new Vector3(targetPosX * scaleT, 0f, 0f);
+            }
+
             if (delayElapsed >= startDelay)
             {
                 isGrowing = true;
@@ -90,10 +105,14 @@ public class Water_Sprout: MonoBehaviour
     private IEnumerator LifeTimeRoutine()
     {
         yield return new WaitForSeconds(lifeTime);
+        
         Watersprout_Anmimation.SetBool("On", false);
+        
         if (pathCollider != null)
             pathCollider.enabled = false;
+        
         yield return null;
+        
         float exitAnimLength = Watersprout_Anmimation.GetCurrentAnimatorStateInfo(0).length;
         
         yield return new WaitForSeconds(exitAnimLength);
@@ -132,6 +151,12 @@ public class Water_Sprout: MonoBehaviour
             pathCollider.offset = new Vector2(0f, baseOffsetY); // 시작점부터 자라도록 초기화
             growTimer = 0f;
         }
+
+        if (Watersprout_render != null)
+        {
+            Watersprout_render.localScale = new Vector3(pathWidth, 0f, 1f);
+            Watersprout_render.localPosition = new Vector3(0f, 0f, 0f);
+        }
     }
 
     private IEnumerator FadePathSprite()
@@ -165,6 +190,8 @@ public class Water_Sprout: MonoBehaviour
         Debug.Log($"SetTargetLength 호출됨. 전달받은 width = {length}");
         targetSize.x = length;
         pathLength = length;
+        targetScaleY = length / spriteNativeHeight * 0.7f;
+        targetPosX = length / spriteNativeHeight * 3.5f * 0.7f;
         Watersprout_render.localScale = new Vector3(pathWidth, length / spriteNativeHeight * 0.7f, 1f);
         Watersprout_render.localPosition = new Vector3((length / spriteNativeHeight * 3.5f * 0.7f), 0, 0);
     }

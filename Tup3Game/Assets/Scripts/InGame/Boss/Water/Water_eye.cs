@@ -9,12 +9,15 @@ public class Water_eye : MonoBehaviour
     private float hp;
     public bool IsDead { get; private set; }
 
-
     [Header("생존 시간")]
     public float lifeTime = 5f;
 
+    [Header("크기")]
+    public float scale = 1f;
+
     [Header("피격 연출")]
     public SpriteRenderer spriteRenderer;
+    public CircleCollider2D Collider;
     public float hitFlashDuration = 0.1f;
     public Color hitFlashColor = Color.red;
 
@@ -27,17 +30,19 @@ public class Water_eye : MonoBehaviour
         hp = maxHp;
         if (spriteRenderer == null)
             spriteRenderer = GetComponent<SpriteRenderer>();
+        if (Collider == null)
+            Collider = GetComponent<CircleCollider2D>();
+        Scale(scale);
         Eye_animation = GetComponent<Animator>();
         Eye_animation.SetBool("Can_attack_eye", true);
     }
 
-    public void Init(BossBase boss)
+    public void Init(BossBase boss, float time, float newscale)
     {
         bossRef = boss;
-    }
-
-    private void Start()
-    {
+        lifeTime = time;
+        CancelInvoke();
+        Scale(newscale);
         Invoke(nameof(ExpireByTime), lifeTime);
     }
     
@@ -83,21 +88,29 @@ public class Water_eye : MonoBehaviour
 
         Eye_animation.enabled = true;
     }
-    private void ExpireByTime()
+
+    public void Scale(float scale)
+    {
+        spriteRenderer.transform.localScale = new Vector3(scale, scale, scale);
+        Collider.transform.localScale = new Vector3(scale, scale, scale);
+    }
+
+    public void ExpireByTime()
     {
         if (IsDead) return;
         IsDead = true;
         Die();
     }
 
-    private void Die()
+    public void Die()
     {
         CancelInvoke(nameof(ExpireByTime)); // 체력으로 먼저 죽었으면 타임아웃 예약 취소
 
         Eye_animation.SetBool("Can_attack_eye", false);
-        
-        
+
         Debug.Log("Water Eye Destroyed");
+
+        DestroySelf();
     }
 
     public void DestroySelf()
