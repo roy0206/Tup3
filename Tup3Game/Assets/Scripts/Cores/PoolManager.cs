@@ -148,6 +148,7 @@ public class PoolManager : Singleton<PoolManager>, ISceneEventListener
     GameObject CreateInstance(GameObject prefab, string prefabName)
     {
         var go = Instantiate(prefab, _root);
+        go.SetActive(false);    // 프리팹이 active면 Instantiate 즉시 OnEnable이 프리팹 좌표에서 돈다. Get이 위치를 잡은 뒤 켜지도록 꺼둔다
         go.name = prefabName;   // "(Clone)" 접미사 제거 — 이름을 키로 쓰므로 통일해둔다
         _owner[go] = new Entry { prefabName = prefabName };
         return go;

@@ -68,18 +68,18 @@ private TaskStatus PatternStarter(int num)
 ### 패턴 하나의 구조 (전부 동일한 틀)
 
 ```csharp
-private bool isParrernSetup;   // 이 패턴이 이미 시작됐는지 (전 패턴 공용 플래그)
+private bool isPatternSetup;   // 이 패턴이 이미 시작됐는지 (전 패턴 공용 플래그)
 
 private TaskStatus Pattern1()
 {
     if (IsDead) return TaskStatus.Failure;
 
-    if (!isParrernSetup)          // ── 진입 프레임에 딱 한 번 ──
+    if (!isPatternSetup)          // ── 진입 프레임에 딱 한 번 ──
     {
         curTimes[1] = 10;         // 이 패턴 쿨타임 10초
         curTimes[0] = 2;          // 이 패턴이 2초간 진행됨
         animationController.Play(1);
-        isParrernSetup = true;
+        isPatternSetup = true;
 
         // DOTween 타이머로 히트박스 on/off 타이밍 예약
         DOVirtual.DelayedCall(1f,   () => hitboxTransforms[0].gameObject.SetActive(true));
@@ -89,7 +89,7 @@ private TaskStatus Pattern1()
 
     if (curTimes[0] > 0) return TaskStatus.Continue;  // 끝날 때까지 이 노드 붙잡기
 
-    isParrernSetup = false;       // ── 종료 처리 ──
+    isPatternSetup = false;       // ── 종료 처리 ──
     return TaskStatus.Success;
 }
 ```
@@ -179,6 +179,6 @@ PoolManager.Instance.Release(go, 4f);   // 4초 뒤 자동 반납
 ### 자주 하는 실수
 
 - `.End()` 개수를 틀리면 트리 모양이 조용히 망가진다. 들여쓰기 맞춰서 세기.
-- `isParrernSetup`은 **보스당 하나뿐인 공용 플래그**다. 패턴은 `Continue` 중에 서로 끼어들 수 없으니 지금은 문제 없지만, 패턴을 동시에 돌릴 생각이면 패턴별 플래그로 쪼개야 한다.
+- `isPatternSetup`은 **보스당 하나뿐인 공용 플래그**다. 패턴은 `Continue` 중에 서로 끼어들 수 없으니 지금은 문제 없지만, 패턴을 동시에 돌릴 생각이면 패턴별 플래그로 쪼개야 한다.
 - `curTimes[0]`(지속시간)을 애니메이션 길이보다 짧게 잡으면 다음 행동이 애니를 끊는다.
 - `Move()`/`Stay()`는 절대 `Failure`만 내면 안 된다. 둘 다 실패하면 보스가 아무것도 안 하는 프레임이 생긴다.

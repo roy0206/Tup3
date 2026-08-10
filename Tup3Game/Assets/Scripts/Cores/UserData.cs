@@ -7,10 +7,10 @@ using UnityEngine;
 public enum BossFlag
 {
     None  = 0,
-    Fire  = 1 << 0,
+    Soil = 1 << 0,
     Water = 1 << 1,
-    Gold  = 1 << 2,
-    Earth = 1 << 3,
+    Fire  = 1 << 2,
+    Gold  = 1 << 3,
 }
 
 public class UserData
@@ -25,7 +25,7 @@ public class PlayData
 {
     public SerializedVector position;
     public float health;
-    public List<bool> skills = new();
+    public List<bool> skills = new(){false, false, false, false};
 
     public BossFlag clearedBosses = 0;
 }
