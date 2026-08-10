@@ -11,7 +11,7 @@ public class BossExit : InteractionBase
     {
         if (base.OnInteract())
         {
-            SceneController.Instance.LoadScene("RoyScene");
+            SceneController.Instance.LoadScene("Lobby");
             return true;
         }
 

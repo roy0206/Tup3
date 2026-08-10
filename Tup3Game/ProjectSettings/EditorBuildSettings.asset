@@ -6,20 +6,26 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/@Developer/ROYental/RoyScene.unity
+    path: Assets/Scenes/Start.unity
+    guid: dda155f1243ff84438f3244fb50ba7b2
+  - enabled: 1
+    path: Assets/Scenes/Lobby.unity
     guid: 5f6b633301182944587b9bbc5524ba0b
+  - enabled: 1
+    path: Assets/Scenes/Boss_Fire.unity
+    guid: 33dbc61c6f990004f8d74cc77a2be58c
   - enabled: 1
     path: Assets/Scenes/Boss_Soil.unity
     guid: 9c2e3d9a247055b4688b42285ee67a72
   - enabled: 1
-    path: Assets/Scenes/Game.unity
+    path: Assets/Scenes/Styx.unity
     guid: 3419b094b122e8041a3c2e397c02d671
   - enabled: 1
     path: Assets/Scenes/Loading.unity
     guid: f61d4e30bc4fd194ab10cc1cf1bfd2bd
   - enabled: 1
-    path: Assets/Scenes/Start.unity
-    guid: dda155f1243ff84438f3244fb50ba7b2
+    path: Assets/Scenes/Ending.unity
+    guid: 08d12a0eec13dd1429ff7e2083b24cdc
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: cdf61fb3b07ef854f989175198eabd19, type: 2}
     com.unity.dt.app-ui: {fileID: 11400000, guid: 99f9c9493070a9d4c979a8fec7c5a8d3, type: 2}

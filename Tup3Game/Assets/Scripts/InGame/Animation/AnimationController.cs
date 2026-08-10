@@ -21,8 +21,9 @@ public class AnimationController : MonoBehaviour
 
     public void Play(int num)
     {
-        if(animation.clip.name != animationClips[num].name)
-            animation.Play(animationClips[num].name);
+        string clipName = animationClips[num].name;
+        if(!animation.IsPlaying(clipName))
+            animation.Play(clipName);
     }
 
     public void Stop(int num)

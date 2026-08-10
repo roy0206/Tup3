@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Fire
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: Fire
+  m_GUID: 6fdcebefc889bdf4c8d0e10977909301
+  m_SerializeEntries:
+  - m_GUID: 5bd3bfadd742b0b4fbe2a32e96070280
+    m_Address: Lava
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - BossAsset
+    - Pool
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 99e80ee1779c5a54bad6f0b01847a8fb
+    m_Address: FireAim
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - BossAsset
+    - Pool
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9e6172bb17626af4c81c4be6593221ad
+    m_Address: FireColumn
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - BossAsset
+    - Pool
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b1179ce28e840174fbaa420932c6144a
+    m_Address: LavaPool
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - BossAsset
+    - Pool
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 0a5bfcc833d0b0a4cadf2be628e75e99, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: be88fe438e53c8043a9d47c8e1c7536c, type: 2}
+    - {fileID: 11400000, guid: 10ba317d9b4a6ab4786525467a068d3c, type: 2}
