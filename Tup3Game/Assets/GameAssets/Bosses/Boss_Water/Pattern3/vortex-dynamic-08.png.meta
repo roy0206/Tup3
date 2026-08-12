@@ -1,13 +1,16 @@
 fileFormatVersion: 2
-guid: 7641635cdec559e4a911f3a89e238797
+guid: c80fc8eb6f98f374ca8f80b50b002d54
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7608458893857104696
-    second: vortex-blue_0
+      213: -788469618117037414
+    second: vortex-dynamic-08_0
   - first:
-      213: -6791531389730989672
-    second: vortex-blue_1
+      213: 7431690425924072894
+    second: vortex-dynamic-08_1
+  - first:
+      213: 3755300413690319057
+    second: vortex-dynamic-08_2
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -49,7 +52,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -103,13 +106,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: vortex-blue_0
+      name: vortex-dynamic-08_0
       rect:
         serializedVersion: 2
-        x: 179
-        y: 152
-        width: 896
-        height: 931
+        x: 41
+        y: 15
+        width: 349
+        height: 359
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -118,20 +121,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 833a3887d0da69960800000000000000
-      internalID: 7608458893857104696
+      spriteID: a9232ff4f0bce05f0800000000000000
+      internalID: -788469618117037414
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: vortex-blue_1
+      name: vortex-dynamic-08_1
       rect:
         serializedVersion: 2
-        x: 355
-        y: 920
-        width: 367
-        height: 178
+        x: 90
+        y: 329
+        width: 172
+        height: 70
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -140,8 +143,30 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 8995b222f22afb1a0800000000000000
-      internalID: -6791531389730989672
+      spriteID: eb530ed411ba22760800000000000000
+      internalID: 7431690425924072894
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vortex-dynamic-08_2
+      rect:
+        serializedVersion: 2
+        x: 319
+        y: 363
+        width: 20
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1d093ee64d18d1430800000000000000
+      internalID: 3755300413690319057
       vertices: []
       indices: 
       edges: []
@@ -150,7 +175,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -160,8 +185,9 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      vortex-blue_0: 7608458893857104696
-      vortex-blue_1: -6791531389730989672
+      vortex-dynamic-08_0: -788469618117037414
+      vortex-dynamic-08_1: 7431690425924072894
+      vortex-dynamic-08_2: 3755300413690319057
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
