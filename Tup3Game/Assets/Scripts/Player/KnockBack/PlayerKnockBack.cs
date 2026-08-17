@@ -22,12 +22,19 @@ public class PlayerKnockBack : MonoBehaviour
 
         combo.CancelCombo();
 
-        Vector2 direction = ((Vector2)transform.position - hitOrigin).normalized;
-        
-        float dirX = Mathf.Abs(direction.x) < 0.1f ? (transform.position.x >= hitOrigin.x ? 1f : -1f) : direction.x;
+        if (knockbackForce > 0f)
+        {
+            Vector2 direction = ((Vector2)transform.position - hitOrigin).normalized;
+            float dirX = Mathf.Abs(direction.x) < 0.1f
+                ? (transform.position.x >= hitOrigin.x ? 1f : -1f)
+                : direction.x;
 
-        Vector2 knockbackVelocity = new Vector2(dirX * knockbackForce,movement.GetVerticalVelocityForKnockback());
-        movement.ApplyKnockback(knockbackVelocity, decelSpeed: 20f);
+            Vector2 knockbackVelocity = new Vector2(
+                dirX * knockbackForce,
+                movement.GetVerticalVelocityForKnockback()
+            );
+            movement.ApplyKnockback(knockbackVelocity, decelSpeed: 20f);
+        }
 
         StartCoroutine(InvincibilityRoutine());
     }

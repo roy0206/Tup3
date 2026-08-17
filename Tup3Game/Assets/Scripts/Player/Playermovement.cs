@@ -49,6 +49,8 @@ public class Playermovement : MonoBehaviour
     [SerializeField] private bool isInWater = false;
     [SerializeField] private float waterFlapForce = 8f;      // 점프키 눌렀을 때 위로 튀는 힘
     [SerializeField] private float waterMaxFallSpeed = 3f;    // 하강 속도 상한선 (계속 빨라지지 않게)
+    [SerializeField] private float waterFastDescendSpeed = 8f;
+    [SerializeField] private KeyCode waterDescendKey = KeyCode.DownArrow;
     [SerializeField] private float waterGravityMultiplier = 0.3f;
 
     private BoxCollider2D col;
@@ -322,6 +324,13 @@ public class Playermovement : MonoBehaviour
 
             if (hit)
             {
+                bool isPassThroughPlatform =
+                 hit.collider.CompareTag("ChangeablePlatform") ||
+                 hit.collider.CompareTag("Slippery");
+
+                if (directionY > 0f && isPassThroughPlatform)
+                    continue;
+
                 float correctedDistance = Mathf.Max(hit.distance - skinWidth, 0f);
                 moveAmount.y = correctedDistance * directionY;
                 rayLength = Mathf.Max(hit.distance, skinWidth);
@@ -406,7 +415,11 @@ public class Playermovement : MonoBehaviour
 
     private void HandleWaterMovement()
     {
-        if (Input.GetKeyDown(KeyCode.X)) // 기존 점프 입력 감지 변수 재활용
+        if (Input.GetKey(waterDescendKey))
+        {
+            velocity.y = -waterFastDescendSpeed;
+        }
+        else if (Input.GetKeyDown(KeyCode.X)) // 기존 점프 입력 감지 변수 재활용
         {
             velocity.y = waterFlapForce; // 기존 velocity 무시하고 즉시 덮어씀 -> 플래피버드 느낌
             if (animator != null)
@@ -466,6 +479,8 @@ public class Playermovement : MonoBehaviour
     }
 
     public bool IsDashing() => isDashing;
+    public bool IsInWater => isInWater;
+    public bool IsGrounded => collisions.below;
     public void ResetVerticalVelocity() => velocity.y = 0f;
     public float GetFacingDirection() => facingDirection;
 

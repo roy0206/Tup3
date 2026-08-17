@@ -122,6 +122,16 @@ public class Water_Sprout: MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        TryDamage(other);
+    }
+
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        TryDamage(other);
+    }
+
+    private void TryDamage(Collider2D other)
+    {
         if (other.TryGetComponent(out PlayerKnockBack playerKnockback))
         {
             playerKnockback.TakeHit(this.transform.position, 0f, (int)damage);

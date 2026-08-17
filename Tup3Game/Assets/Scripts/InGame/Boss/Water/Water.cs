@@ -38,8 +38,8 @@ public class Water : BossBase
     [SerializeField] private GameObject eyePrefab;
     [SerializeField] private float[] Scale;
     [SerializeField] private Transform[] eyeSpawnPoints;
-    private Water_eye currentEye;
-    private GameObject Eye;
+    [SerializeField] private float normalEyeOpenTime = 5.5f;
+    private readonly List<Water_eye> activeEyes = new();
 
     [Header("소용돌이 패턴")]
     [SerializeField] private Storm stormPrefab;
@@ -59,8 +59,20 @@ public class Water : BossBase
     [SerializeField] private RisingWaterPhase risingWaterPhase;
     [SerializeField, Range(0f, 1f)] private float encroachmentHpRatio = 0.5f;
 
+    [Header("잠식 전조 및 파훼")]
+    [SerializeField] private GameObject encroachmentWarningPrefab;
+    [SerializeField] private Transform encroachmentWarningPoint;
+    [SerializeField] private float encroachmentTelegraphDuration = 5f;
+    [SerializeField] private Vector2 encroachmentSealCheckSize = new Vector2(2f, 2f);
+    [SerializeField] private LayerMask encroachmentSealMask = -1;
+
     private BossPhase currentPhase = BossPhase.Normal;
     private float encroachmentTriggerHp;
+    private float encroachmentTelegraphRemaining;
+    private bool hasAttemptedEncroachment;
+    private bool hasStartedWaterRise;
+    private GameObject encroachmentWarningInstance;
+    private Water_eye encroachmentEye;
     private bool hasCleanedUpDeath;
 
     new void Awake()
@@ -121,7 +133,19 @@ public class Water : BossBase
 
         if (!hasCleanedUpDeath)
         {
+            CleanupEncroachmentWarning();
             risingWaterPhase?.StopAndHide();
+
+            foreach (Water_eye eye in activeEyes)
+            {
+                if (eye != null)
+                    eye.ExpireByTime();
+            }
+
+            WaterBossAbsorption absorption = GetComponent<WaterBossAbsorption>();
+            if (absorption != null)
+                absorption.enabled = true;
+
             hasCleanedUpDeath = true;
         }
 
@@ -132,7 +156,7 @@ public class Water : BossBase
 
     private TaskStatus CheckEncroachmentTrigger()
     {
-        if (currentPhase != BossPhase.Normal)
+        if (currentPhase != BossPhase.Normal || hasAttemptedEncroachment)
             return TaskStatus.Failure;
 
         return Hp <= encroachmentTriggerHp
@@ -144,8 +168,50 @@ public class Water : BossBase
     {
         if (currentPhase == BossPhase.Normal)
         {
+            hasAttemptedEncroachment = true;
             currentPhase = BossPhase.EncroachmentTelegraph;
             isPatternSetup = false;
+            hasStartedWaterRise = false;
+            encroachmentTelegraphRemaining = encroachmentTelegraphDuration;
+
+            encroachmentEye = SpawnEye(
+                2,
+                encroachmentTelegraphDuration + 5f,
+                true
+            );
+
+            Transform warningPoint = encroachmentWarningPoint != null
+                ? encroachmentWarningPoint
+                : stormSpawnPoint;
+
+            if (encroachmentWarningPrefab != null && warningPoint != null)
+            {
+                encroachmentWarningInstance = Instantiate(
+                    encroachmentWarningPrefab,
+                    warningPoint.position,
+                    warningPoint.rotation
+                );
+            }
+        }
+
+        if (!hasStartedWaterRise && IsEncroachmentSealed())
+        {
+            CleanupEncroachmentWarning();
+            if (encroachmentEye != null)
+                encroachmentEye.ExpireByTime();
+
+            currentPhase = BossPhase.Normal;
+            return TaskStatus.Success;
+        }
+
+        if (!hasStartedWaterRise)
+        {
+            encroachmentTelegraphRemaining -= Time.deltaTime;
+            if (encroachmentTelegraphRemaining > 0f)
+                return TaskStatus.Continue;
+
+            CleanupEncroachmentWarning();
+            hasStartedWaterRise = true;
 
             if (risingWaterPhase == null || !risingWaterPhase.BeginRise())
             {
@@ -165,27 +231,87 @@ public class Water : BossBase
         return TaskStatus.Continue;
     }
 
+    private bool IsEncroachmentSealed()
+    {
+        Transform warningPoint = encroachmentWarningPoint != null
+            ? encroachmentWarningPoint
+            : stormSpawnPoint;
+
+        if (warningPoint == null)
+            return false;
+
+        Collider2D[] overlaps = Physics2D.OverlapBoxAll(
+            warningPoint.position,
+            encroachmentSealCheckSize,
+            0f,
+            encroachmentSealMask
+        );
+
+        foreach (Collider2D overlap in overlaps)
+        {
+            if (overlap != null && overlap.CompareTag("STOP"))
+                return true;
+        }
+
+        return false;
+    }
+
+    private void CleanupEncroachmentWarning()
+    {
+        if (encroachmentWarningInstance != null)
+        {
+            Destroy(encroachmentWarningInstance);
+            encroachmentWarningInstance = null;
+        }
+    }
+
     private TaskStatus PatternStarter(int num)
     {
+        if (currentPhase == BossPhase.EncroachmentTelegraph)
+            return TaskStatus.Failure;
+
+        if (currentPhase != BossPhase.Encroached && num >= 3)
+            return TaskStatus.Failure;
+
         if (curTimes[num] > 0) return TaskStatus.Failure;
         return TaskStatus.Success;
     }
 
     private bool isPatternSetup;
 
-    private void SpawnEye(int patternIndex, float lifeTime)
+    private Water_eye SpawnEye(int eyeIndex, float lifeTime, bool damageable = true)
     {
-        if (eyePrefab == null) return;
-        if (eyeSpawnPoints == null || patternIndex >= eyeSpawnPoints.Length || eyeSpawnPoints[patternIndex] == null) return;
+        if (eyePrefab == null)
+            return null;
 
-        Eye = Instantiate(eyePrefab, eyeSpawnPoints[patternIndex].position, Quaternion.identity);
-
-        currentEye = Eye.GetComponent<Water_eye>();
-
-        if (currentEye != null)
+        if (eyeSpawnPoints == null ||
+            eyeIndex < 0 ||
+            eyeIndex >= eyeSpawnPoints.Length ||
+            eyeSpawnPoints[eyeIndex] == null)
         {
-            currentEye.Init(this, lifeTime, Scale[patternIndex]);
+            Debug.LogWarning($"Water: 눈 {eyeIndex + 1} 생성 위치가 연결되지 않았습니다.", this);
+            return null;
         }
+
+        GameObject eyeObject = Instantiate(
+            eyePrefab,
+            eyeSpawnPoints[eyeIndex].position,
+            eyeSpawnPoints[eyeIndex].rotation
+        );
+
+        Water_eye eye = eyeObject.GetComponent<Water_eye>();
+
+        if (eye != null)
+        {
+            float eyeScale = Scale != null && eyeIndex < Scale.Length
+                ? Scale[eyeIndex]
+                : 1f;
+
+            eye.Init(this, lifeTime, eyeScale, damageable);
+            activeEyes.Add(eye);
+        }
+
+        return eye;
     }
 
     private TaskStatus Pattern1_IceBullet()
@@ -193,11 +319,12 @@ public class Water : BossBase
         if (IsDead) return TaskStatus.Failure;
         if (!isPatternSetup)
         {
-            curTimes[1] = iceBullet_CoolTime; // TODO: 쿨타임 값 조정
+            curTimes[1] = iceBullet_DelayTime + iceBullet_CoolTime;
             curTimes[0] = iceBullet_DelayTime; // TODO: 패턴 총 지속시간 (애니메이션 길이에 맞춰서)
             isPatternSetup = true;
             
-            SpawnEye(0, iceBullet_DelayTime);
+            // 얼음 발사는 눈2가 담당한다.
+            SpawnEye(1, normalEyeOpenTime);
             
             if (iceBulletSpawnZones != null && iceBulletSpawnZones.Length > 0)
             {
@@ -206,9 +333,22 @@ public class Water : BossBase
                 {
                     DOVirtual.DelayedCall(0.3f, () =>
                     {
-                        chosenZone.SpawnIceBullets(iceBullet_SpawnCount);
-                    });
+                        if (!IsDead)
+                            chosenZone.SpawnIceBullets(iceBullet_SpawnCount);
+                    }).SetLink(gameObject, LinkBehaviour.KillOnDestroy);
                 }
+            }
+
+            // 잠식 이후에는 눈1 분출과 눈2 얼음발사가 함께 발동될 수 있다.
+            if (currentPhase == BossPhase.Encroached && watersproutzone != null)
+            {
+                curTimes[2] = WaterSprout_DelayTime + WaterSprout_CoolTime;
+                SpawnEye(0, normalEyeOpenTime);
+                DOVirtual.DelayedCall(0.5f, () =>
+                {
+                    if (!IsDead)
+                        watersproutzone.SpawnWaterBullets(WaterSprout_SpawnCount);
+                }).SetLink(gameObject, LinkBehaviour.KillOnDestroy);
             }
         }
 
@@ -226,16 +366,18 @@ public class Water : BossBase
         if (IsDead) return TaskStatus.Failure;
         if (!isPatternSetup)
         {
-            curTimes[2] = WaterSprout_CoolTime; // TODO: 쿨타임 값 조정
+            curTimes[2] = WaterSprout_DelayTime + WaterSprout_CoolTime;
             curTimes[0] = WaterSprout_DelayTime;  // TODO: 패턴 총 지속시간
             isPatternSetup = true;
-            SpawnEye(1, WaterSprout_DelayTime);
+            // 물 분출은 눈1이 담당한다.
+            SpawnEye(0, normalEyeOpenTime);
             if (watersproutzone != null)
             {
                 DOVirtual.DelayedCall(0.5f, () =>
                 {
-                    watersproutzone.SpawnWaterBullets(WaterSprout_SpawnCount);
-                });
+                    if (!IsDead)
+                        watersproutzone.SpawnWaterBullets(WaterSprout_SpawnCount);
+                }).SetLink(gameObject, LinkBehaviour.KillOnDestroy);
             }
         }
         
@@ -253,11 +395,10 @@ public class Water : BossBase
         if (IsDead) return TaskStatus.Failure;
         if (!isPatternSetup)
         {
-            curTimes[3] = 30f; // TODO: 쿨타임 값 조정
-            curTimes[0] = 10f; // TODO: 패턴 총 지속시간
+            curTimes[3] = stormPatternDuration + stormCoolTime;
+            curTimes[0] = stormPatternDuration;
             isPatternSetup = true;
             SpawnEye(2, stormPatternDuration);
-            Destroy(Eye, curTimes[0]);
             DOVirtual.DelayedCall(stormSpawnDelay, () =>
             {
                 if (IsDead)
@@ -285,30 +426,52 @@ public class Water : BossBase
         if (IsDead) return TaskStatus.Failure;
         if (!isPatternSetup)
         {
-            curTimes[4] = electricBallCoolTime;
+            curTimes[4] = electricBallPatternDuration + electricBallCoolTime;
             curTimes[0] = electricBallPatternDuration;
             isPatternSetup = true;
-            SpawnEye(3, electricBallPatternDuration);
-            DOVirtual.DelayedCall(electricBallSpawnDelay, () =>
-            {
-                if (IsDead)
-                    return;
-
-                if (electricBallPrefab != null &&
-                    electricBallSpawnPoint != null)
-                {
-                    Instantiate(
-                        electricBallPrefab,
-                        electricBallSpawnPoint.position,
-                        electricBallSpawnPoint.rotation
-                    );
-                }
-            }).SetLink(gameObject, LinkBehaviour.KillOnDestroy);
+            SpawnEye(3, normalEyeOpenTime, false);
+            StartCoroutine(SpawnElectricBalls());
         }
 
         if (curTimes[0] > 0) return TaskStatus.Continue;
 
         isPatternSetup = false;
         return TaskStatus.Success;
+    }
+
+    private IEnumerator SpawnElectricBalls()
+    {
+        yield return new WaitForSeconds(electricBallSpawnDelay);
+
+        if (electricBallPrefab == null || electricBallSpawnPoint == null)
+            yield break;
+
+        for (int i = 0; i < 3; i++)
+        {
+            if (IsDead || currentPhase != BossPhase.Encroached)
+                yield break;
+
+            Instantiate(
+                electricBallPrefab,
+                electricBallSpawnPoint.position,
+                electricBallSpawnPoint.rotation
+            );
+
+            if (i < 2)
+                yield return new WaitForSeconds(electricBallPrefab.ChargeDuration);
+        }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Transform warningPoint = encroachmentWarningPoint != null
+            ? encroachmentWarningPoint
+            : stormSpawnPoint;
+
+        if (warningPoint == null)
+            return;
+
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireCube(warningPoint.position, encroachmentSealCheckSize);
     }
 }
