@@ -324,6 +324,13 @@ public class Playermovement : MonoBehaviour
 
             if (hit)
             {
+                bool isPassThroughPlatform =
+                 hit.collider.CompareTag("ChangeablePlatform") ||
+                 hit.collider.CompareTag("Slippery");
+
+                if (directionY > 0f && isPassThroughPlatform)
+                    continue;
+
                 float correctedDistance = Mathf.Max(hit.distance - skinWidth, 0f);
                 moveAmount.y = correctedDistance * directionY;
                 rayLength = Mathf.Max(hit.distance, skinWidth);
