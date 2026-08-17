@@ -48,7 +48,6 @@ public class Playermovement : MonoBehaviour
     [Header("Water Swim Settings")]
     [SerializeField] private bool isInWater = false;
     [SerializeField] private float waterFlapForce = 8f;      // 점프키 눌렀을 때 위로 튀는 힘
-    [SerializeField] private float waterSinkSpeed = 2f;       // 물속 기본 하강 속도 (느리게)
     [SerializeField] private float waterMaxFallSpeed = 3f;    // 하강 속도 상한선 (계속 빨라지지 않게)
     [SerializeField] private float waterGravityMultiplier = 0.3f;
 

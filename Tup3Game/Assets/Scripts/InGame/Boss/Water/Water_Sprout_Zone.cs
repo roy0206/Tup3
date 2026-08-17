@@ -17,10 +17,10 @@ public class Water_Sprout_Zone : MonoBehaviour
     }
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Y))
+       /* if (Input.GetKeyDown(KeyCode.Y))
         {
             SpawnWaterBullets(SpawnNum);
-        }
+        }*/
     }
 
     void Set_spawnpoint()

@@ -41,14 +41,27 @@ public class Water : BossBase
     private Water_eye currentEye;
     private GameObject Eye;
 
-    [Header("소용돌이")]
-    [SerializeField] private Transform Storm_spawnpoint;
-    [SerializeField] private float Storm_force;
+    [Header("소용돌이 패턴")]
+    [SerializeField] private Storm stormPrefab;
+    [SerializeField] private Transform stormSpawnPoint;
+    [SerializeField] private float stormSpawnDelay = 0.5f;
+    [SerializeField] private float stormPatternDuration = 10f;
+    [SerializeField] private float stormCoolTime = 30f;
+
+    [Header("전기 구체 패턴")]
+    [SerializeField] private Electric_ball electricBallPrefab;
+    [SerializeField] private Transform electricBallSpawnPoint;
+    [SerializeField] private float electricBallSpawnDelay = 0.5f;
+    [SerializeField] private float electricBallPatternDuration = 1.5f;
+    [SerializeField] private float electricBallCoolTime = 30f;
+
+    [Header("잠식 2페이즈")]
+    [SerializeField] private RisingWaterPhase risingWaterPhase;
+    [SerializeField, Range(0f, 1f)] private float encroachmentHpRatio = 0.5f;
 
     private BossPhase currentPhase = BossPhase.Normal;
-    private Coroutine telegraphRoutine;/*
-    [SerializeField] private CrackZone crackZone;*/
-    [SerializeField] private float telegraphDuration = 5f;
+    private float encroachmentTriggerHp;
+    private bool hasCleanedUpDeath;
 
     new void Awake()
     {
@@ -57,11 +70,11 @@ public class Water : BossBase
             .Selector("Root")
                 .Sequence("DeadSequence")
                     .Do("Dead", Dead)
-                .End()/*
+                .End()
                 .Sequence("EncroachmentSequence")
-                        .Do("CheckEncroachmentTrigger", CheckEncroachmentTrigger)
-                        .Do("EnterTelegraphPhase", EnterTelegraphPhase)
-                    .End()*/
+                    .Do("CheckEncroachmentTrigger", CheckEncroachmentTrigger)
+                    .Do("EnterEncroachmentPhase", EnterEncroachmentPhase)
+                .End()
                 .Selector("PatternSelector")
                     .Sequence("1")
                         .Do("Cool1", () => PatternStarter(1))
@@ -75,17 +88,22 @@ public class Water : BossBase
                         .Do("Cool3", () => PatternStarter(3))
                         .Do("A3_ThunderStorm", Pattern3_Storm)
                     .End()
+                    .Sequence("4")
+                        .Do("Cool4", () => PatternStarter(4))
+                        .Do("A4_ElectricBall", Pattern4_ElectricBall)
+                    .End()
                 .End()
             .End()
             .Build();
 
         curTimes = new List<float>()
         {
-            0, 0, 0, 0
+            0, 0, 0, 0, 0
         };
 
         animationController = GetComponent<AnimationController>();
         player = GameObject.FindGameObjectWithTag("Player");
+        encroachmentTriggerHp = Hp * encroachmentHpRatio;
     }
 
     private void Update()
@@ -100,9 +118,51 @@ public class Water : BossBase
     private TaskStatus Dead()
     {
         if (!IsDead) return TaskStatus.Failure;
-        gameObject.layer = LayerMask.GetMask("Default");
+
+        if (!hasCleanedUpDeath)
+        {
+            risingWaterPhase?.StopAndHide();
+            hasCleanedUpDeath = true;
+        }
+
+        gameObject.layer = LayerMask.NameToLayer("Default");
 
         return TaskStatus.Success;
+    }
+
+    private TaskStatus CheckEncroachmentTrigger()
+    {
+        if (currentPhase != BossPhase.Normal)
+            return TaskStatus.Failure;
+
+        return Hp <= encroachmentTriggerHp
+            ? TaskStatus.Success
+            : TaskStatus.Failure;
+    }
+
+    private TaskStatus EnterEncroachmentPhase()
+    {
+        if (currentPhase == BossPhase.Normal)
+        {
+            currentPhase = BossPhase.EncroachmentTelegraph;
+            isPatternSetup = false;
+
+            if (risingWaterPhase == null || !risingWaterPhase.BeginRise())
+            {
+                Debug.LogError("Water: Rising Water Phase가 연결되지 않아 수위 상승 없이 2페이즈로 전환합니다.", this);
+                currentPhase = BossPhase.Encroached;
+                return TaskStatus.Success;
+            }
+        }
+
+        if (currentPhase == BossPhase.EncroachmentTelegraph &&
+            risingWaterPhase.HasReachedTarget)
+        {
+            currentPhase = BossPhase.Encroached;
+            return TaskStatus.Success;
+        }
+
+        return TaskStatus.Continue;
     }
 
     private TaskStatus PatternStarter(int num)
@@ -196,8 +256,22 @@ public class Water : BossBase
             curTimes[3] = 30f; // TODO: 쿨타임 값 조정
             curTimes[0] = 10f; // TODO: 패턴 총 지속시간
             isPatternSetup = true;
-            SpawnEye(2, 10f);
+            SpawnEye(2, stormPatternDuration);
             Destroy(Eye, curTimes[0]);
+            DOVirtual.DelayedCall(stormSpawnDelay, () =>
+            {
+                if (IsDead)
+                    return;
+
+                if (stormPrefab != null && stormSpawnPoint != null)
+                {
+                    Instantiate(
+                        stormPrefab,
+                        stormSpawnPoint.position,
+                        stormSpawnPoint.rotation
+                    );
+                }
+            }).SetLink(gameObject, LinkBehaviour.KillOnDestroy);
         }
 
         if (curTimes[0] > 0) return TaskStatus.Continue;
@@ -205,27 +279,36 @@ public class Water : BossBase
         isPatternSetup = false;
         return TaskStatus.Success;
     }
-/*  
-    private float CurrentHpRatio()
+
+    private TaskStatus Pattern4_ElectricBall()
     {
-        return hp / maxHp;
-    }
+        if (IsDead) return TaskStatus.Failure;
+        if (!isPatternSetup)
+        {
+            curTimes[4] = electricBallCoolTime;
+            curTimes[0] = electricBallPatternDuration;
+            isPatternSetup = true;
+            SpawnEye(3, electricBallPatternDuration);
+            DOVirtual.DelayedCall(electricBallSpawnDelay, () =>
+            {
+                if (IsDead)
+                    return;
 
-    private TaskStatus CheckEncroachmentTrigger()
-    {
-        if (currentPhase == BossPhase.Normal && CurrentHpRatio() <= 0.5f)
-            return TaskStatus.Success;
+                if (electricBallPrefab != null &&
+                    electricBallSpawnPoint != null)
+                {
+                    Instantiate(
+                        electricBallPrefab,
+                        electricBallSpawnPoint.position,
+                        electricBallSpawnPoint.rotation
+                    );
+                }
+            }).SetLink(gameObject, LinkBehaviour.KillOnDestroy);
+        }
 
-        return TaskStatus.Failure;
-    }
+        if (curTimes[0] > 0) return TaskStatus.Continue;
 
-    private TaskStatus EnterTelegraphPhase()
-    {
-        currentPhase = BossPhase.EncroachmentTelegraph;*//*
-        crackZone.Activate();*//*
-        crackZone.OnBlocked += HandleBlocked;
-        telegraphRoutine = StartCoroutine(TelegraphTimer());*//*
-
+        isPatternSetup = false;
         return TaskStatus.Success;
-    }*/
+    }
 }
