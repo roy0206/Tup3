@@ -34,8 +34,11 @@ public class Lava : MonoBehaviour
             Land();
             return;
         }
-
-        transform.position = PositionAt(curTime);
+        var targetPos = PositionAt(curTime);
+        var targetVec = targetPos - (Vector2)transform.position;
+        transform.position = targetPos;
+        
+        transform.rotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(targetVec.y, targetVec.x) * Mathf.Rad2Deg + 90);
     }
 
     private Vector2 PositionAt(float t)

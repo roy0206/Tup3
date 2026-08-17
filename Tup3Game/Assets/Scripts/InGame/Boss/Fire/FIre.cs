@@ -12,6 +12,11 @@ public class Fire : BossBase
     private List<float> curTimes;
     [SerializeField] List<Transform> hitboxTransforms = new List<Transform>();
     private GameObject player;
+    private Animator animator;
+    private SpriteRenderer spriteRenderer;
+    private Transform bodyTransform;
+    private Transform worldCanvas;
+    private bool rushFacingRight;
 
     [Header("이동")]
     [SerializeField] private float returnSpeed = 3f;
@@ -66,6 +71,10 @@ public class Fire : BossBase
         };
 
         animationController = GetComponent<AnimationController>();
+        animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        bodyTransform = transform.Find("Body");
+        worldCanvas = transform.Find("WorldCanvas");
         player = GameObject.FindGameObjectWithTag("Player");
     }
 
@@ -111,7 +120,9 @@ public class Fire : BossBase
         {
             isPatternSetup = true;
             curTimes[0] = waitTime;
-            transform.DOMove(new Vector2(endPosition.x * (UnityEngine.Random.value > 0.5f ? -1 : 1), endPosition.y),
+            Vector2 landPosition = new Vector2(endPosition.x * (UnityEngine.Random.value > 0.5f ? -1 : 1), endPosition.y);
+            Face(landPosition.x - transform.position.x);
+            transform.DOMove(landPosition,
                 waitTime).SetEase(Ease.InOutQuad);
         }
         if (curTimes[0] <= 0)
@@ -128,12 +139,16 @@ public class Fire : BossBase
         {
             isPatternSetup = true;
             curTimes[0] = waitTime;
+            animator.SetBool("Rush", true);
+            FaceRush(pos - (Vector2)transform.position);
             transform.DOMove(pos,
                 waitTime).SetEase(Ease.InCubic);
         }
         if (curTimes[0] <= 0)
         {
             isPatternSetup = false;
+            animator.SetBool("Rush", false);
+            SetRushRotation(0f);
             LavaJet(lavaCount);
             return TaskStatus.Success;
         
@@ -147,12 +162,16 @@ public class Fire : BossBase
         {
             isPatternSetup = true;
             curTimes[0] = waitTime;
-            transform.DOMoveX(endPosition.x * (transform.position.x > 0 ? -1 : 1),
+            animator.SetBool("Rush", true);
+            float targetX = endPosition.x * (transform.position.x > 0 ? -1 : 1);
+            Face(targetX - transform.position.x);
+            transform.DOMoveX(targetX,
                 waitTime);
         }
         if (curTimes[0] <= 0)
         {
             isPatternSetup = false;
+            animator.SetBool("Rush", false);
             return TaskStatus.Success;
 
         }
@@ -165,7 +184,10 @@ public class Fire : BossBase
         {
             isPatternSetup = true;
             curTimes[0] = waitTime;
-            transform.DOMoveX(endPosition.x * (transform.position.x > 0 ? -1 : 1),
+            animator.SetBool("Rush", true);
+            float targetX = endPosition.x * (transform.position.x > 0 ? -1 : 1);
+            Face(targetX - transform.position.x);
+            transform.DOMoveX(targetX,
                 waitTime).SetEase(Ease.Linear);
             for (int i = 1; i <= 16; i++)
             {
@@ -183,6 +205,7 @@ public class Fire : BossBase
         if (curTimes[0] <= 0)
         {
             isPatternSetup = false;
+            animator.SetBool("Rush", false);
             return TaskStatus.Success;
 
         }
@@ -209,11 +232,13 @@ public class Fire : BossBase
         {
             isPatternSetup = true;
             curTimes[0] = waitTime;
+            animator.SetBool("Stun", true);
 
         }
         if(curTimes[0] <= 0)
         {
             isPatternSetup = false;
+            animator.SetBool("Stun", false);
             return TaskStatus.Success;
         }
         return TaskStatus.Continue;
@@ -227,6 +252,7 @@ public class Fire : BossBase
         {
             isPatternSetup = true;
             curTimes[0] = waitTime;
+            animator.SetBool("Warn", true);
             aimObject =  PoolManager.Instance.Get("FireAim", transform.position, Quaternion.identity);
             aimObject.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
             aimObject.GetComponent<SpriteRenderer>().DOFade(1, 0.2f).SetEase(Ease.InQuad);
@@ -234,6 +260,7 @@ public class Fire : BossBase
         if(curTimes[0] <= 0)
         {
             isPatternSetup = false;
+            animator.SetBool("Warn", false);
             
             targetPosition = aimObject.transform.position;
             
@@ -263,6 +290,7 @@ public class Fire : BossBase
         if (!isPatternSetup)
         {
             isPatternSetup = true;
+            Face(idlePosition.x - transform.position.x);
             transform.DOMove(idlePosition, waitTime);
             curTimes[0] = waitTime;
         }
@@ -288,10 +316,32 @@ public class Fire : BossBase
         }
         return TaskStatus.Continue;
     }
+
     
     private void Face(float dir)
     {
-        transform.localRotation = Quaternion.Euler(0f, dir > 0f ? 180f : 0f, 0f);
+        if (Mathf.Approximately(dir, 0f)) return;
+        rushFacingRight = dir > 0f;
+        spriteRenderer.flipX = rushFacingRight;
+        Vector3 scale = bodyTransform.localScale;
+        scale.x = Mathf.Abs(scale.x) * (rushFacingRight ? -1f : 1f);
+        bodyTransform.localScale = scale;
+    }
+
+    private void FaceRush(Vector2 dir)
+    {
+        if (dir.sqrMagnitude <= Mathf.Epsilon) return;
+        Face(dir.x);
+        float angle = Vector2.SignedAngle(rushFacingRight ? Vector2.right : Vector2.left, dir);
+        SetRushRotation(angle);
+    }
+
+    private void SetRushRotation(float angle)
+    {
+        Vector3 canvasPosition = worldCanvas.position;
+        Quaternion canvasRotation = worldCanvas.rotation;
+        transform.localRotation = Quaternion.Euler(0f, 0f, angle);
+        worldCanvas.SetPositionAndRotation(canvasPosition, canvasRotation);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
