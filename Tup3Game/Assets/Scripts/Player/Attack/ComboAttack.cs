@@ -53,7 +53,9 @@ public class ComboAttack : MonoBehaviour
     void Update()
     {
 
-        if (movement.IsDashing() || movement.IsKnockedBack)
+        if (movement.IsDashing() ||
+            movement.IsKnockedBack ||
+            (movement.IsInWater && !movement.IsGrounded))
             return;
 
         if (Input.GetKeyDown(KeyCode.C))

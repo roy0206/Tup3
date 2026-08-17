@@ -131,7 +131,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Electric_ball
   moveSpeed: 7
   lifeTime: 8
-  chargeDuration: 2
+  chargeDuration: 0.8
   startScale: 0.1
   finalScale: 1
   damage: 10

@@ -24,6 +24,7 @@ public class Water_eye : MonoBehaviour
     [Header("보스에게 입히는 피해량")]
     public float Damge_to_boss = 10f;
     private BossBase bossRef;
+    private bool canReceiveDamage = true;
 
     void Awake()
     {
@@ -37,18 +38,23 @@ public class Water_eye : MonoBehaviour
         Eye_animation.SetBool("Can_attack_eye", true);
     }
 
-    public void Init(BossBase boss, float time, float newscale)
+    public void Init(BossBase boss, float time, float newscale, bool damageable = true)
     {
         bossRef = boss;
         lifeTime = time;
+        hp = maxHp;
+        IsDead = false;
+        canReceiveDamage = damageable;
         CancelInvoke();
         Scale(newscale);
+        if (Collider != null)
+            Collider.enabled = damageable;
         Invoke(nameof(ExpireByTime), lifeTime);
     }
     
     public void DoDamage(float amount)
     {
-        if (IsDead) return;
+        if (IsDead || !canReceiveDamage || bossRef == null) return;
 
         float realDamage = Mathf.Min(hp, amount);
         
@@ -80,9 +86,9 @@ public class Water_eye : MonoBehaviour
     {
         Eye_animation.enabled = false;
 
-        spriteRenderer.color = Color.red;
+        spriteRenderer.color = hitFlashColor;
 
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(hitFlashDuration);
 
         spriteRenderer.color = Color.white;
 
@@ -91,8 +97,7 @@ public class Water_eye : MonoBehaviour
 
     public void Scale(float scale)
     {
-        spriteRenderer.transform.localScale = new Vector3(scale, scale, scale);
-        Collider.transform.localScale = new Vector3(scale, scale, scale);
+        transform.localScale = Vector3.one * scale;
     }
 
     public void ExpireByTime()

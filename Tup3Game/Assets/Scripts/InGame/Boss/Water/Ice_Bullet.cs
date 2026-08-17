@@ -27,7 +27,6 @@ public class Ice_Bullet : MonoBehaviour
     private float elapsed;
     private float delayElapsed;
     private bool hasHit;
-    private bool hasHitplatform;
     private bool isLaunching;
 
     public void Launch(Vector2 dir)
@@ -38,7 +37,6 @@ public class Ice_Bullet : MonoBehaviour
 
         ShowPathPreview();
         hasHit = false;
-        hasHitplatform = false;
         isLaunching = false;
         delayElapsed = 0f;
         elapsed = 0f;
@@ -88,7 +86,6 @@ public class Ice_Bullet : MonoBehaviour
 
         if (other.CompareTag("ChangeablePlatform"))
         {
-            if (hasHitplatform) return;
             other.gameObject.tag = "Slippery"; 
             
             if (other.TryGetComponent(out SpriteRenderer sprite))
@@ -96,7 +93,6 @@ public class Ice_Bullet : MonoBehaviour
                 sprite.color = Color.skyBlue;
             }
             
-            hasHitplatform = true;
         }
     }
 

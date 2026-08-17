@@ -16,6 +16,9 @@ public class Electric_ball : MonoBehaviour
     private Transform player;
     private Vector3 moveDirection;
     private bool isLaunched;
+    private float nextDamageTime;
+
+    public float ChargeDuration => chargeDuration;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -53,8 +56,22 @@ public class Electric_ball : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        TryDamage(other);
+    }
+
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        TryDamage(other);
+    }
+
+    private void TryDamage(Collider2D other)
+    {
+        if (!isLaunched || Time.time < nextDamageTime)
+            return;
+
         if (other.TryGetComponent(out PlayerKnockBack playerKnockback))
         {
+            nextDamageTime = Time.time + 1f;
             playerKnockback.TakeHit(transform.position, 5f, (int)damage);
         }
     }
