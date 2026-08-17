@@ -25,6 +25,10 @@ public class Soil : BossBase
     private BoxCollider2D bodyCollider;
     private float verticalVelocity;
 
+    [SerializeField] private float pattern1Cooltime;
+    [SerializeField] private float pattern2Cooltime;
+    [SerializeField] private float pattern3Cooltime;
+
     new void Awake()
     {
         base.Awake();
@@ -53,7 +57,7 @@ public class Soil : BossBase
             .Build();
         curTimes = new List<float>()
         {
-            0, 0, 0, 0
+            0, pattern1Cooltime, pattern2Cooltime, pattern3Cooltime
         };
 
         animationController = GetComponent<AnimationController>();
@@ -96,18 +100,18 @@ public class Soil : BossBase
         if(IsDead) return TaskStatus.Failure;
         if (!isPatternSetup)
         {
-            curTimes[1] = 10;
+            curTimes[1] = pattern1Cooltime;
             curTimes[0] = 2;
             animationController.Play(1);
             isPatternSetup = true;
-            DOVirtual.DelayedCall(0.11f, () =>
+            /*DOVirtual.DelayedCall(0.11f, () =>
             {
                 hitboxTransforms[0].gameObject.SetActive(true);
             } );
             DOVirtual.DelayedCall(0.5f, () =>
             {
                 hitboxTransforms[0].gameObject.SetActive(false);
-            } );
+            } );*/
             DOVirtual.DelayedCall(0.6f, () =>
             {
                 hitboxTransforms[1].gameObject.SetActive(true);
@@ -155,7 +159,7 @@ public class Soil : BossBase
         if(IsDead) return TaskStatus.Failure;
         if (!isPatternSetup)
         {
-            curTimes[2] = 20;
+            curTimes[2] = pattern2Cooltime;
             curTimes[0] = 5;
             animationController.Play(2);
             isPatternSetup = true;
@@ -176,7 +180,7 @@ public class Soil : BossBase
         if(IsDead) return TaskStatus.Failure;
         if (!isPatternSetup)
         {
-            curTimes[3] = 0;
+            curTimes[3] = pattern3Cooltime;
             curTimes[0] = 2;
             animationController.Play(3);
             isPatternSetup = true;

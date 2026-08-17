@@ -434,7 +434,7 @@ GameObject:
   - component: {fileID: 256045217}
   - component: {fileID: 256045216}
   - component: {fileID: 256045215}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Health
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -588,6 +588,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossRoom
   boss: 4
+  DM: {fileID: 0}
 --- !u!4 &278629422
 Transform:
   m_ObjectHideFlags: 0
@@ -1117,7 +1118,7 @@ GameObject:
   - component: {fileID: 682012603}
   - component: {fileID: 682012605}
   - component: {fileID: 682012604}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Red
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1441,7 +1442,7 @@ GameObject:
   - component: {fileID: 943016450}
   - component: {fileID: 943016449}
   - component: {fileID: 943016448}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: WorldCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2163,7 +2164,7 @@ GameObject:
   - component: {fileID: 7866644532615433440}
   - component: {fileID: 7866644532615433442}
   - component: {fileID: 7866644532615433441}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Fire
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -2808,7 +2809,7 @@ MonoBehaviour:
   hitboxTransforms: []
   returnSpeed: 3
   idlePosition: {x: 0, y: 3}
-  endPosition: {x: 7.5, y: 0}
+  endPosition: {x: 7.5, y: -1}
   defaultDamage: 10
 --- !u!50 &7866644532615433440
 Rigidbody2D:
