@@ -195,9 +195,9 @@ public class Fire : BossBase
                     waitTime / 16 * i,
                     () =>
                     {
-                        var obj = PoolManager.Instance.Get("FireColumn", new Vector2(transform.position.x, endPosition.y),
+                        var obj = PoolManager.Instance.Get("FireColumn", new Vector2(transform.position.x, -5),
                             Quaternion.identity);
-                        PoolManager.Instance.Release(obj, 0.5f);
+                        PoolManager.Instance.Release(obj, 0.2f);
                     });
             }
 
