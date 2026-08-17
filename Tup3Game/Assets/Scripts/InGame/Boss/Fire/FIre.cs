@@ -14,7 +14,6 @@ public class Fire : BossBase
     private GameObject player;
     private Animator animator;
     private SpriteRenderer spriteRenderer;
-    private Transform bodyTransform;
     private Transform worldCanvas;
     private bool rushFacingRight;
 
@@ -73,7 +72,6 @@ public class Fire : BossBase
         animationController = GetComponent<AnimationController>();
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        bodyTransform = transform.Find("Body");
         worldCanvas = transform.Find("WorldCanvas");
         player = GameObject.FindGameObjectWithTag("Player");
     }
@@ -323,9 +321,6 @@ public class Fire : BossBase
         if (Mathf.Approximately(dir, 0f)) return;
         rushFacingRight = dir > 0f;
         spriteRenderer.flipX = rushFacingRight;
-        Vector3 scale = bodyTransform.localScale;
-        scale.x = Mathf.Abs(scale.x) * (rushFacingRight ? -1f : 1f);
-        bodyTransform.localScale = scale;
     }
 
     private void FaceRush(Vector2 dir)
