@@ -23,9 +23,9 @@ public abstract class BossBase : MonoBehaviour, IHealthUIEvent
         hp = maxHp;
     }
 
-    public void DoDamage(float damage)
+    public virtual bool DoDamage(float damage)
     {
-        if(isDead) return;
+        if(isDead) return false;
         hp -= damage;
         OnHealthChanged?.Invoke(hp, maxHp);
         Debug.Log($"<color=green>Boss Hit! {hp} Left</color>");
@@ -33,6 +33,7 @@ public abstract class BossBase : MonoBehaviour, IHealthUIEvent
         {
             isDead = true;
         }
+        return true;
     }
 
     public event Action<float, float> OnHealthChanged;
