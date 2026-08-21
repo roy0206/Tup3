@@ -172,17 +172,16 @@ public class Gold : BossBase
 
             DOVirtual.DelayedCall(1f, () =>
             {
-                GameObject swordTrap = PoolManager.Instance.Get(
+                PoolManager.Instance.Get(
                     "SwordTrap",
-                    transform.position + Vector3.right,
-                    Quaternion.identity);
-                PoolManager.Instance.Release(swordTrap, 10f);
+                    new Vector3(transform.position.x + 1, -3f, 0f),
+                    Quaternion.identity).transform.rotation = Quaternion.Euler(0f, 180, 0f);
 
-                swordTrap = PoolManager.Instance.Get(
+
+                PoolManager.Instance.Get(
                     "SwordTrap",
-                    transform.position + Vector3.left,
-                    Quaternion.identity);
-                PoolManager.Instance.Release(swordTrap, 10f);
+                    new Vector3(transform.position.x + -1, -3f, 0f),
+                    Quaternion.identity).transform.rotation = Quaternion.Euler(0f, 0, 0f);
             });
         }
 

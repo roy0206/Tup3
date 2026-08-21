@@ -22,25 +22,40 @@ public class FlyingSword : MonoBehaviour
         isFixed = false;
 
         int randLength = UnityEngine.Random.Range(3, 4);
-        float randAngle = UnityEngine.Random.Range(60f, 120f);
+        float randAngle = UnityEngine.Random.Range(30f, 150f);
         Vector3 targetPos = transform.position + new Vector3(randLength * Mathf.Cos(randAngle *  Mathf.Deg2Rad), randLength * Mathf.Sin(randAngle *  Mathf.Deg2Rad));
         transform.DOMove(targetPos, 1f);
-        Timer = 3;
+        Timer = UnityEngine.Random.Range(3f, 5f);
     }
 
     private void Update()
     {
-        CheckGround();
-        Timer -= Time.deltaTime;
+        
+    }
+
+    private void FixedUpdate()
+    {
+
+        Timer -= Time.fixedDeltaTime;
         var vec = player.transform.position - transform.position;
         if (!isFixed)
         {
-            transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(vec), Time.deltaTime * speed);
+            var angle = Mathf.Atan2(vec.y, vec.x) * Mathf.Rad2Deg;
+            if (angle > transform.eulerAngles.y)
+            {
+                transform.rotation = Quaternion.Euler(0,0, Mathf.Lerp(transform.eulerAngles.z,angle, Time.fixedDeltaTime));
+            }
+            else
+            {
+                transform.rotation = Quaternion.Euler(0,0, Mathf.Lerp(angle, transform.eulerAngles.z, Time.fixedDeltaTime));
+            }
+
         }
         if (Timer <= 0f && !isStoped)
         {
+            CheckGround();
             isFixed = true;
-            transform.Translate(Vector3.forward * speed * Time.deltaTime, Space.World);
+            transform.Translate(Vector2.right * speed * Time.fixedDeltaTime, Space.Self);
         }
     }
 
@@ -50,7 +65,7 @@ public class FlyingSword : MonoBehaviour
         Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 0.2f);
         foreach (var col in colliders)
         {
-            if (col.gameObject.layer == LayerMask.GetMask("ground"))
+            if (col.gameObject.layer == 6)
             {
                 isStoped = true;
                 bc.enabled = false;
