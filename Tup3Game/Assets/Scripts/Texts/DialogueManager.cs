@@ -29,21 +29,22 @@ public class DialogueManager : MonoBehaviour
         public string choices;
     }
     
-    [SerializeField] private float charDelay = 0.04f;
+    [SerializeField] private Transform dialogueRoot;
+    private float charDelay = 0.04f;
 
     [Header("화자별 대화창")]
-    [SerializeField] private GameObject playerPanel;
-    [SerializeField] private TextMeshProUGUI playerText;
-    [SerializeField] private GameObject bossPanel;
-    [SerializeField] private TextMeshProUGUI bossText;
+    private GameObject playerPanel;
+    private TextMeshProUGUI playerText;
+    private GameObject bossPanel;
+    private TextMeshProUGUI bossText;
 
 
     [Header("선택지 UI")]
-    [SerializeField] private GameObject choicePanel;
-    [SerializeField] private GameObject[] choiceObjects;      // Choice0, Choice1
-    [SerializeField] private TextMeshProUGUI[] choiceTexts;   // Choice0Text, Choice1Text
-    [SerializeField] private Color normalColor = Color.white;
-    [SerializeField] private Color selectedColor = Color.yellow;
+    private GameObject choicePanel;
+    private GameObject[] choiceObjects;
+    private TextMeshProUGUI[] choiceTexts;
+    private Color normalColor = Color.white;
+    private Color selectedColor = Color.yellow;
 
     private List<Choice> currentChoices;
     private int selectedIndex;
@@ -64,9 +65,20 @@ public class DialogueManager : MonoBehaviour
 
     void Awake()
     {
-        if (playerPanel != null) playerPanel.SetActive(false);
-        if (bossPanel != null) bossPanel.SetActive(false);
-        if (choicePanel != null) choicePanel.SetActive(false);
+        playerPanel = dialogueRoot.Find("PlayerPanel").gameObject;
+        bossPanel = dialogueRoot.Find("BossPanel").gameObject;
+        choicePanel = dialogueRoot.Find("ChoicePanel").gameObject;
+        playerText = playerPanel.GetComponentInChildren<TextMeshProUGUI>(true);
+        bossText = bossPanel.GetComponentInChildren<TextMeshProUGUI>(true);
+        choiceTexts = choicePanel.GetComponentsInChildren<TextMeshProUGUI>(true);
+        choiceObjects = new GameObject[choiceTexts.Length];
+
+        for (int i = 0; i < choiceTexts.Length; i++)
+            choiceObjects[i] = choiceTexts[i].transform.parent.gameObject;
+
+        playerPanel.SetActive(false);
+        bossPanel.SetActive(false);
+        choicePanel.SetActive(false);
     }
 
     private Dictionary<string, DialogueEntry> entryMap;
