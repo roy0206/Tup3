@@ -107,7 +107,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 638401d7e8f38cd4994dfd4348c54bbd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Ice_Bullet
-  maxSpeed: 15
+  maxSpeed: 9
   lifeTime: 3
   speedCurve:
     serializedVersion: 2
@@ -140,7 +140,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   pathSprite: {fileID: 1193188577515134286}
-  pathLength: 60
+  pathLength: 30
   pathWidth: 1
   pathFadeDuration: 0.5
   iceVisual: {fileID: 5892537651637583862}
