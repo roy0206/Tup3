@@ -293,6 +293,12 @@ public class Playermovement : MonoBehaviour
 
             if (hit)
             {
+                // 단방향 플랫폼은 옆면을 벽으로 사용하지 않는다.
+                // 점프로 플랫폼을 통과하는 도중 옆 레이가 플랫폼 내부를 감지하면
+                // 이동량이 0으로 고정되어 플레이어가 끼는 현상이 발생한다.
+                if (IsPassThroughPlatform(hit.collider))
+                    continue;
+
                 float correctedDistance = Mathf.Max(hit.distance - skinWidth, 0f);
                 moveAmount.x = correctedDistance * directionX;
                 rayLength = Mathf.Max(hit.distance, skinWidth);
@@ -324,12 +330,22 @@ public class Playermovement : MonoBehaviour
 
             if (hit)
             {
-                bool isPassThroughPlatform =
-                 hit.collider.CompareTag("ChangeablePlatform") ||
-                 hit.collider.CompareTag("Slippery");
+                bool isPassThroughPlatform = IsPassThroughPlatform(hit.collider);
 
-                if (directionY > 0f && isPassThroughPlatform)
-                    continue;
+                if (isPassThroughPlatform)
+                {
+                    // 상승 중에는 통과한다.
+                    if (directionY > 0f)
+                        continue;
+
+                    // 플랫폼 내부 또는 아래에서 하강을 시작했다면 계속 통과한다.
+                    // 플레이어의 발이 플랫폼 윗면까지 완전히 올라온 뒤에만 착지시켜
+                    // 플랫폼 한가운데서 충돌이 복구되어 끼는 것을 방지한다.
+                    float playerBottomY = col.bounds.min.y;
+                    float platformTopY = hit.collider.bounds.max.y;
+                    if (playerBottomY < platformTopY - DistanceEpsilon)
+                        continue;
+                }
 
                 float correctedDistance = Mathf.Max(hit.distance - skinWidth, 0f);
                 moveAmount.y = correctedDistance * directionY;
@@ -349,6 +365,12 @@ public class Playermovement : MonoBehaviour
         }
         if (directionY == -1 && groundedThisCheck)
             isOnSlippery = slipperyThisCheck;
+    }
+
+    private static bool IsPassThroughPlatform(Collider2D target)
+    {
+        return target != null &&
+               (target.CompareTag("ChangeablePlatform") || target.CompareTag("Slippery"));
     }
 
     private void UpdateRaycastOrigins()
