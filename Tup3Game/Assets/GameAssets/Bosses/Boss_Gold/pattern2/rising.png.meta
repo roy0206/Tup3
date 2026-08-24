@@ -8,6 +8,18 @@ TextureImporter:
   - first:
       213: -4922294719736455639
     second: rising_1
+  - first:
+      213: -5360417021079579684
+    second: rising_2
+  - first:
+      213: 4097748248231901366
+    second: rising_3
+  - first:
+      213: -6853114472852944900
+    second: rising_4
+  - first:
+      213: -8071755861639042417
+    second: rising_5
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -128,6 +140,94 @@ TextureImporter:
       name: rising_1
       rect:
         serializedVersion: 2
+        x: 326
+        y: 346
+        width: 111
+        height: 170
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 92ed356280f70bbb0800000000000000
+      internalID: -4922294719736455639
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rising_2
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 346
+        width: 84
+        height: 154
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cd3189abe19fb95b0800000000000000
+      internalID: -5360417021079579684
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rising_3
+      rect:
+        serializedVersion: 2
+        x: 556
+        y: 346
+        width: 84
+        height: 154
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b877da22502ed830800000000000000
+      internalID: 4097748248231901366
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rising_4
+      rect:
+        serializedVersion: 2
+        x: 587
+        y: 346
+        width: 111
+        height: 170
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cf7038042b8d4e0a0800000000000000
+      internalID: -6853114472852944900
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rising_5
+      rect:
+        serializedVersion: 2
         x: 615
         y: 345
         width: 377
@@ -140,8 +240,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 92ed356280f70bbb0800000000000000
-      internalID: -4922294719736455639
+      spriteID: f8ae3515fcc5bff80800000000000000
+      internalID: -8071755861639042417
       vertices: []
       indices: 
       edges: []
@@ -162,6 +262,10 @@ TextureImporter:
     nameFileIdTable:
       rising_0: -3297615492833219699
       rising_1: -4922294719736455639
+      rising_2: -5360417021079579684
+      rising_3: 4097748248231901366
+      rising_4: -6853114472852944900
+      rising_5: -8071755861639042417
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
