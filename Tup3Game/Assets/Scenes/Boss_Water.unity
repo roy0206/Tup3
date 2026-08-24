@@ -2111,7 +2111,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Water
   boxColliders: []
-  maxHp: 28
+  maxHp: 200
   watersproutzone: {fileID: 2002017500}
   WaterSprout_SpawnCount: 2
   WaterSprout_DelayTime: 3
