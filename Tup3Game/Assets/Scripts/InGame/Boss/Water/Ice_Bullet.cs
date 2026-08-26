@@ -44,6 +44,7 @@ public class Ice_Bullet : MonoBehaviour
 
     private void Update()
     {
+        if (PauseManager.IsPaused) return;
         if (hasHit) return;
 
         if (!isLaunching)

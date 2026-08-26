@@ -33,6 +33,8 @@ public class RisingWaterPhase : MonoBehaviour
 
     private void Update()
     {
+        if (PauseManager.IsPaused) return;
+
         if (!hasStarted)
             return;
 

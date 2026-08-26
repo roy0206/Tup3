@@ -11,6 +11,8 @@ public class LavaPool : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (PauseManager.IsPaused) return;
+
         spriteRenderer.flipX = !spriteRenderer.flipX;
     }
 }

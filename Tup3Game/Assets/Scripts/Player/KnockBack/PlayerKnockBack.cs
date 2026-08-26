@@ -14,6 +14,7 @@ public class PlayerKnockBack : MonoBehaviour
 
     public void TakeHit(Vector2 hitOrigin, float knockbackForce, int damage)
     {
+        if (PauseManager.IsPaused) return;
         if (isInvincible) return;
         if (movement.IsDashing()) return;
 
@@ -58,3 +59,8 @@ public class PlayerKnockBack : MonoBehaviour
         isInvincible = false;
     }
 }
+
+/* [파일 노트]
+ * TakeHit 첫 줄의 PauseManager.IsPaused 게이트 : 보스 패턴/투사체/함정의 피해가 전부 이 메서드를
+ * 경유하므로, 일시정지 중에는 어떤 경로로도 플레이어가 넉백/피해를 받지 않는다(전역 피해 차단 지점).
+ */

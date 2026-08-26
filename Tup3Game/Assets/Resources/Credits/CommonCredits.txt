@@ -1,0 +1,94 @@
+─────────────────────────────
+
+음악 (Music)
+
+─────────────────────────────
+
+"Eastern Thought" Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/
+
+"Rites" Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/
+
+"Meditation Impromptu 01" Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/
+
+"Undaunted" Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/
+
+"Aquarium" Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/
+
+"Ready Aim Fire" Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/
+
+"Steel Rods" Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/
+
+"Final Battle of the Dark Wizards" Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/
+
+"For the Fallen" Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/
+
+"Rains Will Fall" Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/
+
+"Promises to Keep" Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/
+
+"Ghostpocalypse - 6 Crossing the Threshold" Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/
+
+─────────────────────────────
+
+아트 에셋 (Art Assets)
+
+─────────────────────────────
+
+2D Hand Painted Platformer Environment
+
+2D Platformer - Skull Garden Tilesets Asset Pack
+by NovaDevs
+
+─────────────────────────────
+
+라이브러리 / 폰트 (Libraries & Fonts)
+
+─────────────────────────────
+
+DOTween by Demigiant
+http://dotween.demigiant.com/
+
+Fluid Behavior Tree by CleverCrow
+https://github.com/ashblue/fluid-behavior-tree
+
+Pretendard Font by Kil Hyung-jin
+Licensed under SIL Open Font License 1.1
+
+TextMesh Pro (Unity Technologies)
+
+─────────────────────────────
+
+엔진 (Engine)
+
+─────────────────────────────
+
+Made with Unity
+Unity 6 (6000.3)
+
+
+
+Thank you for playing.

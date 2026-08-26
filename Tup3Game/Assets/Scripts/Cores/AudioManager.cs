@@ -331,7 +331,7 @@ public class AudioManager : Singleton<AudioManager>, ISceneEventListener
         SoundsReady = false;
     }
 
-    public void OnSceneLoadComplete(string sceneName) { }
+    public void OnSceneLoadComplete(string sceneName) => VolumeSettings.ApplySaved();
     public void OnSceneExit(string sceneName) => DisableAllChannels();
 
     void DisableAllChannels()
@@ -357,3 +357,10 @@ public class AudioManager : Singleton<AudioManager>, ISceneEventListener
     }
 #endif
 }
+
+/* [파일 노트]
+ * OnSceneLoadComplete : SceneController 가 유저 데이터 로드를 마친 뒤 호출하는 시점이므로
+ * 여기서 VolumeSettings.ApplySaved() 로 세이브된 BGM/SFX 볼륨을 믹서에 반영한다.
+ * (최초 부팅 포함 모든 씬 진입 시 저장값이 적용된다. 옵션 슬라이더 조작 중에는
+ * VolumeSettings 가 BGMVolume/SFXVolume 세터를 직접 호출해 라이브 반영한다.)
+ */

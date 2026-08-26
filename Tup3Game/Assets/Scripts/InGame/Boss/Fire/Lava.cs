@@ -27,6 +27,8 @@ public class Lava : MonoBehaviour
 
     private void Update()
     {
+        if (PauseManager.IsPaused) return;
+
         curTime += Time.deltaTime;
 
         if (curTime >= flightTime)

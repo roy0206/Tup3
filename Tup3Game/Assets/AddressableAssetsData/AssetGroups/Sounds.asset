@@ -21,6 +21,78 @@ MonoBehaviour:
     m_SerializedLabels:
     - Sound
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 07a51defdeaa498f921aa5b10d73432a
+    m_Address: BGM_Title
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1871cb4897934b099370d2e0390305c5
+    m_Address: BGM_Prologue
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b6079b1f95e9485b9eb49cb8dd9526bf
+    m_Address: BGM_Lobby
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b4dbc502813b4651863cdba96828f442
+    m_Address: BGM_Soil
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1f15cfb6c8244a3eb865d549e79c51bb
+    m_Address: BGM_Water
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 86293ee5e7024b19a126d1624aff03da
+    m_Address: BGM_Fire
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3e7da0914eb94fd8bd02632cb7b4f16a
+    m_Address: BGM_Gold
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7ec6d887a59e437f828059e428cdac47
+    m_Address: BGM_Styx
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 72e10dc0b10e09cb5b952e6ac6036b64
+    m_Address: BGM_Ending1
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9fe9b21e6f7d41f9820eea4c3bc014f5
+    m_Address: BGM_Ending2
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 31a6e18606743722477a8da87c2c2fe5
+    m_Address: BGM_Ending3
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8acfa85a8c24ffc989e28484a25d645d
+    m_Address: BGM_Ending4
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 0a5bfcc833d0b0a4cadf2be628e75e99, type: 2}
   m_SchemaSet:

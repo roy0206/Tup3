@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 using CleverCrow.Fluid.BTs.Tasks;
 using CleverCrow.Fluid.BTs.Trees;
@@ -12,6 +12,8 @@ public class Soil : BossBase
     private List<float> curTimes;
     [SerializeField] List<Transform> hitboxTransforms = new List<Transform>();
     private GameObject player;
+    private SpriteRenderer spriteRenderer;
+    private bool isFacingRight;
 
     [Header("이동")]
     [SerializeField] private float moveSpeed = 3f;
@@ -63,10 +65,19 @@ public class Soil : BossBase
         animationController = GetComponent<AnimationController>();
         player = GameObject.FindGameObjectWithTag("Player");
         bodyCollider = boxColliders.Count > 0 ? boxColliders[0] : GetComponent<BoxCollider2D>();
+
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        if (Mathf.Approximately(transform.rotation.eulerAngles.y, 180f))
+        {
+            transform.rotation = Quaternion.identity;
+            SetFacing(true);
+        }
     }
 
     private void Update()
     {
+        if (PauseManager.IsPaused || DialogueManager.IsDialogueActive) return;
+
         for (int i = 0; i < curTimes.Count; i++)
         {
             curTimes[i] -= Time.deltaTime;
@@ -120,8 +131,8 @@ public class Soil : BossBase
             {
                 hitboxTransforms[2].gameObject.SetActive(true);
                 hitboxTransforms[2]
-                    .DOMoveX(hitboxTransforms[2].transform.position.x - hitboxTransforms[2].transform.right.x * 10, 1f)
-                    .OnComplete(() =>{ hitboxTransforms[2].gameObject.SetActive(false);hitboxTransforms[2].localPosition = new Vector3(-2, 2f, 0); });
+                    .DOMoveX(hitboxTransforms[2].transform.position.x + (isFacingRight ? 10f : -10f), 1f)
+                    .OnComplete(() =>{ hitboxTransforms[2].gameObject.SetActive(false);hitboxTransforms[2].localPosition = new Vector3(isFacingRight ? 2f : -2f, 2f, 0); });
             } );
             DOVirtual.DelayedCall(0.9f, () =>
             {
@@ -139,8 +150,10 @@ public class Soil : BossBase
     {
         for (int i = 0; i < 12; i++)
         {
+            yield return PauseManager.WaitWhilePaused();
+
             var bossX = transform.position.x;
-            bool bossFlip = transform.rotation.eulerAngles.y == 180;
+            bool bossFlip = isFacingRight;
             Vector2 position;
             if(bossFlip)
                 position = new Vector2(UnityEngine.Random.Range(bossX -2f, bossX + 10f), 5);
@@ -223,7 +236,31 @@ public class Soil : BossBase
     
     private void Face(float dir)
     {
-        transform.localRotation = Quaternion.Euler(0f, dir > 0f ? 180f : 0f, 0f);
+        if (Mathf.Approximately(dir, 0f)) return;
+        SetFacing(dir > 0f);
+    }
+
+    private void SetFacing(bool facingRight)
+    {
+        if (spriteRenderer != null) spriteRenderer.flipX = facingRight;
+        if (facingRight == isFacingRight) return;
+
+        isFacingRight = facingRight;
+        foreach (var hitbox in hitboxTransforms)
+            MirrorChild(hitbox);
+    }
+
+    private static void MirrorChild(Transform t)
+    {
+        if (t == null) return;
+
+        Vector3 pos = t.localPosition;
+        pos.x = -pos.x;
+        t.localPosition = pos;
+
+        Vector3 scale = t.localScale;
+        scale.x = -scale.x;
+        t.localScale = scale;
     }
 
     private void ApplyGravity()
@@ -241,5 +278,18 @@ public class Soil : BossBase
         verticalVelocity += gravity * Time.deltaTime;
         transform.Translate(Vector3.up * (verticalVelocity * Time.deltaTime), Space.World);
     }
-    
+
 }
+
+/* [파일 노트]
+ * 일시정지 대응 : Update 첫 줄 PauseManager.IsPaused 게이트로 BT/쿨타임/중력이 멈춘다.
+ * 패턴의 지연 히트박스(DOVirtual.DelayedCall)와 이동 트윈은 PauseManager 의 DOTween.PauseAll 로 멈추고,
+ * SoilDrop 소환 코루틴은 루프마다 WaitWhilePaused 로 일시정지 동안 추가 소환을 하지 않는다.
+ *
+ * 좌우반전은 Gold 보스와 같은 spriteRenderer.flipX 방식이다 — 예전의 루트 Y축 180도 회전은
+ * 자식 체력바 캔버스까지 카메라 반대편으로 뒤집어 안 보이게 만들었다. flipX 는 자식을 안 뒤집으므로
+ * 방향이 바뀔 때 SetFacing 이 hitboxTransforms 전체의 localPosition.x / localScale.x 를 미러링한다.
+ * 기본(스프라이트 원본)은 왼쪽 보기 = isFacingRight false 이고, 씬에 Y=180 으로 저장돼 있던 경우를
+ * 위해 Awake 에서 회전을 identity 로 되돌리고 facing 상태로 변환한다. 패턴1의 전진 히트박스와
+ * SoilDrop 낙하 방향도 회전 대신 isFacingRight 를 본다.
+ */
