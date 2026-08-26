@@ -25,17 +25,21 @@ public class Water_eye : MonoBehaviour
     public float Damge_to_boss = 10f;
     private BossBase bossRef;
     private bool canReceiveDamage = true;
+    private Color originalColor = Color.white;
 
     void Awake()
     {
         hp = maxHp;
         if (spriteRenderer == null)
             spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null)
+            originalColor = spriteRenderer.color;
         if (Collider == null)
             Collider = GetComponent<CircleCollider2D>();
         Scale(scale);
         Eye_animation = GetComponent<Animator>();
-        Eye_animation.SetBool("Can_attack_eye", true);
+        if (Eye_animation != null)
+            Eye_animation.SetBool("Can_attack_eye", true);
     }
 
     public void Init(BossBase boss, float time, float newscale, bool damageable = true)
@@ -46,22 +50,28 @@ public class Water_eye : MonoBehaviour
         IsDead = false;
         canReceiveDamage = damageable;
         CancelInvoke();
+        CancelInvoke(nameof(DestroySelf));
         Scale(newscale);
         if (Collider != null)
             Collider.enabled = damageable;
+
+        if (Eye_animation != null)
+        {
+            Eye_animation.enabled = true;
+            Eye_animation.SetBool("Can_attack_eye", true);
+        }
+
         Invoke(nameof(ExpireByTime), lifeTime);
     }
     
     public void DoDamage(float amount)
     {
-        if (IsDead || !canReceiveDamage || bossRef == null) return;
+        if (IsDead || !canReceiveDamage || bossRef == null || amount <= 0f) return;
 
         float realDamage = Mathf.Min(hp, amount);
         
         hp -= realDamage;
         
-        Debug.Log($"<color=orange> Water Eye Hit! {hp}/{maxHp} Left</color>");
-
         bossRef.DoDamage(realDamage);
 
         FlashOnHit();
@@ -76,7 +86,6 @@ public class Water_eye : MonoBehaviour
 
     private void FlashOnHit()
     {
-        Debug.Log("FlashOnHit 호출");
         if (spriteRenderer == null) return;
         StopAllCoroutines(); // 연타 시 겹쳐 실행 방지
         StartCoroutine(FlashRoutine());
@@ -84,15 +93,17 @@ public class Water_eye : MonoBehaviour
 
     private System.Collections.IEnumerator FlashRoutine()
     {
-        Eye_animation.enabled = false;
+        if (Eye_animation != null)
+            Eye_animation.enabled = false;
 
         spriteRenderer.color = hitFlashColor;
 
         yield return new WaitForSeconds(hitFlashDuration);
 
-        spriteRenderer.color = Color.white;
+        spriteRenderer.color = originalColor;
 
-        Eye_animation.enabled = true;
+        if (Eye_animation != null)
+            Eye_animation.enabled = true;
     }
 
     public void Scale(float scale)
@@ -110,16 +121,36 @@ public class Water_eye : MonoBehaviour
     public void Die()
     {
         CancelInvoke(nameof(ExpireByTime)); // 체력으로 먼저 죽었으면 타임아웃 예약 취소
+        canReceiveDamage = false;
 
-        Eye_animation.SetBool("Can_attack_eye", false);
+        if (Collider != null)
+            Collider.enabled = false;
 
-        Debug.Log("Water Eye Destroyed");
+        StopAllCoroutines();
+        if (spriteRenderer != null)
+            spriteRenderer.color = originalColor;
 
-        DestroySelf();
+        if (Eye_animation != null)
+        {
+            Eye_animation.enabled = true;
+            Eye_animation.SetBool("Can_attack_eye", false);
+        }
+
+        // Eye_die 애니메이션의 DestroySelf 이벤트가 정상적으로 재생되도록 즉시 삭제하지 않는다.
+        // 컨트롤러 연결이 끊긴 경우에도 오브젝트가 남지 않도록 안전 삭제를 예약한다.
+        Destroy(gameObject, 1f);
     }
 
     public void DestroySelf()
     {
         Destroy(gameObject);
+    }
+
+    private void OnValidate()
+    {
+        maxHp = Mathf.Max(1f, maxHp);
+        lifeTime = Mathf.Max(0f, lifeTime);
+        scale = Mathf.Max(0.01f, scale);
+        hitFlashDuration = Mathf.Max(0f, hitFlashDuration);
     }
 }

@@ -689,6 +689,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  - {fileID: 0}
   IceBullet: {fileID: 521257976468912241, guid: d90c6f3e68b21f041a5d1d2f8df51e8b, type: 3}
   fireDirection: 0
 --- !u!4 &636207159
@@ -3052,6 +3053,7 @@ MonoBehaviour:
   startPoint: {fileID: 1903119869}
   interval: 1
   spawnPoints:
+  - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}

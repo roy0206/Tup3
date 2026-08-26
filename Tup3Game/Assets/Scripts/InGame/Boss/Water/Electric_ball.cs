@@ -69,10 +69,11 @@ public class Electric_ball : MonoBehaviour
         if (!isLaunched || Time.time < nextDamageTime)
             return;
 
-        if (other.TryGetComponent(out PlayerKnockBack playerKnockback))
+        PlayerKnockBack playerKnockback = other.GetComponentInParent<PlayerKnockBack>();
+        if (playerKnockback != null)
         {
             nextDamageTime = Time.time + 1f;
-            playerKnockback.TakeHit(transform.position, 5f, (int)damage);
+            playerKnockback.TakeHit(transform.position, 5f, Mathf.RoundToInt(damage));
         }
     }
 
@@ -90,9 +91,9 @@ public class Electric_ball : MonoBehaviour
         {
             timer += Time.deltaTime;
 
-            float ratio = Mathf.Clamp01(
-                timer / chargeDuration
-            );
+            float ratio = chargeDuration <= 0f
+                ? 1f
+                : Mathf.Clamp01(timer / chargeDuration);
 
             ratio = Mathf.SmoothStep(0f, 1f, ratio);
 
@@ -117,5 +118,15 @@ public class Electric_ball : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    private void OnValidate()
+    {
+        moveSpeed = Mathf.Max(0f, moveSpeed);
+        lifeTime = Mathf.Max(0.01f, lifeTime);
+        chargeDuration = Mathf.Max(0f, chargeDuration);
+        startScale = Mathf.Max(0f, startScale);
+        finalScale = Mathf.Max(startScale, finalScale);
+        damage = Mathf.Max(0f, damage);
     }
 }

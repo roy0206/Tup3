@@ -153,6 +153,10 @@ public class RisingWaterPhase : MonoBehaviour
 
     private void OnDisable()
     {
+        riseTween?.Kill();
+        riseTween = null;
+        hasStarted = false;
+        HasReachedTarget = false;
         SetPlayerSwimming(false);
     }
 

@@ -26,6 +26,9 @@ public class Ocean_animation : MonoBehaviour
 
     private void Awake()
     {
+        if (layers == null)
+            return;
+
         foreach (WaterLayer layer in layers)
         {
             if (layer.target != null)
@@ -35,6 +38,9 @@ public class Ocean_animation : MonoBehaviour
 
     private void Update()
     {
+        if (layers == null)
+            return;
+
         float time = Time.time;
 
         foreach (WaterLayer layer in layers)

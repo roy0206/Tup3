@@ -1,4 +1,3 @@
-using System.IO.Pipes;
 using UnityEngine;
 
 public class IceBulletSpawnZone : MonoBehaviour
@@ -9,33 +8,37 @@ public class IceBulletSpawnZone : MonoBehaviour
     [SerializeField] private float interval = 2f;
     [SerializeField] private Transform[] spawnPoints = new Transform[5];
     [SerializeField] private GameObject IceBullet;
-    [SerializeField] private int SpawnNum = 3;
     [SerializeField] private FireDirection fireDirection = FireDirection.Right;
 
-    void Start()
+    private void Start()
     {
-        Set_spawnpoint();
+        EnsureSpawnPoints();
     }
 
-
-    // Update is called once per frame
-    void Update()
+    private bool EnsureSpawnPoints()
     {
-        if (Input.GetKeyDown(KeyCode.U))
+        if (startPoint == null)
         {
-            SpawnIceBullets(SpawnNum);
+            Debug.LogError("IceBulletSpawnZone: Start Point가 연결되지 않았습니다.", this);
+            return false;
         }
-    }
 
-    void Set_spawnpoint()
-    {
+        if (spawnPoints == null || spawnPoints.Length == 0)
+            spawnPoints = new Transform[5];
+
         for (int k = 0; k < spawnPoints.Length; k++)
         {
-            GameObject point = new GameObject($"SpawnPoint_{k}");
-            point.transform.parent = transform;
-            point.transform.position = startPoint.position + Vector3.down * interval * k;
-            spawnPoints[k] = point.transform;
+            if (spawnPoints[k] == null)
+            {
+                GameObject point = new GameObject($"SpawnPoint_{k}");
+                point.transform.SetParent(transform);
+                spawnPoints[k] = point.transform;
+            }
+
+            spawnPoints[k].position = startPoint.position + Vector3.down * interval * k;
         }
+
+        return true;
     }
 
     int[] Get_random_index(int spawnNum)
@@ -60,6 +63,32 @@ public class IceBulletSpawnZone : MonoBehaviour
 
     public void SpawnIceBullets(int spawnNum)
     {
+        float prefabTelegraphTime = 0f;
+        if (IceBullet != null && IceBullet.TryGetComponent(out Ice_Bullet bullet))
+            prefabTelegraphTime = bullet.TelegraphDuration;
+
+        SpawnIceBullets(spawnNum, prefabTelegraphTime);
+    }
+
+    public float GetPatternDuration(float telegraphDuration)
+    {
+        if (IceBullet != null && IceBullet.TryGetComponent(out Ice_Bullet bullet))
+            return bullet.GetTotalLifetime(telegraphDuration);
+
+        return Mathf.Max(0.1f, telegraphDuration);
+    }
+
+    public void SpawnIceBullets(int spawnNum, float telegraphDuration)
+    {
+        if (!EnsureSpawnPoints())
+            return;
+
+        if (IceBullet == null)
+        {
+            Debug.LogError("IceBulletSpawnZone: Ice Bullet 프리팹이 연결되지 않았습니다.", this);
+            return;
+        }
+
         Vector2 dir = fireDirection == FireDirection.Right ? Vector2.right : Vector2.left;
 
         int[] selected = Get_random_index(spawnNum);
@@ -67,7 +96,19 @@ public class IceBulletSpawnZone : MonoBehaviour
         {
             GameObject obj = Instantiate(IceBullet, spawnPoints[idx].position, Quaternion.identity);
             Ice_Bullet bullet = obj.GetComponent<Ice_Bullet>();
-            bullet.Launch(dir);
+            if (bullet == null)
+            {
+                Debug.LogError("IceBulletSpawnZone: 생성된 프리팹에 Ice_Bullet 컴포넌트가 없습니다.", obj);
+                Destroy(obj);
+                continue;
+            }
+
+            bullet.Launch(dir, telegraphDuration);
         }
+    }
+
+    private void OnValidate()
+    {
+        interval = Mathf.Max(0.01f, interval);
     }
 }

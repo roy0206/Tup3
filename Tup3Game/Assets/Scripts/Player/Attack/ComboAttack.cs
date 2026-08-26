@@ -41,7 +41,10 @@ public class ComboAttack : MonoBehaviour
     void Awake()
     {
         movement = GetComponent<Playermovement>();
-        attackCollider.enabled = false;
+        if (attackCollider != null)
+            attackCollider.enabled = false;
+        else
+            Debug.LogError("ComboAttack: Attack Collider가 연결되지 않았습니다.", this);
     }
     void Start()
     {
@@ -52,19 +55,18 @@ public class ComboAttack : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
-        if (movement.IsDashing() ||
-            movement.IsKnockedBack ||
-            (movement.IsInWater && !movement.IsGrounded))
+        if (!CanAttackNow())
+        {
+            if (isAttacking)
+                CancelCombo();
             return;
+        }
 
         if (Input.GetKeyDown(KeyCode.C))
         {
             if (!isAttacking)
             {
-             
                 StartCoroutine(Comboattack());
-                Debug.Log("콤보스탭은" + comboStep);
             }
             else
                 comboQueued = true;
@@ -79,8 +81,10 @@ public class ComboAttack : MonoBehaviour
         {
             while (true)
             {
+                if (!CanAttackNow())
+                    yield break;
+
                 comboStep++;
-                Debug.Log("현재 콤보 수: " + comboStep);
                 float facingDirection = movement.GetFacingDirection();
                 
                 // 바라보는 방향으로 공격
@@ -91,7 +95,6 @@ public class ComboAttack : MonoBehaviour
 
                 // 여기서 comboStep에 따라 애니메이션 트리거, 데미지, 히트박스 크기 등을 다르게 조작
 
-                float bodyLength = movement.BodySizeX;
                 if (movement.animator != null)
                 { 
                     movement.animator.SetTrigger("AttackTrigger");
@@ -106,7 +109,8 @@ public class ComboAttack : MonoBehaviour
                     _ => 0.417f
                 };
 
-                attackEffect.PlayEffect(comboStep, facingDirection, duration);
+                if (attackEffect != null)
+                    attackEffect.PlayEffect(comboStep, facingDirection, duration);
 
                 switch (comboStep)
                 {
@@ -114,14 +118,14 @@ public class ComboAttack : MonoBehaviour
                         currentDamage = attackPower * 1.0f;
                         isLunging = true;
                         yield return StartCoroutine(DashForward(attack1Distance, duration, facingDirection));
-                        attackEffect.HideEffect();
+                        attackEffect?.HideEffect();
                         isLunging = false;
                         break;
                     case 2:
                         currentDamage = attackPower * 1.0f;
                         isLunging = true;
                         yield return StartCoroutine(DashForward(attack2Distance, duration, facingDirection));
-                        attackEffect.HideEffect();
+                        attackEffect?.HideEffect();
                         isLunging = false;
                         break;
                     case 3:
@@ -135,8 +139,11 @@ public class ComboAttack : MonoBehaviour
                             yield break;
                         }
                         yield return StartCoroutine(DashForward(attack3Distance, duration, facingDirection));
-                        yield return new WaitForSeconds(attack3ChargeTime);
-                        attackEffect.HideEffect();
+                        if (cancelRequested)
+                            yield break;
+
+                        yield return new WaitForSeconds(Mathf.Max(0f, attack3ChargeTime));
+                        attackEffect?.HideEffect();
                         isLunging = false;
                         break;
 
@@ -162,6 +169,12 @@ public class ComboAttack : MonoBehaviour
                 float timer = 0f;
                 while (!comboQueued && timer < comboInputWindow)
                 {
+                    if (!CanAttackNow())
+                    {
+                        cancelRequested = true;
+                        break;
+                    }
+
                     timer += Time.deltaTime;
                     yield return null;
                 }
@@ -186,26 +199,36 @@ public class ComboAttack : MonoBehaviour
         }
         finally
         {
-            attackEffect.HideEffect();
+            attackEffect?.HideEffect();
+            if (attackCollider != null)
+                attackCollider.enabled = false;
+
+            isLunging = false;
             comboQueued = false;
             comboStep = 0;
             currentDamage = 0f;
             isAttacking = false;
+            cancelRequested = false;
         }
     }
 
 
     private IEnumerator DashForward(float distance, float duration, float direction)
     {
+        if (attackCollider == null)
+            yield break;
+
         attackCollider.enabled = true;
 
         float traveled = 0f;
         float elapsed = 0f;
+        duration = Mathf.Max(0.01f, duration);
 
         while (traveled < distance)
         {
-            if (cancelRequested)
+            if (cancelRequested || !CanAttackNow())
             {
+                cancelRequested = true;
                 attackCollider.enabled = false;
                 yield break;
             }
@@ -231,18 +254,28 @@ public class ComboAttack : MonoBehaviour
 
     public void SetAttackSpeedMultiplier(float multiplier)
     {
-        attackSpeedMultiplier = multiplier;
+        attackSpeedMultiplier = Mathf.Max(0.01f, multiplier);
     }
 
     private float GetAdjustedDuration(float baseDuration)
     {
-        return baseDuration / attackSpeedMultiplier;
+        return Mathf.Max(0.01f, baseDuration / attackSpeedMultiplier);
     }
 
     private bool cancelRequested = false;
 
     public void CancelCombo()
     {
-        cancelRequested = true;
+        if (isAttacking)
+            cancelRequested = true;
+    }
+
+    private bool CanAttackNow()
+    {
+        return movement != null &&
+               attackCollider != null &&
+               !movement.IsDashing() &&
+               !movement.IsKnockedBack &&
+               !(movement.IsInWater && !movement.IsGrounded);
     }
 }

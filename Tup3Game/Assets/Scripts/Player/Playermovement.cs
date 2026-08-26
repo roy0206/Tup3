@@ -42,7 +42,9 @@ public class Playermovement : MonoBehaviour
     public float jumpCutMultiplier = 0.5f;
 
     [Header("미끄러운 바닥")]
-    public float slipperyAcceleration = 10f;
+    [SerializeField] private float slipperyStartAcceleration = 20f;
+    [SerializeField] private float slipperyStopDeceleration = 28f;
+    [SerializeField] private float slipperyTurnAcceleration = 36f;
     private bool isOnSlippery = false;
 
     [Header("Water Swim Settings")]
@@ -140,9 +142,19 @@ public class Playermovement : MonoBehaviour
             {
                 float targetVelocityX = isLunging ? 0f : horizontalInput * moveSpeed;
 
-                velocity.x = isOnSlippery
-                    ? Mathf.MoveTowards(velocity.x, targetVelocityX, slipperyAcceleration * Time.deltaTime)
-                    : targetVelocityX;
+                if (isOnSlippery)
+                {
+                    float response = GetSlipperyResponse(targetVelocityX);
+                    velocity.x = Mathf.MoveTowards(
+                        velocity.x,
+                        targetVelocityX,
+                        response * Time.deltaTime
+                    );
+                }
+                else
+                {
+                    velocity.x = targetVelocityX;
+                }
             }
             if (isInWater)
             {
@@ -373,6 +385,19 @@ public class Playermovement : MonoBehaviour
                (target.CompareTag("ChangeablePlatform") || target.CompareTag("Slippery"));
     }
 
+    private float GetSlipperyResponse(float targetVelocityX)
+    {
+        if (Mathf.Abs(targetVelocityX) < 0.01f)
+            return slipperyStopDeceleration;
+
+        bool isTurning = Mathf.Abs(velocity.x) > 0.01f &&
+                         Mathf.Sign(velocity.x) != Mathf.Sign(targetVelocityX);
+
+        return isTurning
+            ? slipperyTurnAcceleration
+            : slipperyStartAcceleration;
+    }
+
     private void UpdateRaycastOrigins()
     {
         Bounds bounds = col.bounds;
@@ -498,6 +523,9 @@ public class Playermovement : MonoBehaviour
         horizontalRayCount = Mathf.Max(2, horizontalRayCount);
         verticalRayCount = Mathf.Max(2, verticalRayCount);
         skinWidth = Mathf.Max(0.001f, skinWidth);
+        slipperyStartAcceleration = Mathf.Max(0f, slipperyStartAcceleration);
+        slipperyStopDeceleration = Mathf.Max(0f, slipperyStopDeceleration);
+        slipperyTurnAcceleration = Mathf.Max(0f, slipperyTurnAcceleration);
     }
 
     public bool IsDashing() => isDashing;
