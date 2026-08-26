@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -53,6 +53,8 @@ public class UserInput : Singleton<UserInput>
 
     private void Update()
     {
+        if (PauseManager.IsPaused || DialogueManager.IsDialogueActive) return;
+
         UpdateMouse();
         DispatchKeyListeners();
         DispatchMouseListeners();
@@ -169,3 +171,10 @@ public class UserInput : Singleton<UserInput>
         }
     }
 }
+
+/* [파일 노트]
+ * Update 첫 줄의 PauseManager.IsPaused 게이트 : 일시정지 중에는 등록된 키/마우스 리스너를
+ * 일절 디스패치하지 않는다(예: V 홀드 상호작용으로 보스방 입장 씬 전환이 일어나는 사고 방지).
+ * 일시정지 UI 는 uGUI 이벤트(EventSystem)와 PauseManager 자체의 ESC 처리로만 동작하므로
+ * 이 게이트의 영향을 받지 않는다.
+ */

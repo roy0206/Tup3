@@ -13,6 +13,8 @@ public class SoilDrop : MonoBehaviour
 
     private void Update()
     {
+        if (PauseManager.IsPaused) return;
+
         speed += accel * Time.deltaTime;
         transform.Translate(Vector3.down * speed * Time.deltaTime);
     }

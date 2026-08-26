@@ -65,6 +65,8 @@ public class Water_Sprout : MonoBehaviour
 
     private void Update()
     {
+        if (PauseManager.IsPaused) return;
+
         if (state == SproutState.Waiting)
         {
             delayElapsed += Time.deltaTime;

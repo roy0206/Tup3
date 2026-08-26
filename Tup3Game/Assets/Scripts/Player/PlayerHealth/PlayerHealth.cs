@@ -21,6 +21,7 @@ public class PlayerHealth : MonoBehaviour, IHealthUIEvent
 
     public void TakeDamage(float amount)
     {
+        if (PauseManager.IsPaused) return;
         if (IsDead || amount <= 0f) return;
 
         currentHealth = Mathf.Max(0f, currentHealth - amount);
@@ -53,3 +54,8 @@ public class PlayerHealth : MonoBehaviour, IHealthUIEvent
 
     public event Action<float, float> OnHealthChanged;
 }
+
+/* [파일 노트]
+ * TakeDamage 첫 줄의 PauseManager.IsPaused 게이트 : PlayerKnockBack 을 거치지 않고
+ * PlayerHealth.TakeDamage 를 직접 부르는 경로(Fire 보스 몸통 박치기 등)까지 일시정지 중 차단한다.
+ */

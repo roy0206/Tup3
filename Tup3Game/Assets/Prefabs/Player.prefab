@@ -4955,9 +4955,12 @@ MonoBehaviour:
   dashEffectController: {fileID: 5619284950695481464}
   animator: {fileID: 0}
   spriteRenderer: {fileID: 0}
-  collisionMask:
+  verticalCollisionMask:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 1088
+  horizontalCollisionMask:
+    serializedVersion: 2
+    m_Bits: 1024
   horizontalRayCount: 10
   verticalRayCount: 4
   skinWidth: 0.05
@@ -4971,6 +4974,13 @@ MonoBehaviour:
   dashCooldown: 1
   coyoteTime: 0.15
   jumpCutMultiplier: 0.5
+  slipperyAcceleration: 10
+  isInWater: 0
+  waterFlapForce: 8
+  waterMaxFallSpeed: 3
+  waterFastDescendSpeed: 8
+  waterDescendKey: 274
+  waterGravityMultiplier: 0.3
 --- !u!61 &7619190873882549438
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -5126,6 +5136,7 @@ MonoBehaviour:
   skill_4_cool: 10
   skill_4_duration: 5
   skill_4_HealEffect: {fileID: 6764349960059873119}
+  isSkillEquiped: 00000000
   skill_1_key: 97
   skill_2_key: 115
   skill_3_key: 100

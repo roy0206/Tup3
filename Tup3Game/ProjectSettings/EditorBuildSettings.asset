@@ -26,6 +26,27 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Ending.unity
     guid: 08d12a0eec13dd1429ff7e2083b24cdc
+  - enabled: 1
+    path: Assets/Scenes/Prologue.unity
+    guid: df8b8495bcb022d4a9f509d6417f59b2
+  - enabled: 1
+    path: Assets/Scenes/Boss_Water.unity
+    guid: 6a733d5b7b0c3424ca79dcb2cf2ef31b
+  - enabled: 1
+    path: Assets/Scenes/Boss_Gold.unity
+    guid: 0affd5a9920a84a48bb1c5422126d072
+  - enabled: 1
+    path: Assets/Scenes/Ending1.unity
+    guid: 407249197f3bb5748866559362fde5af
+  - enabled: 1
+    path: Assets/Scenes/Ending2.unity
+    guid: 7ff3e49572d36734d9fbc4407ada345a
+  - enabled: 1
+    path: Assets/Scenes/Ending3.unity
+    guid: c0fbaf00ea8e18642bf9ba3f3f567955
+  - enabled: 1
+    path: Assets/Scenes/Ending4.unity
+    guid: 1562a1ae277f37f4b85133fc18d406d0
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: cdf61fb3b07ef854f989175198eabd19, type: 2}
     com.unity.dt.app-ui: {fileID: 11400000, guid: 99f9c9493070a9d4c979a8fec7c5a8d3, type: 2}

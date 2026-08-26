@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Final
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: Final
+  m_GUID: af43653f256010a43864f19a7e9091e3
+  m_SerializeEntries:
+  - m_GUID: 8a01e50db925c064bab980f36c182dbc
+    m_Address: SoilWave
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - BossAsset
+    - Pool
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 0a5bfcc833d0b0a4cadf2be628e75e99, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: acfe1ee048805ab47939a83593a10733, type: 2}
+    - {fileID: 11400000, guid: 02a5412ed2d50414693101b24427055e, type: 2}

@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
@@ -6,7 +6,7 @@ using System;
 [RequireComponent(typeof(Playermovement))]
 [RequireComponent(typeof(ComboAttack))]
 [RequireComponent(typeof(PlayerHealth))]
-public class Skills : MonoBehaviour
+public class Skills : MonoBehaviour, ISceneEventListener
 {
     private Playermovement movement;
     private ComboAttack attack;
@@ -66,6 +66,8 @@ public class Skills : MonoBehaviour
     [SerializeField] private List<bool> isSkillEquiped = new() {false, false, false, false};
     public List<bool> IsSkillEquiped => isSkillEquiped;
 
+    public event Action<int> OnSkillEquipped;
+
     public List<Action<float, float>> OnSkillsActive = new() { null, null, null, null };
     
 
@@ -82,6 +84,8 @@ public class Skills : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
+        SceneController.Instance.RegisterListener(this);
+
         movement = GetComponent<Playermovement>();
         attack = GetComponent<ComboAttack>();
         health = GetComponent<PlayerHealth>();
@@ -98,12 +102,44 @@ public class Skills : MonoBehaviour
 
     public void OptainSkill(int num)
     {
+        if (num < 0 || num >= isSkillEquiped.Count) return;
+        if (isSkillEquiped[num]) return;
+
         isSkillEquiped[num] = true;
+        OnSkillEquipped?.Invoke(num);
+    }
+
+    public void OnSceneLoadComplete(string sceneName)
+    {
+        SyncFromSaveData();
+    }
+
+    public void OnSceneExit(string sceneName)
+    {
+        SceneController.Instance.UnregisterListener(this);
+    }
+
+    private void SyncFromSaveData()
+    {
+        var data = UserDataManager.Instance != null ? UserDataManager.Instance.Data : null;
+        if (data == null || data.Play == null || data.Play.skills == null) return;
+
+        var saved = data.Play.skills;
+        for (int i = 0; i < isSkillEquiped.Count && i < saved.Count; i++)
+        {
+            if (saved[i] && !isSkillEquiped[i])
+            {
+                isSkillEquiped[i] = true;
+                OnSkillEquipped?.Invoke(i);
+            }
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (PauseManager.IsPaused || DialogueManager.IsDialogueActive) return;
+
         if (Input.GetKeyDown(skill_1_key) && canUseSkill_1 && isSkillEquiped[0])
         {
             StartCoroutine(Do_skill_1());
@@ -279,6 +315,7 @@ public class Skills : MonoBehaviour
         if (skill_2_groundPrefab != null)
         {
             GameObject spawnedGround = Instantiate(skill_2_groundPrefab, spawnPoint, Quaternion.identity);
+            spawnedGround.AddComponent<SkillGroundMarker>();
 
             yield return new WaitForSeconds(skill_2_duration);
             if (spawnedGround != null)
@@ -381,3 +418,18 @@ public class Skills : MonoBehaviour
 
     public bool IsAiming => isAiming;
 }
+
+/* [파일 노트]
+ * 스킬은 isSkillEquiped[n] 이 true 인 것만 발동된다(Update 의 키 입력 게이트).
+ * 획득 경로는 두 가지: 보스전 승리(BossRoom.GrantSkill → OptainSkill)와
+ * 세이브 동기화(SyncFromSaveData — 씬 로드 완료 시 PlayData.skills 를 반영).
+ * 씬마다 플레이어 인스턴스가 새로 생기므로 ISceneEventListener 로 등록해
+ * 어느 씬에서든 저장된 보유 스킬이 살아나게 한다(기존에는 Lobby.cs 만 동기화해서
+ * 보스 씬에서는 획득한 스킬도 잠겨 있었다).
+ * OnSkillEquipped(int) 는 획득·동기화로 스킬이 새로 열릴 때마다 1회 발생한다 —
+ * SkillView 가 구독해 잠금 해제 표시에 사용. OptainSkill 은 멱등(이미 보유면 무시).
+ *
+ * SpawnGroundAfterDelay 의 AddComponent<SkillGroundMarker>() 한 줄 : 스킬2로 소환한 지형에
+ * 식별용 빈 마커를 붙인다. 최종보스의 토 파동 투사체(SoilWave)가 이 마커를 보고 소멸한다
+ * (속성 상성). 지형 프리팹은 수정하지 않았고 지형 동작에도 영향이 없다.
+ */

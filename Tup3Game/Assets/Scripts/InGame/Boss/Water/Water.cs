@@ -117,6 +117,8 @@ public class Water : BossBase
 
     private void Update()
     {
+        if (PauseManager.IsPaused || DialogueManager.IsDialogueActive) return;
+
         for (int i = 0; i < curTimes.Count; i++)
         {
             curTimes[i] -= Time.deltaTime;
@@ -500,6 +502,8 @@ public class Water : BossBase
 
         for (int i = 0; i < 3; i++)
         {
+            yield return PauseManager.WaitWhilePaused();
+
             if (IsDead || currentPhase != BossPhase.Encroached)
                 yield break;
 
@@ -557,3 +561,10 @@ public class Water : BossBase
         CleanupEncroachmentWarning();
     }
 }
+
+/* [파일 노트]
+ * 일시정지 대응 : Update 첫 줄 PauseManager.IsPaused 게이트로 BT/쿨타임/잠식 전조 타이머가 멈춘다.
+ * 얼음총알·분수·스톰 소환 예약(DOVirtual.DelayedCall)과 수위 상승 트윈(RisingWaterPhase)은
+ * DOTween.PauseAll 로 함께 멈추고, 전기 구체 연속 소환 코루틴은 루프마다 WaitWhilePaused 로 대기한다.
+ * Water_eye 의 수명 타이머(Invoke)는 실시간으로 흘러 일시정지 중 만료될 수 있다(플레이어에게 불리하지 않음).
+ */

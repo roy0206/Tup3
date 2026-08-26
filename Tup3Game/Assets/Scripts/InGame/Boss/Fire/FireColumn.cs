@@ -21,6 +21,8 @@ public class FireColumn : MonoBehaviour
 
     private void Update()
     {
+        if (PauseManager.IsPaused) return;
+
         spriteRenderer.flipX = !spriteRenderer.flipX;
     }
 }

@@ -15,7 +15,8 @@ public class Playermovement : MonoBehaviour
     public SpriteRenderer spriteRenderer;
 
     [Header("레이캐스트 설정")]
-    public LayerMask collisionMask;
+    public LayerMask verticalCollisionMask;
+    public LayerMask horizontalCollisionMask;
     public int horizontalRayCount = 4;
     public int verticalRayCount = 4;
     public float skinWidth = 0.02f;
@@ -108,6 +109,8 @@ public class Playermovement : MonoBehaviour
 
     void Update()
     {
+        if (PauseManager.IsPaused || DialogueManager.IsDialogueActive) return;
+
         float horizontalInput = Input.GetAxisRaw("Horizontal");
         
         bool isAiming = skills != null && skills.IsAiming;
@@ -305,7 +308,7 @@ public class Playermovement : MonoBehaviour
             Vector2 rayOrigin = (directionX == -1) ? raycastOrigins.bottomLeft : raycastOrigins.bottomRight;
             rayOrigin += Vector2.up * (i * raySpacing);
 
-            RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * directionX, rayLength, collisionMask);
+            RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * directionX, rayLength, horizontalCollisionMask);
             Debug.DrawRay(rayOrigin, Vector2.right * directionX * rayLength, Color.red);
 
             if (hit)
@@ -342,7 +345,7 @@ public class Playermovement : MonoBehaviour
             Vector2 rayOrigin = (directionY == -1) ? raycastOrigins.bottomLeft : raycastOrigins.topLeft;
             rayOrigin += Vector2.right * (i * raySpacing);
 
-            RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.up * directionY, rayLength, collisionMask);
+            RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.up * directionY, rayLength, verticalCollisionMask);
             Debug.DrawRay(rayOrigin, Vector2.up * directionY * rayLength, Color.red);
 
             if (hit)
@@ -430,6 +433,12 @@ public class Playermovement : MonoBehaviour
         float timer = 0f;
         while (timer < dashDuration)
         {
+            if (PauseManager.IsPaused)
+            {
+                yield return null;
+                continue;
+            }
+
             if (animator != null)
             {
                 animator.Play("Dash");
@@ -571,5 +580,11 @@ public class Playermovement : MonoBehaviour
     public float GetFacingDirection() => facingDirection;
 
 
-   
+
 }
+
+/* [파일 노트]
+ * 일시정지 대응 : Update 첫 줄에서 PauseManager.IsPaused 를 검사해 입력/중력/이동을 전부 멈추고,
+ * DoDash 코루틴도 루프 안에서 일시정지 동안 프레임을 흘려보내 대시 이동/타이머가 진행되지 않게 했다.
+ * 대시 쿨다운(WaitForSeconds)은 일시정지 중에도 실시간으로 흐른다(플레이어에게 불리하지 않아 허용).
+ */

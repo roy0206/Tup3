@@ -1,0 +1,2424 @@
+version: 1
+updated_at: '2026-08-26T15:40:02+09:00'
+note: 오디오 라이선스 장부 — station.gen.audio가 쓴다. 손으로 고치지 말 것(다음 취득에서 덮인다). 곡 추가는 `python -m station.gen.audio fetch`.
+tracks:
+- track_id: incompetech-aquarium
+  title: Aquarium
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: Aquarium
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1900026
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Aquarium.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"Aquarium" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN1900026
+  path: 공통_bgm/Aquarium.mp3
+  bytes: 5895241
+  sha256: 1f52f8d577c4ff6cc56c9acef25793c1d15c614dd2625f48772a9f4f63e8583d
+  duration_sec: 144.0
+  acquired_at: '2026-08-26T15:23:28+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-aquarium.html
+  usage: []
+- track_id: incompetech-atlantean-twilight
+  title: Atlantean Twilight
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: Atlantean Twilight
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100322
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Atlantean%20Twilight.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"Atlantean Twilight" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN1100322
+  path: 공통_bgm/Atlantean_Twilight.mp3
+  bytes: 5579577
+  sha256: a3ad327aa9661d95ab701860e5583dac2a59b710af6d204316ff6043ee7205d3
+  duration_sec: 171.0
+  acquired_at: '2026-08-26T15:23:31+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-atlantean-twilight.html
+  usage: []
+- track_id: incompetech-burn-the-world-waltz
+  title: Burn The World Waltz
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: 'Burn The World Waltz '
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN2100009
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Burn%20The%20World%20Waltz%20.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"Burn The World Waltz" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN2100009
+  path: 공통_bgm/Burn_The_World_Waltz.mp3
+  bytes: 4003696
+  sha256: 35e03b3e014536029d69119ae649441bce84e77fa29c87ce1f44825639e0c2aa
+  duration_sec: 200.0
+  acquired_at: '2026-08-26T15:23:40+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-burn-the-world-waltz.html
+  usage: []
+- track_id: incompetech-clear-waters
+  title: Clear Waters
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: Clear Waters
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100290
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Clear%20Waters.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"Clear Waters" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN1100290
+  path: 공통_bgm/Clear_Waters.mp3
+  bytes: 5238443
+  sha256: a9b4a309aa57ae3084535a79a20a783290ad293836623a3c3c0c3b48775be0ff
+  duration_sec: 128.0
+  acquired_at: '2026-08-26T15:23:00+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-clear-waters.html
+  usage: []
+- track_id: incompetech-clenched-teeth
+  title: Clenched Teeth
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: Clenched Teeth
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100705
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Clenched%20Teeth.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"Clenched Teeth" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN1100705
+  path: 공통_bgm/Clenched_Teeth.mp3
+  bytes: 3648195
+  sha256: a113c6c93730d8517b5f851cd2ac72c1e89b8a3f61abfd62ae499c60b1456998
+  duration_sec: 91.0
+  acquired_at: '2026-08-26T15:24:51+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-clenched-teeth.html
+  usage: []
+- track_id: incompetech-curse-of-the-scarab
+  title: Curse of the Scarab
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: Curse of the Scarab
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1600014
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Curse%20of%20the%20Scarab.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"Curse of the Scarab" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN1600014
+  path: 공통_bgm/Curse_of_the_Scarab.mp3
+  bytes: 10473824
+  sha256: e1c825715a8e0e58eb7bf308438df68bcd2b9caf5df84d397e0466bcba89e193
+  duration_sec: 327.0
+  acquired_at: '2026-08-26T15:24:48+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-curse-of-the-scarab.html
+  usage: []
+- track_id: incompetech-devastation-and-revenge
+  title: Devastation and Revenge
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: Devastation and Revenge
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100694
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Devastation%20and%20Revenge.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"Devastation and Revenge" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN1100694
+  path: 공통_bgm/Devastation_and_Revenge.mp3
+  bytes: 7412540
+  sha256: 197e1957faeb64521c43c7ef748fd59bc01f3a3c4ca77d3e6d0eb9f5ae3f2ff8
+  duration_sec: 185.0
+  acquired_at: '2026-08-26T15:23:12+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-devastation-and-revenge.html
+  usage: []
+- track_id: incompetech-dream-culture
+  title: Dream Culture
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: Dream Culture
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1300046
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Dream%20Culture.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"Dream Culture" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN1300046
+  path: 공통_bgm/Dream_Culture.mp3
+  bytes: 8576659
+  sha256: f12cbb52bd4b92bd6cf8a343645567c119627e9cbf98108a3eb6ac2cc275ee46
+  duration_sec: 214.0
+  acquired_at: '2026-08-26T15:22:57+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-dream-culture.html
+  usage: []
+- track_id: incompetech-eastern-thought
+  title: Eastern Thought
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: Eastern Thought
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100682
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Eastern%20Thought.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"Eastern Thought" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN1100682
+  path: 공통_bgm/Eastern_Thought.mp3
+  bytes: 10477322
+  sha256: 5daab860de26f2c47701958a21dcbe6c6283a7955863e72fe9ca5a536d6d552d
+  duration_sec: 262.0
+  acquired_at: '2026-08-26T15:22:17+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-eastern-thought.html
+  usage: []
+- track_id: incompetech-eternal-hope
+  title: Eternal Hope
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: Eternal Hope
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100238
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Eternal%20Hope.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"Eternal Hope" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN1100238
+  path: 공통_bgm/Eternal_Hope.mp3
+  bytes: 11500749
+  sha256: b410a6e67dfd23868ac3a4f892226ef2d0933b7846d66f8d8472377a1fde36a5
+  duration_sec: 284.0
+  acquired_at: '2026-08-26T15:24:17+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-eternal-hope.html
+  usage: []
+- track_id: incompetech-exciting-trailer
+  title: Exciting Trailer
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: Exciting Trailer
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100494
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Exciting%20Trailer.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"Exciting Trailer" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN1100494
+  path: 공통_bgm/Exciting_Trailer.mp3
+  bytes: 3097270
+  sha256: 11876fdee63d983fe9cb6dd4e3140d49b53055f47f04480e1ddacbde4628b7c8
+  duration_sec: 76.0
+  acquired_at: '2026-08-26T15:23:43+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-exciting-trailer.html
+  usage: []
+- track_id: incompetech-final-battle-of-the-dark-wizards
+  title: Final Battle of the Dark Wizards
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: Final Battle of the Dark Wizards
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1500085
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Final%20Battle%20of%20the%20Dark%20Wizards.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"Final Battle of the Dark Wizards" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN1500085
+  path: 공통_bgm/Final_Battle_of_the_Dark_Wizards.mp3
+  bytes: 8694170
+  sha256: f4b4321aa1e4b7057c4e06e9c67f4f713d42555d9fec9950b07ec305af25f8dc
+  duration_sec: 272.0
+  acquired_at: '2026-08-26T15:24:38+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-final-battle-of-the-dark-wizards.html
+  usage: []
+- track_id: incompetech-for-the-fallen
+  title: For the Fallen
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: For the Fallen
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100704
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/For%20the%20Fallen.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"For the Fallen" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN1100704
+  path: 공통_bgm/For_the_Fallen.mp3
+  bytes: 3808517
+  sha256: 1c73f6cc23b746942ddcc6b56ef24542d42dbb2ba1a6932848848bfb10d17849
+  duration_sec: 95.0
+  acquired_at: '2026-08-26T15:23:16+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-for-the-fallen.html
+  usage: []
+- track_id: incompetech-ghost-processional
+  title: Ghost Processional
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: Ghost Processional
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100219
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Ghost%20Processional.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"Ghost Processional" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN1100219
+  path: 공통_bgm/Ghost_Processional.mp3
+  bytes: 3440840
+  sha256: 9502c6f9a0c365f2717ea82acd7e18c17f784da742c63a1e6887c5761a7ef421
+  duration_sec: 105.0
+  acquired_at: '2026-08-26T15:24:05+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-ghost-processional.html
+  usage: []
+- track_id: incompetech-ghostpocalypse-4-temptress
+  title: Ghostpocalypse - 4 Temptress
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: Ghostpocalypse - 4 Temptress
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100665
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Ghostpocalypse%20-%204%20Temptress.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"Ghostpocalypse - 4 Temptress" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN1100665
+  path: 공통_bgm/Ghostpocalypse_-_4_Temptress.mp3
+  bytes: 4601598
+  sha256: 2f9470d8c8c93e6a898e68d24d194ddbcb9d60405d57d8a7899c11541dd1ec17
+  duration_sec: 115.0
+  acquired_at: '2026-08-26T15:24:11+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-ghostpocalypse-4-temptress.html
+  usage: []
+- track_id: incompetech-ghostpocalypse-6-crossing-the-threshold
+  title: Ghostpocalypse - 6 Crossing the Threshold
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: Ghostpocalypse - 6 Crossing the Threshold
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100663
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Ghostpocalypse%20-%206%20Crossing%20the%20Threshold.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"Ghostpocalypse - 6 Crossing the Threshold" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN1100663
+  path: 공통_bgm/Ghostpocalypse_-_6_Crossing_the_Threshold.mp3
+  bytes: 4344331
+  sha256: 2f3b9cda076fc3501c8d1e3b8ccf0c247b96b5dfcac153dd1675e7ede0b826b6
+  duration_sec: 108.0
+  acquired_at: '2026-08-26T15:24:08+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-ghostpocalypse-6-crossing-the-threshold.html
+  usage: []
+- track_id: incompetech-guzheng-city
+  title: Guzheng City
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: Guzheng City
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN2100001
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Guzheng%20City.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"Guzheng City" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN2100001
+  path: 공통_bgm/Guzheng_City.mp3
+  bytes: 3654552
+  sha256: 7d117a43cad22ff05b32340f2bd331368c48342f503eab85b1e5c403043d4be6
+  duration_sec: 113.0
+  acquired_at: '2026-08-26T15:22:20+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-guzheng-city.html
+  usage: []
+- track_id: incompetech-iron-horse
+  title: Iron Horse
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: Iron Horse
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100735
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Iron%20Horse.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"Iron Horse" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN1100735
+  path: 공통_bgm/Iron_Horse.mp3
+  bytes: 3989337
+  sha256: 0576cde4e3c1704ab657434a1a59e464cf64085c0b6dce51fc1af2e372a52b7f
+  duration_sec: 100.0
+  acquired_at: '2026-08-26T15:23:56+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-iron-horse.html
+  usage: []
+- track_id: incompetech-lotus
+  title: Lotus
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: Lotus
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1900019
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Lotus.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"Lotus" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN1900019
+  path: 공통_bgm/Lotus.mp3
+  bytes: 13136374
+  sha256: 7e4b1082894152588912177cba33ac99dd6f79b9473fbc4873a67210f1c7da11
+  duration_sec: 328.0
+  acquired_at: '2026-08-26T15:22:24+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-lotus.html
+  usage: []
+- track_id: incompetech-meditation-impromptu-01
+  title: Meditation Impromptu 01
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: Meditation Impromptu 01
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100163
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Meditation%20Impromptu%2001.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"Meditation Impromptu 01" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN1100163
+  path: 공통_bgm/Meditation_Impromptu_01.mp3
+  bytes: 7042622
+  sha256: ac1332a12fe020cbeee206c7f33a82e29109d5ce63636e3302454e3bdfc36187
+  duration_sec: 212.0
+  acquired_at: '2026-08-26T15:22:50+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-meditation-impromptu-01.html
+  usage: []
+- track_id: incompetech-promises-to-keep
+  title: Promises to Keep
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: Promises to Keep
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1200004
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Promises%20to%20Keep.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"Promises to Keep" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN1200004
+  path: 공통_bgm/Promises_to_Keep.mp3
+  bytes: 12164741
+  sha256: 5c00ec533ec68db10a46641cf53d555cf1f783ecb853180bf8c251e61bc845be
+  duration_sec: 304.0
+  acquired_at: '2026-08-26T15:24:21+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-promises-to-keep.html
+  usage: []
+- track_id: incompetech-rains-will-fall
+  title: Rains Will Fall
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: Rains Will Fall
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100723
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Rains%20Will%20Fall.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"Rains Will Fall" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN1100723
+  path: 공통_bgm/Rains_Will_Fall.mp3
+  bytes: 8898445
+  sha256: bf598ba673784fb54266f79138bbd807a6a63629914d4bbeca4bba10f2d70d70
+  duration_sec: 222.0
+  acquired_at: '2026-08-26T15:24:30+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-rains-will-fall.html
+  usage: []
+- track_id: incompetech-ready-aim-fire
+  title: Ready Aim Fire
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: Ready Aim Fire
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1500002
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Ready%20Aim%20Fire.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"Ready Aim Fire" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN1500002
+  path: 공통_bgm/Ready_Aim_Fire.mp3
+  bytes: 6944566
+  sha256: 9c733e8227961f989b743d7566a8e6c777ebd8555265d803df740775ab31b9d3
+  duration_sec: 217.0
+  acquired_at: '2026-08-26T15:23:37+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-ready-aim-fire.html
+  usage: []
+- track_id: incompetech-rites
+  title: Rites
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: Rites
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100722
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Rites.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"Rites" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN1100722
+  path: 공통_bgm/Rites.mp3
+  bytes: 5078605
+  sha256: 269fbc51c8866b674e557ca570671b8ca5658c62965ba9b69853dd210c372646
+  duration_sec: 127.0
+  acquired_at: '2026-08-26T15:22:38+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-rites.html
+  usage: []
+- track_id: incompetech-ritual
+  title: Ritual
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: Ritual
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100466
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Ritual.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"Ritual" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN1100466
+  path: 공통_bgm/Ritual.mp3
+  bytes: 10705537
+  sha256: 2dfdfede2f491f3991f8264577f250dc6abf63dd7c7dd3cd751d41b57b995283
+  duration_sec: 264.0
+  acquired_at: '2026-08-26T15:22:36+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-ritual.html
+  usage: []
+- track_id: incompetech-shadowlands-3-machine
+  title: Shadowlands 3 - Machine
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: Shadowlands 3 - Machine
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1700036
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Shadowlands%203%20-%20Machine.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"Shadowlands 3 - Machine" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN1700036
+  path: 공통_bgm/Shadowlands_3_-_Machine.mp3
+  bytes: 7364165
+  sha256: bc31348093ace3140fcb8916597737522d07cfb3cf219844a18ec0fefc1fda36
+  duration_sec: 230.0
+  acquired_at: '2026-08-26T15:24:02+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-shadowlands-3-machine.html
+  usage: []
+- track_id: incompetech-steel-rods
+  title: Steel Rods
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: Steel Rods
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1200052
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Steel%20Rods.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"Steel Rods" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN1200052
+  path: 공통_bgm/Steel_Rods.mp3
+  bytes: 5778494
+  sha256: ef9c0cc999887cb58a87b1614510fcdc0c6d60b8a6b01a0d8947ae8f8afbd7d3
+  duration_sec: 144.0
+  acquired_at: '2026-08-26T15:23:53+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-steel-rods.html
+  usage: []
+- track_id: incompetech-temple-of-the-manes
+  title: Temple of the Manes
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: Temple of the Manes
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100053
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Temple%20of%20the%20Manes.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"Temple of the Manes" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN1100053
+  path: 공통_bgm/Temple_of_the_Manes.mp3
+  bytes: 6336457
+  sha256: 21774c909751472f4fb6621e4cb5d0ac29ae535c4768392d13d2917f7107bcbf
+  duration_sec: 156.0
+  acquired_at: '2026-08-26T15:22:43+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-temple-of-the-manes.html
+  usage: []
+- track_id: incompetech-undaunted
+  title: Undaunted
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: Undaunted
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1400025
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Undaunted.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"Undaunted" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN1400025
+  path: 공통_bgm/Undaunted.mp3
+  bytes: 6803270
+  sha256: eb80db4bfba6c0516824a2e9a7a88bba47560a7d4e447a7750979f003fe13fcd
+  duration_sec: 212.0
+  acquired_at: '2026-08-26T15:23:19+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-undaunted.html
+  usage: []
+- track_id: incompetech-water-prelude
+  title: Water Prelude
+  artist: Kevin MacLeod
+  kind: bgm
+  source: incompetech
+  source_id: Water Prelude
+  source_url: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100017
+  download_url: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Water%20Prelude.mp3
+  license_id: CC-BY-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_note: ''
+  attribution_text: '"Water Prelude" Kevin MacLeod (incompetech.com)
+
+    Licensed under Creative Commons: By Attribution 4.0 License
+
+    http://creativecommons.org/licenses/by/4.0/'
+  credit_required: true
+  commercial_ok: true
+  derivative_ok: true
+  isrc: USUAN1100017
+  path: 공통_bgm/Water_Prelude.mp3
+  bytes: 6588555
+  sha256: aa9af59090133e60a2246e0da49b3b477a9b1f5fe5259d3f4e6cec3edfd3aad4
+  duration_sec: 324.0
+  acquired_at: '2026-08-26T15:23:25+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/incompetech-water-prelude.html
+  usage: []
+- track_id: openverse-8-bit-death-sound
+  title: 8 bit Death sound
+  artist: MentosLat
+  kind: sfx
+  source: openverse
+  source_id: 90737d8b-1c82-427d-b0f2-3403966e7c60
+  source_url: https://freesound.org/people/MentosLat/sounds/417486
+  download_url: https://cdn.freesound.org/previews/417/417486_8281056-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"8 bit Death sound" by MentosLat is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/8_bit_Death_sound.mp3
+  bytes: 17425
+  sha256: 1e76805f76cc248cb3345150ea057fcfcb34872cadfcd7ae005dd52840f647e6
+  duration_sec: 0.9
+  acquired_at: '2026-08-26T15:30:35+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-8-bit-death-sound.html
+  usage: []
+- track_id: openverse-beep-space-button
+  title: Beep Space Button
+  artist: GameAudio
+  kind: sfx
+  source: openverse
+  source_id: 87ed2e86-287f-4b7f-8083-b9777f049017
+  source_url: https://freesound.org/people/GameAudio/sounds/220206
+  download_url: https://cdn.freesound.org/previews/220/220206_4100837-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Beep Space Button" by GameAudio is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Beep_Space_Button.mp3
+  bytes: 12366
+  sha256: a16dae6a47af926eb29696afb87f92ad73a3928e19b480b55375af98d9462160
+  duration_sec: 0.5
+  acquired_at: '2026-08-26T15:36:08+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-beep-space-button.html
+  usage: []
+- track_id: openverse-brick-on-soil-wav
+  title: Brick on soil.wav
+  artist: deleted_user_2104797
+  kind: sfx
+  source: openverse
+  source_id: 198bec23-49c8-42e9-8802-d4ef6112927c
+  source_url: https://freesound.org/people/deleted_user_2104797/sounds/325268
+  download_url: https://cdn.freesound.org/previews/325/325268_2104797-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Brick on soil.wav" by deleted_user_2104797 is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Brick_on_soil.wav
+  bytes: 94848
+  sha256: bc50d926cd722ba8bdaed87be32be184dcc0af311083bad2ca9c38afb6390ea4
+  duration_sec: 3.869
+  acquired_at: '2026-08-26T15:32:18+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-brick-on-soil-wav.html
+  usage: []
+- track_id: openverse-buzzer-mp3
+  title: buzzer.mp3
+  artist: Loyalty_Freak_Music
+  kind: sfx
+  source: openverse
+  source_id: 47cc09b3-cf72-4cfe-8794-929acfc39590
+  source_url: https://freesound.org/people/Loyalty_Freak_Music/sounds/407466
+  download_url: https://cdn.freesound.org/previews/407/407466_7947620-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"buzzer.mp3" by Loyalty_Freak_Music is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/buzzer.mp3
+  bytes: 13412
+  sha256: 421c555ec76692648a5d844e31fd26e27ee6a1b59331f25e99c8e4dbe8f77d1d
+  duration_sec: 0.458
+  acquired_at: '2026-08-26T15:36:38+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-buzzer-mp3.html
+  usage: []
+- track_id: openverse-coin-get
+  title: Coin GET!
+  artist: plasterbrain
+  kind: sfx
+  source: openverse
+  source_id: 681fd988-e499-4a28-a01d-f09fd1ad4baf
+  source_url: https://freesound.org/people/plasterbrain/sounds/242857
+  download_url: https://cdn.freesound.org/previews/242/242857_4284968-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Coin GET!" by plasterbrain is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Coin_GET.mp3
+  bytes: 8036
+  sha256: 93775db5d9a77085676268e32391868d77c053cb8909a906d366602fe4ad661d
+  duration_sec: 0.285
+  acquired_at: '2026-08-26T15:36:42+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-coin-get.html
+  usage: []
+- track_id: openverse-coins-being-dropped-assorted
+  title: Coins Being Dropped-Assorted
+  artist: TheWoodlandNomad
+  kind: sfx
+  source: openverse
+  source_id: 6b689584-cecf-46b3-b65d-818be8e405aa
+  source_url: https://freesound.org/people/TheWoodlandNomad/sounds/363090
+  download_url: https://cdn.freesound.org/previews/363/363090_6612464-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Coins Being Dropped-Assorted" by TheWoodlandNomad is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Coins_Being_Dropped-Assorted.mp3
+  bytes: 596579
+  sha256: 8ce0abe7e26bf5fbea590a0d91935f140eac42e49117ae3a9bb1cf267e20b1b2
+  duration_sec: 24.417
+  acquired_at: '2026-08-26T15:36:53+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-coins-being-dropped-assorted.html
+  usage: []
+- track_id: openverse-correct-blips
+  title: Correct Blips
+  artist: CogFireStudios
+  kind: sfx
+  source: openverse
+  source_id: 5e277a80-5103-4dc1-9b50-fc3d180da713
+  source_url: https://freesound.org/people/CogFireStudios/sounds/531510
+  download_url: https://cdn.freesound.org/previews/531/531510_7614679-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Correct Blips" by CogFireStudios is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Correct_Blips.mp3
+  bytes: 96768
+  sha256: ad28de1ef0a14917f2c839fe6e62bd3529d95617aac134c35c839eb680d05c07
+  duration_sec: 4.183
+  acquired_at: '2026-08-26T15:36:29+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-correct-blips.html
+  usage: []
+- track_id: openverse-deep-whoosh-1
+  title: 'Deep Whoosh #1'
+  artist: Kinoton
+  kind: sfx
+  source: openverse
+  source_id: eab8a6e2-0ac8-4615-9e0d-ebde30523783
+  source_url: https://freesound.org/people/Kinoton/sounds/351256
+  download_url: https://cdn.freesound.org/previews/351/351256_2247456-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Deep Whoosh #1" by Kinoton is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Deep_Whoosh_1.mp3
+  bytes: 69196
+  sha256: 8e4dccf0697f7faff1104e58a1b38ebdd692f26294e3a53649e73e4cf7e9801f
+  duration_sec: 3.155
+  acquired_at: '2026-08-26T15:28:41+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-deep-whoosh-1.html
+  usage: []
+- track_id: openverse-electric-zap-light
+  title: Electric Zap Light
+  artist: Wakerone
+  kind: sfx
+  source: openverse
+  source_id: 68678036-ebf6-44ee-9390-1809b66d4b62
+  source_url: https://freesound.org/people/Wakerone/sounds/393823
+  download_url: https://cdn.freesound.org/previews/393/393823_7399650-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Electric Zap Light" by Wakerone is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Electric_Zap_Light.mp3
+  bytes: 563280
+  sha256: 820228ff0defad7fac41a85acb0b21f88a0c36f26facf07d2f796750d2507781
+  duration_sec: 22.689
+  acquired_at: '2026-08-26T15:34:36+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-electric-zap-light.html
+  usage: []
+- track_id: openverse-electric-zap-loop
+  title: Electric Zap Loop
+  artist: Resaural
+  kind: sfx
+  source: openverse
+  source_id: 5d9cebb1-7342-4aba-a303-341173f4b6ae
+  source_url: https://freesound.org/people/Resaural/sounds/531421
+  download_url: https://cdn.freesound.org/previews/531/531421_9662992-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Electric Zap Loop" by Resaural is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Electric_Zap_Loop.mp3
+  bytes: 96147
+  sha256: 55a0a915c025c98e2d133a51682950463ac1ace8ca0183c0eedd3d0f65149b25
+  duration_sec: 4.907
+  acquired_at: '2026-08-26T15:34:21+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-electric-zap-loop.html
+  usage: []
+- track_id: openverse-electrical-shock-zap-wav
+  title: Electrical Shock (Zap).wav
+  artist: BigKahuna360
+  kind: sfx
+  source: openverse
+  source_id: e6f2593e-52fb-494c-949f-7cba43674b59
+  source_url: https://freesound.org/people/BigKahuna360/sounds/160421
+  download_url: https://cdn.freesound.org/previews/160/160421_2643065-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Electrical Shock (Zap).wav" by BigKahuna360 is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Electrical_Shock_(Zap).wav
+  bytes: 84864
+  sha256: eb78444af31528ad7421b7a7b5d7f75ebc80882aa3525417d60d391e75baabc7
+  duration_sec: 3.641
+  acquired_at: '2026-08-26T15:34:26+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-electrical-shock-zap-wav.html
+  usage: []
+- track_id: openverse-error
+  title: error
+  artist: fisch12345
+  kind: sfx
+  source: openverse
+  source_id: 01381184-7be3-4804-bd0d-14719096b595
+  source_url: https://freesound.org/people/fisch12345/sounds/325113
+  download_url: https://cdn.freesound.org/previews/325/325113_3246658-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"error" by fisch12345 is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/error.mp3
+  bytes: 82235
+  sha256: c3ae9dd52406938a7e9e0ba84f8b4170ab5e957bb8c21aeaf999ab35defb5515
+  duration_sec: 3.476
+  acquired_at: '2026-08-26T15:36:33+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-error.html
+  usage: []
+- track_id: openverse-explosion-with-debris-wav
+  title: Explosion with Debris.wav
+  artist: FxKid2
+  kind: sfx
+  source: openverse
+  source_id: 8c54c9c2-618e-41fb-82b0-0d1a20bf0c23
+  source_url: https://freesound.org/people/FxKid2/sounds/367622
+  download_url: https://cdn.freesound.org/previews/367/367622_4377219-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Explosion with Debris.wav" by FxKid2 is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Explosion_with_Debris.wav
+  bytes: 124045
+  sha256: baaef8f2838d5ce1f38b52e167c06460a5112bfbae1b7623ed12829af89ba7be
+  duration_sec: 5.105
+  acquired_at: '2026-08-26T15:31:57+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-explosion-with-debris-wav.html
+  usage: []
+- track_id: openverse-family-friendly-inspect-sound-ui-or-in-game-notification-wav
+  title: Family Friendly Inspect Sound, UI, or In-Game Notification.wav
+  artist: MATRIXXX_
+  kind: sfx
+  source: openverse
+  source_id: e21bf59c-b836-4a20-9bdc-5f7d28c3d2e5
+  source_url: https://freesound.org/people/MATRIXXX_/sounds/657948
+  download_url: https://cdn.freesound.org/previews/657/657948_6142149-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Family Friendly Inspect Sound, UI, or In-Game Notification.wav" by MATRIXXX_ is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Family_Friendly_Inspect_Sound_UI_or_In-Game_Notification.wav
+  bytes: 3235
+  sha256: 829a95e895e668c1edc3cc2fe7c95260d377cf530609382838dd71dc6bcc45a6
+  duration_sec: 0.08
+  acquired_at: '2026-08-26T15:36:23+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-family-friendly-inspect-sound-ui-or-in-game-notification-wav.html
+  usage: []
+- track_id: openverse-fast-sword-swing-sound
+  title: Fast Sword Swing Sound
+  artist: qubodup
+  kind: sfx
+  source: openverse
+  source_id: 518ead89-8e89-4614-b954-bb7a844f3c42
+  source_url: https://freesound.org/people/qubodup/sounds/60004
+  download_url: https://cdn.freesound.org/previews/60/60004_71257-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Fast Sword Swing Sound" by qubodup is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Fast_Sword_Swing_Sound.mp3
+  bytes: 10958
+  sha256: 80fa46616e5bc1a2b50901d95d4d51674c4f63b1bd36c6f4b31dbe2f6662ace8
+  duration_sec: 0.383
+  acquired_at: '2026-08-26T15:27:56+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-fast-sword-swing-sound.html
+  usage: []
+- track_id: openverse-fire-whoosh-wav
+  title: fire-whoosh.wav
+  artist: hnhnh
+  kind: sfx
+  source: openverse
+  source_id: 5c19a506-bfd8-4233-9381-bf5e9c854805
+  source_url: https://freesound.org/people/hnhnh/sounds/244926
+  download_url: https://cdn.freesound.org/previews/244/244926_3983630-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"fire-whoosh.wav" by hnhnh is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/fire-whoosh.wav
+  bytes: 91488
+  sha256: f7c5e6618b15c4f07502d3ceb9ce52a9146401ce0f5b8acbf8c41c51e8030bfa
+  duration_sec: 3.857
+  acquired_at: '2026-08-26T15:34:54+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-fire-whoosh-wav.html
+  usage: []
+- track_id: openverse-flamewind-wav
+  title: flamewind.wav
+  artist: scarbelly25
+  kind: sfx
+  source: openverse
+  source_id: 541caae3-d7bd-47b0-86c1-8a5dde3ba0a4
+  source_url: https://freesound.org/people/scarbelly25/sounds/33943
+  download_url: https://cdn.freesound.org/previews/33/33943_298165-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"flamewind.wav" by scarbelly25 is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/flamewind.wav
+  bytes: 247349
+  sha256: f6590850cc303938161ecdf9566dc4611e42a6beabd1c8ffcd1024d113b0127b
+  duration_sec: 11.192
+  acquired_at: '2026-08-26T15:35:06+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-flamewind-wav.html
+  usage: []
+- track_id: openverse-gravel-impacts-and-falls-wav
+  title: Gravel Impacts and Falls.wav
+  artist: lolamadeus
+  kind: sfx
+  source: openverse
+  source_id: 3bb6fd08-7432-4cc3-b0e4-48409e8d1844
+  source_url: https://freesound.org/people/lolamadeus/sounds/179341
+  download_url: https://cdn.freesound.org/previews/179/179341_544580-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Gravel Impacts and Falls.wav" by lolamadeus is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Gravel_Impacts_and_Falls.wav
+  bytes: 333476
+  sha256: 0b8c4a326713d2a4b2d1a4987c697f84614d0ece502fe3dad6ea5bdd254cade7
+  duration_sec: 12.754
+  acquired_at: '2026-08-26T15:32:13+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-gravel-impacts-and-falls-wav.html
+  usage: []
+- track_id: openverse-hit-impact
+  title: Hit Impact
+  artist: Mrguff
+  kind: sfx
+  source: openverse
+  source_id: 7f3dc6f7-0aca-436c-828c-11670ee8b47f
+  source_url: https://freesound.org/people/Mrguff/sounds/369711
+  download_url: https://cdn.freesound.org/previews/369/369711_2855293-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Hit Impact" by Mrguff is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Hit_Impact.mp3
+  bytes: 12001
+  sha256: da86db6956d8c1a0345238bee360e1d4a60c7f6a6766ae02eac54123337cf453
+  duration_sec: 0.446
+  acquired_at: '2026-08-26T15:28:18+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-hit-impact.html
+  usage: []
+- track_id: openverse-hit-impact-sword-2
+  title: Hit Impact Sword 2
+  artist: Eponn
+  kind: sfx
+  source: openverse
+  source_id: b122081c-ef13-455b-8fd0-675fcbb8157e
+  source_url: https://freesound.org/people/Eponn/sounds/547036
+  download_url: https://cdn.freesound.org/previews/547/547036_7614679-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Hit Impact Sword 2" by Eponn is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Hit_Impact_Sword_2.mp3
+  bytes: 30370
+  sha256: 5aaee83cc53bb1b185c40993f430b7ece398d1083b4621f2e5dc588a37eada8e
+  duration_sec: 1.209
+  acquired_at: '2026-08-26T15:28:14+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-hit-impact-sword-2.html
+  usage: []
+- track_id: openverse-hit-impact-sword-3
+  title: Hit Impact Sword 3
+  artist: CogFireStudios
+  kind: sfx
+  source: openverse
+  source_id: 3c27fa96-eaf7-440f-9d1c-d14db5e381ae
+  source_url: https://freesound.org/people/CogFireStudios/sounds/547042
+  download_url: https://cdn.freesound.org/previews/547/547042_7614679-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Hit Impact Sword 3" by CogFireStudios is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Hit_Impact_Sword_3.mp3
+  bytes: 31935
+  sha256: bfa9309e46739a5bd2fc4424b98f383a55e080012e5b0eec1bb747e910329bb9
+  duration_sec: 1.3
+  acquired_at: '2026-08-26T15:28:23+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-hit-impact-sword-3.html
+  usage: []
+- track_id: openverse-hover-1
+  title: Hover 1
+  artist: plasterbrain
+  kind: sfx
+  source: openverse
+  source_id: 93e881f2-5549-4997-8b42-c68da2e2bd9f
+  source_url: https://freesound.org/people/plasterbrain/sounds/237422
+  download_url: https://cdn.freesound.org/previews/237/237422_4284968-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Hover 1" by plasterbrain is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Hover_1.mp3
+  bytes: 7931
+  sha256: 18e6671e3ee51c9e31266cbbf48092b60c8eb593cf629cc4459a2757b6ab893c
+  duration_sec: 0.23
+  acquired_at: '2026-08-26T15:35:53+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-hover-1.html
+  usage: []
+- track_id: openverse-human-aah-wav
+  title: Human AAH!.wav
+  artist: MATRIXXX_
+  kind: sfx
+  source: openverse
+  source_id: fdcd67b7-66c0-4d49-8e4a-abe56e347b73
+  source_url: https://freesound.org/people/MATRIXXX_/sounds/486943
+  download_url: https://cdn.freesound.org/previews/486/486943_6142149-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Human AAH!.wav" by MATRIXXX_ is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Human_AAH.wav
+  bytes: 9603
+  sha256: aa7de621b9f5d0b4baa986983add92bcd0a1f1eecb66d0749faf99e47d75aa8b
+  duration_sec: 0.33
+  acquired_at: '2026-08-26T15:28:56+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-human-aah-wav.html
+  usage: []
+- track_id: openverse-ice-crack-5-wav
+  title: Ice Crack 5.wav
+  artist: ecfike
+  kind: sfx
+  source: openverse
+  source_id: d0d5da51-a072-45ae-9e30-4b85a4404bcb
+  source_url: https://freesound.org/people/ecfike/sounds/177217
+  download_url: https://cdn.freesound.org/previews/177/177217_2337290-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Ice Crack 5.wav" by ecfike is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Ice_Crack_5.wav
+  bytes: 104809
+  sha256: 41eeb59634b26337649bba5564e8da7174e89d0b885e567a641e665c5b9c463d
+  duration_sec: 3.505
+  acquired_at: '2026-08-26T15:32:23+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-ice-crack-5-wav.html
+  usage: []
+- track_id: openverse-ice-cracks
+  title: Ice Cracks
+  artist: karlis.stigis
+  kind: sfx
+  source: openverse
+  source_id: a315897a-9772-4353-b65f-e787a847d2cc
+  source_url: https://freesound.org/people/karlis.stigis/sounds/168712
+  download_url: https://cdn.freesound.org/previews/168/168712_853134-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Ice Cracks" by karlis.stigis is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Ice_Cracks.mp3
+  bytes: 2434287
+  sha256: d0985639115e7687473f02983badba85e95be2ecf80507520d343a6d70748488
+  duration_sec: 92.362
+  acquired_at: '2026-08-26T15:32:58+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-ice-cracks.html
+  usage: []
+- track_id: openverse-impact-riser-01
+  title: impact riser 01
+  artist: soramoosic
+  kind: sfx
+  source: openverse
+  source_id: 52f9b0a6-b23d-46b0-8a6a-0703b0d8cc5f
+  source_url: https://freesound.org/people/soramoosic/sounds/244249
+  download_url: https://cdn.freesound.org/previews/244/244249_3986112-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"impact riser 01" by soramoosic is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/impact_riser_01.mp3
+  bytes: 319740
+  sha256: d226df3a453e45ecf44810547fa771eba8b0871bea3f1144f68e77011ffee014
+  duration_sec: 14.575
+  acquired_at: '2026-08-26T15:31:25+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-impact-riser-01.html
+  usage: []
+- track_id: openverse-injured-grunts
+  title: Injured Grunts
+  artist: trettfilms
+  kind: sfx
+  source: openverse
+  source_id: 8388322c-dac2-4b6f-b405-7cfd3c86ebdc
+  source_url: https://freesound.org/people/trettfilms/sounds/128227
+  download_url: https://cdn.freesound.org/previews/128/128227_151842-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Injured Grunts" by trettfilms is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Injured_Grunts.mp3
+  bytes: 263313
+  sha256: f09079d80c16cdf312243f2a2ef82b25f9fb1f804bea53af3cc81e044b35a807
+  duration_sec: 11.182
+  acquired_at: '2026-08-26T15:29:03+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-injured-grunts.html
+  usage: []
+- track_id: openverse-jump-sound-or-power-up-sound
+  title: Jump sound or Power Up sound
+  artist: Cman634
+  kind: sfx
+  source: openverse
+  source_id: dc3dbb96-2fe3-414e-96d3-e592b060e633
+  source_url: https://freesound.org/people/Cman634/sounds/198784
+  download_url: https://cdn.freesound.org/previews/198/198784_3478269-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Jump sound or Power Up sound" by Cman634 is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Jump_sound_or_Power_Up_sound.mp3
+  bytes: 10829
+  sha256: 492de6aa12ac385d33f1b6091ddcac128ae510cecb21b3874e6ffe33b88497cd
+  duration_sec: 1.894
+  acquired_at: '2026-08-26T15:28:32+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-jump-sound-or-power-up-sound.html
+  usage: []
+- track_id: openverse-jump-wav
+  title: jump.wav
+  artist: pcmac
+  kind: sfx
+  source: openverse
+  source_id: a459214a-5877-4161-9137-d42a02c79f00
+  source_url: https://freesound.org/people/pcmac/sounds/464527
+  download_url: https://cdn.freesound.org/previews/464/464527_7890039-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"jump.wav" by pcmac is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/jump.wav
+  bytes: 39971
+  sha256: 4b82bc065ce2d14e8f0022dcff97351ad56434e4b03b77bd3587eeb1684997a4
+  duration_sec: 1.529
+  acquired_at: '2026-08-26T15:28:37+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-jump-wav.html
+  usage: []
+- track_id: openverse-jumping
+  title: jumping
+  artist: Leszek_Szary
+  kind: sfx
+  source: openverse
+  source_id: 37e41430-40ee-485d-98de-a6364ee5b600
+  source_url: https://freesound.org/people/Leszek_Szary/sounds/146726
+  download_url: https://cdn.freesound.org/previews/146/146726_2437358-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"jumping" by Leszek_Szary is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/jumping.mp3
+  bytes: 9392
+  sha256: 17af34fd0cd024651a98acad0b19183b023208cb86ff00b2eea4acdf3bbffcc7
+  duration_sec: 0.336
+  acquired_at: '2026-08-26T15:28:28+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-jumping.html
+  usage: []
+- track_id: openverse-knife-sword-swing
+  title: Knife/sword swing
+  artist: spycrah
+  kind: sfx
+  source: openverse
+  source_id: e99218f4-5d92-456d-ab99-a3b6600e99a5
+  source_url: https://freesound.org/people/spycrah/sounds/471097
+  download_url: https://cdn.freesound.org/previews/471/471097_9856191-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Knife/sword swing" by spycrah is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Knife_sword_swing.mp3
+  bytes: 92507
+  sha256: 2aebde083f273dd530c5dd70caa348b8579761a243628288f9171abdc75df4c3
+  duration_sec: 3.919
+  acquired_at: '2026-08-26T15:31:03+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-knife-sword-swing.html
+  usage: []
+- track_id: openverse-lake-swimming
+  title: lake swimming
+  artist: dawidwmika
+  kind: sfx
+  source: openverse
+  source_id: 588b6c83-2c25-4086-acfa-d77b9d21b497
+  source_url: https://freesound.org/people/dawidwmika/sounds/372518
+  download_url: https://cdn.freesound.org/previews/372/372518_6941033-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"lake swimming" by dawidwmika is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/lake_swimming.mp3
+  bytes: 1656240
+  sha256: eb6f45e6416a6cd2d29050f563892b4e5cfd57df356be2e6e2ca14b21f12f91c
+  duration_sec: 68.064
+  acquired_at: '2026-08-26T15:30:31+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-lake-swimming.html
+  usage: []
+- track_id: openverse-low-mid-afar-explosion-1-wav
+  title: low mid afar explosion 1.wav
+  artist: Logicogonist
+  kind: sfx
+  source: openverse
+  source_id: 023d25d5-a1e6-475d-a148-db56cd73636d
+  source_url: https://freesound.org/people/Logicogonist/sounds/264031
+  download_url: https://cdn.freesound.org/previews/264/264031_3797507-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"low mid afar explosion 1.wav" by Logicogonist is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/low_mid_afar_explosion_1.wav
+  bytes: 149154
+  sha256: 0f65a97e7321e58996ef4d2c18e8984aa8cf001d4fc4d1bb9e0202f89481e492
+  duration_sec: 7.211
+  acquired_at: '2026-08-26T15:35:16+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-low-mid-afar-explosion-1-wav.html
+  usage: []
+- track_id: openverse-magic-spell-05-wav
+  title: Magic Spell 05.wav
+  artist: MATRIXXX_
+  kind: sfx
+  source: openverse
+  source_id: 87a836ae-d9db-4c84-85e1-854752306a9e
+  source_url: https://freesound.org/people/MATRIXXX_/sounds/495453
+  download_url: https://cdn.freesound.org/previews/495/495453_6142149-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Magic Spell 05.wav" by MATRIXXX_ is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Magic_Spell_05.wav
+  bytes: 25360
+  sha256: 6720568deaa8bab2fd5d9bfa428943b3dd03154ae7dd6d2e55217eb1a627a2ca
+  duration_sec: 1.0
+  acquired_at: '2026-08-26T15:29:46+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-magic-spell-05-wav.html
+  usage: []
+- track_id: openverse-magic-spell-09-wav
+  title: Magic Spell 09.wav
+  artist: MATRIXXX_
+  kind: sfx
+  source: openverse
+  source_id: 1bd1fe86-ab33-4808-bd53-c74a7286d2ef
+  source_url: https://freesound.org/people/MATRIXXX_/sounds/523204
+  download_url: https://cdn.freesound.org/previews/523/523204_6142149-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Magic Spell 09.wav" by MATRIXXX_ is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Magic_Spell_09.wav
+  bytes: 27915
+  sha256: 92e5d1addcbfde209810ad21f75866443eff21ffb4be50feb393ba5597574e8f
+  duration_sec: 1.382
+  acquired_at: '2026-08-26T15:29:40+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-magic-spell-09-wav.html
+  usage: []
+- track_id: openverse-magic-spell-small-positive
+  title: Magic spell (small positive)
+  artist: Nakhas
+  kind: sfx
+  source: openverse
+  source_id: 0bd4d044-5ae2-4a9d-b0d0-e1fc5e8b1b44
+  source_url: https://freesound.org/people/Nakhas/sounds/506939
+  download_url: https://cdn.freesound.org/previews/506/506939_717697-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Magic spell (small positive)" by Nakhas is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Magic_spell_(small_positive).mp3
+  bytes: 68400
+  sha256: a0b7f4e4cf2c5de10f214d8c5b96cca0f118dd7fbfa3ca5148b2d690155ac250
+  duration_sec: 3.079
+  acquired_at: '2026-08-26T15:29:35+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-magic-spell-small-positive.html
+  usage: []
+- track_id: openverse-metal-clang-sound
+  title: Metal Clang sound
+  artist: kermite607
+  kind: sfx
+  source: openverse
+  source_id: 6afade61-ff10-493f-b420-48978c4b237c
+  source_url: https://freesound.org/people/kermite607/sounds/362625
+  download_url: https://cdn.freesound.org/previews/362/362625_3165091-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Metal Clang sound" by kermite607 is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Metal_Clang_sound.mp3
+  bytes: 35136
+  sha256: a8be20d01dddd4531e8763a2327ada175dbfb55309caea26b2691b9b0b12c7bc
+  duration_sec: 1.387
+  acquired_at: '2026-08-26T15:31:34+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-metal-clang-sound.html
+  usage: []
+- track_id: openverse-metal-iron-magic-spell-cast-flac
+  title: Metal iron magic spell cast.flac
+  artist: qubodup
+  kind: sfx
+  source: openverse
+  source_id: 4272857a-4a23-44d4-938e-c99d15a93b81
+  source_url: https://freesound.org/people/qubodup/sounds/171100
+  download_url: https://cdn.freesound.org/previews/171/171100_71257-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Metal iron magic spell cast.flac" by qubodup is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Metal_iron_magic_spell_cast.flac
+  bytes: 33082
+  sha256: 61bdcc735721cc62879c7524eab7111b24cf66536118da3de832fd1de2e098f2
+  duration_sec: 1.354
+  acquired_at: '2026-08-26T15:29:50+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-metal-iron-magic-spell-cast-flac.html
+  usage: []
+- track_id: openverse-ping
+  title: Ping!
+  artist: unfa
+  kind: sfx
+  source: openverse
+  source_id: 66399776-b9ff-4d77-9e43-5fdbfeb2c30b
+  source_url: https://freesound.org/people/unfa/sounds/215415
+  download_url: https://cdn.freesound.org/previews/215/215415_1038806-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Ping!" by unfa is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Ping.mp3
+  bytes: 127344
+  sha256: 95a9aa72784498d8d34cbd22262fd3d111b0c1e418565f9f88dcab57ef48b427
+  duration_sec: 6.04
+  acquired_at: '2026-08-26T15:36:58+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-ping.html
+  usage: []
+- track_id: openverse-playerhurt2
+  title: PlayerHurt2
+  artist: mrickey13
+  kind: sfx
+  source: openverse
+  source_id: 8d8f5f7c-7be0-48f3-99c3-4f91ca37f7b7
+  source_url: https://freesound.org/people/mrickey13/sounds/515624
+  download_url: https://cdn.freesound.org/previews/515/515624_6769489-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"PlayerHurt2" by mrickey13 is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/PlayerHurt2.mp3
+  bytes: 10277
+  sha256: 9b6dcacd2456e8311d24ac2575afb891b450a9d44d4cf58f59738ffd925e77f9
+  duration_sec: 0.485
+  acquired_at: '2026-08-26T15:28:51+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-playerhurt2.html
+  usage: []
+- track_id: openverse-reverse-blip
+  title: Reverse Blip
+  artist: Breviceps
+  kind: sfx
+  source: openverse
+  source_id: 6e4a600c-d984-4a39-9f3f-937095382b63
+  source_url: https://freesound.org/people/Breviceps/sounds/450612
+  download_url: https://cdn.freesound.org/previews/450/450612_9159316-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Reverse Blip" by Breviceps is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Reverse_Blip.mp3
+  bytes: 7306
+  sha256: eb8cb972ab4d3085d95c4d68bf7c3fd18216b9d837f6a390d4392e93e699702e
+  duration_sec: 0.286
+  acquired_at: '2026-08-26T15:36:13+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-reverse-blip.html
+  usage: []
+- track_id: openverse-riser
+  title: Riser
+  artist: Rizzard
+  kind: sfx
+  source: openverse
+  source_id: 96a9062b-be8d-42ae-aacc-f64d3a34294a
+  source_url: https://freesound.org/people/Rizzard/sounds/561207
+  download_url: https://cdn.freesound.org/previews/561/561207_10825267-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Riser" by Rizzard is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Riser.mp3
+  bytes: 49306
+  sha256: c512a725e9c866277b3fa0f8e7f8f311d5cca619bb0fac2e3620958f2a8b7e49
+  duration_sec: 2.0
+  acquired_at: '2026-08-26T15:31:30+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-riser.html
+  usage: []
+- track_id: openverse-select-granted-01-wav
+  title: Select, Granted 01.wav
+  artist: MATRIXXX_
+  kind: sfx
+  source: openverse
+  source_id: d1f545f3-3bbc-4965-9549-906fde2aa603
+  source_url: https://freesound.org/people/MATRIXXX_/sounds/404151
+  download_url: https://cdn.freesound.org/previews/404/404151_6142149-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Select, Granted 01.wav" by MATRIXXX_ is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Select_Granted_01.wav
+  bytes: 3600
+  sha256: 7a2fc1514d10c621b25a4347f08e999bc01b38037500d40211f4bf9fa813d202
+  duration_sec: 0.089
+  acquired_at: '2026-08-26T15:35:58+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-select-granted-01-wav.html
+  usage: []
+- track_id: openverse-select-granted-06-wav
+  title: Select, Granted 06.wav
+  artist: MATRIXXX_
+  kind: sfx
+  source: openverse
+  source_id: 0e4470e4-4159-4da6-9aee-6c14a525394a
+  source_url: https://freesound.org/people/MATRIXXX_/sounds/523763
+  download_url: https://cdn.freesound.org/previews/523/523763_6142149-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Select, Granted 06.wav" by MATRIXXX_ is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Select_Granted_06.wav
+  bytes: 19097
+  sha256: 14861fe9b83f00505d1e7b632f9f5a5fe41ef9d7174607ebc908c5bdfa8bf6dc
+  duration_sec: 0.78
+  acquired_at: '2026-08-26T15:36:04+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-select-granted-06-wav.html
+  usage: []
+- track_id: openverse-sfx-ui-button-click
+  title: SFX UI Button Click
+  artist: suntemple
+  kind: sfx
+  source: openverse
+  source_id: ea9dc47e-7f07-45dd-8aa6-8c9e25609251
+  source_url: https://freesound.org/people/suntemple/sounds/253168
+  download_url: https://cdn.freesound.org/previews/253/253168_4404552-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"SFX UI Button Click" by suntemple is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/SFX_UI_Button_Click.mp3
+  bytes: 5844
+  sha256: 8900ecddb6fe60ce3fa652dd0e9b9cee6ec02ab2bb8d462c409de3cf6dec0f9c
+  duration_sec: 0.158
+  acquired_at: '2026-08-26T15:35:44+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-sfx-ui-button-click.html
+  usage: []
+- track_id: openverse-small-rock-and-stone-hits-wav
+  title: Small Rock and Stone Hits.wav
+  artist: lolamadeus
+  kind: sfx
+  source: openverse
+  source_id: 2a6f22f3-761f-4d09-805c-2afb3936e315
+  source_url: https://freesound.org/people/lolamadeus/sounds/179365
+  download_url: https://cdn.freesound.org/previews/179/179365_544580-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Small Rock and Stone Hits.wav" by lolamadeus is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Small_Rock_and_Stone_Hits.wav
+  bytes: 370364
+  sha256: 32a4101259bb2105e525eab430ca2cf80f34c5b375544e37b08343036c6f3972
+  duration_sec: 14.996
+  acquired_at: '2026-08-26T15:32:05+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-small-rock-and-stone-hits-wav.html
+  usage: []
+- track_id: openverse-supernatural-explosion
+  title: Supernatural Explosion
+  artist: Quaker540
+  kind: sfx
+  source: openverse
+  source_id: a46d595e-2336-40cd-93b1-4536d7fde0cf
+  source_url: https://freesound.org/people/Quaker540/sounds/256960
+  download_url: https://cdn.freesound.org/previews/256/256960_3545904-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Supernatural Explosion" by Quaker540 is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Supernatural_Explosion.mp3
+  bytes: 59616
+  sha256: 0212e96ca5a17c650e2a9641ba2bcd14764cf2f04603f3306d82dd4791336379
+  duration_sec: 2.575
+  acquired_at: '2026-08-26T15:35:11+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-supernatural-explosion.html
+  usage: []
+- track_id: openverse-swipe-whoosh
+  title: Swipe Whoosh
+  artist: qubodup
+  kind: sfx
+  source: openverse
+  source_id: b7ae7822-8ec5-4a82-b6f8-d539b51caa61
+  source_url: https://freesound.org/people/qubodup/sounds/60007
+  download_url: https://cdn.freesound.org/previews/60/60007_71257-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Swipe Whoosh" by qubodup is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Swipe_Whoosh.mp3
+  bytes: 12211
+  sha256: 18bab6ab4fa3c399affe8bcc527cf37ce0392d6d2a9360fb02a0fc6cea2bd398
+  duration_sec: 0.447
+  acquired_at: '2026-08-26T15:28:46+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-swipe-whoosh.html
+  usage: []
+- track_id: openverse-swoosh-explosion
+  title: Swoosh Explosion
+  artist: Electroviolence
+  kind: sfx
+  source: openverse
+  source_id: d541f407-6b6d-4588-b54c-ed30e20b56b6
+  source_url: https://freesound.org/people/Electroviolence/sounds/234555
+  download_url: https://cdn.freesound.org/previews/234/234555_4238641-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Swoosh Explosion" by Electroviolence is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Swoosh_Explosion.mp3
+  bytes: 107409
+  sha256: 2e6617acb2dbb265ebddb077522adfa7367c0442c49bbf7600c22db2221d013a
+  duration_sec: 4.613
+  acquired_at: '2026-08-26T15:35:21+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-swoosh-explosion.html
+  usage: []
+- track_id: openverse-sword-clash
+  title: Sword Clash
+  artist: loudernoises
+  kind: sfx
+  source: openverse
+  source_id: a16abece-6627-45d2-a18e-28f65b66bf70
+  source_url: https://freesound.org/people/loudernoises/sounds/334169
+  download_url: https://cdn.freesound.org/previews/334/334169_5859881-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Sword Clash" by loudernoises is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Sword_Clash.mp3
+  bytes: 14455
+  sha256: a394298362847c54709c405425b72bbee8db146948dad27c81d17e97cb535886
+  duration_sec: 0.517
+  acquired_at: '2026-08-26T15:30:42+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-sword-clash.html
+  usage: []
+- track_id: openverse-sword-slash-1
+  title: Sword Slash 1
+  artist: smokebomb99
+  kind: sfx
+  source: openverse
+  source_id: 50083266-eeb1-4fa2-943d-f9e902839307
+  source_url: https://freesound.org/people/smokebomb99/sounds/147288
+  download_url: https://cdn.freesound.org/previews/147/147288_1401157-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Sword Slash 1" by smokebomb99 is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Sword_Slash_1.mp3
+  bytes: 8819
+  sha256: ef6bf7d5a4a40e6549ee8d19ae8feed5da75b4b3ceebbcdc360d6e7a83f6cc36
+  duration_sec: 0.325
+  acquired_at: '2026-08-26T15:28:06+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-sword-slash-1.html
+  usage: []
+- track_id: openverse-sword-slide-wav
+  title: Sword slide.wav
+  artist: AuDRoger
+  kind: sfx
+  source: openverse
+  source_id: 256687e2-b250-4446-a5b6-0828e2efc16f
+  source_url: https://freesound.org/people/AuDRoger/sounds/471147
+  download_url: https://cdn.freesound.org/previews/471/471147_9938764-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Sword slide.wav" by AuDRoger is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Sword_slide.wav
+  bytes: 32638
+  sha256: d8b5ce8250989bb83441e36b480436b41f258cc683ef03b713b17baf33917370
+  duration_sec: 1.636
+  acquired_at: '2026-08-26T15:31:17+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-sword-slide-wav.html
+  usage: []
+- track_id: openverse-sword-sound-1-wav
+  title: Sword sound 1.wav
+  artist: Merrick079
+  kind: sfx
+  source: openverse
+  source_id: 05deb51c-0382-4aea-883d-8a9f7f96856d
+  source_url: https://freesound.org/people/Merrick079/sounds/568170
+  download_url: https://cdn.freesound.org/previews/568/568170_12735833-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Sword sound 1.wav" by Merrick079 is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Sword_sound_1.wav
+  bytes: 17208
+  sha256: 5f9ab16b7a74a205b1490001d4c913d0d55f561df796cb2d43c1a30b97c351b1
+  duration_sec: 0.722
+  acquired_at: '2026-08-26T15:30:57+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-sword-sound-1-wav.html
+  usage: []
+- track_id: openverse-sword-swings
+  title: Sword Swings
+  artist: SamsterBirdies
+  kind: sfx
+  source: openverse
+  source_id: 33a3919d-44f3-4d79-9004-75a988ddbdcb
+  source_url: https://freesound.org/people/SamsterBirdies/sounds/353708
+  download_url: https://cdn.freesound.org/previews/353/353708_5487341-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Sword Swings" by SamsterBirdies is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Sword_Swings.mp3
+  bytes: 41016
+  sha256: f0e7a92b09b65c0d9b1ef8506fee9305ca5b7e62dbe39e77aaf6cb21c20af2a2
+  duration_sec: 1.729
+  acquired_at: '2026-08-26T15:28:00+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-sword-swings.html
+  usage: []
+- track_id: openverse-sword-unsheath
+  title: Sword Unsheath
+  artist: lucabia
+  kind: sfx
+  source: openverse
+  source_id: 5932a217-879d-437e-a946-14c4e8fd492d
+  source_url: https://freesound.org/people/lucabia/sounds/276872
+  download_url: https://cdn.freesound.org/previews/276/276872_1989929-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Sword Unsheath" by lucabia is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Sword_Unsheath.mp3
+  bytes: 67833
+  sha256: babd39b6464245e96948710ab1fa06f6f23ccee16bc57048980f23902bd885b6
+  duration_sec: 2.798
+  acquired_at: '2026-08-26T15:31:08+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-sword-unsheath.html
+  usage: []
+- track_id: openverse-swords-clash-high-quality-2
+  title: 'Swords Clash - High Quality #2'
+  artist: Christopherderp
+  kind: sfx
+  source: openverse
+  source_id: a9fe37d9-1231-4acc-be19-fcab7dc71207
+  source_url: https://freesound.org/people/Christopherderp/sounds/364530
+  download_url: https://cdn.freesound.org/previews/364/364530_3908740-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Swords Clash - High Quality #2" by Christopherderp is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Swords_Clash_-_High_Quality_2.mp3
+  bytes: 44717
+  sha256: 9f1f48da604f5730a0c1cf197cbed041b3c1710283b8ed7e1a17ae6d89a65712
+  duration_sec: 1.865
+  acquired_at: '2026-08-26T15:30:47+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-swords-clash-high-quality-2.html
+  usage: []
+- track_id: openverse-swords-clashing
+  title: Swords Clashing
+  artist: Sam300Productions
+  kind: sfx
+  source: openverse
+  source_id: 4b8e557a-ad44-4745-9f7e-279f8d88f134
+  source_url: https://freesound.org/people/Sam300Productions/sounds/611765
+  download_url: https://cdn.freesound.org/previews/611/611765_13131817-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Swords Clashing" by Sam300Productions is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Swords_Clashing.mp3
+  bytes: 200506
+  sha256: 4a5f8323de8566c15b287cc6b1224e07a0c5a05895b184fec3081cc1bf274eb0
+  duration_sec: 10.123
+  acquired_at: '2026-08-26T15:30:53+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-swords-clashing.html
+  usage: []
+- track_id: openverse-tada-fanfare-a
+  title: Tada Fanfare A
+  artist: plasterbrain
+  kind: sfx
+  source: openverse
+  source_id: f3bb59f0-e401-46c8-a338-331a54f20576
+  source_url: https://freesound.org/people/plasterbrain/sounds/397355
+  download_url: https://cdn.freesound.org/previews/397/397355_4284968-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Tada Fanfare A" by plasterbrain is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Tada_Fanfare_A.mp3
+  bytes: 42317
+  sha256: c1b1ca9eab9017599f35727fea150e3ad04b959be89990c366072fcc332d242f
+  duration_sec: 1.716
+  acquired_at: '2026-08-26T15:29:55+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-tada-fanfare-a.html
+  usage: []
+- track_id: openverse-tada-fanfare-f
+  title: Tada Fanfare F
+  artist: plasterbrain
+  kind: sfx
+  source: openverse
+  source_id: 5ae7fa1c-47d9-450c-b901-7d10a3bb3d66
+  source_url: https://freesound.org/people/plasterbrain/sounds/397354
+  download_url: https://cdn.freesound.org/previews/397/397354_4284968-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Tada Fanfare F" by plasterbrain is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Tada_Fanfare_F.mp3
+  bytes: 42163
+  sha256: 12a64c4ac54191b3e1c365927d3bba518a95b23138f41109b2797af77c5e9f89
+  duration_sec: 1.742
+  acquired_at: '2026-08-26T15:30:00+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-tada-fanfare-f.html
+  usage: []
+- track_id: openverse-textsound-no2
+  title: Textsound No2
+  artist: EdEditz
+  kind: sfx
+  source: openverse
+  source_id: 48ba2950-f4fa-408c-9b72-354a53bd4939
+  source_url: https://freesound.org/people/EdEditz/sounds/188340
+  download_url: https://cdn.freesound.org/previews/188/188340_934775-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Textsound No2" by EdEditz is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Textsound_No2.mp3
+  bytes: 30417
+  sha256: 3d9ea89e219b0a7a4f26f049bff2a6899afee831a061c1b0f8497c0f41d5787b
+  duration_sec: 1.215
+  acquired_at: '2026-08-26T15:36:18+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-textsound-no2.html
+  usage: []
+- track_id: openverse-thunder
+  title: Thunder
+  artist: Fission9
+  kind: sfx
+  source: openverse
+  source_id: 79b7d9cd-51c6-4064-b66e-5f432cd30fb3
+  source_url: https://freesound.org/people/Fission9/sounds/465314
+  download_url: https://cdn.freesound.org/previews/465/465314_9395330-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Thunder" by Fission9 is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Thunder.mp3
+  bytes: 689784
+  sha256: 1149ea14b506b0ab9d5a134d819facdf44eeaf3dae02f7bcb8054b07a1cfc41d
+  duration_sec: 32.205
+  acquired_at: '2026-08-26T15:34:00+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-thunder.html
+  usage: []
+- track_id: openverse-thunder-rush-28-july-2021-wav
+  title: Thunder Rush. 28 July 2021.wav
+  artist: carthny
+  kind: sfx
+  source: openverse
+  source_id: bdf9f8fc-f607-4ff5-929c-0d38f6fc6565
+  source_url: https://freesound.org/people/carthny/sounds/581491
+  download_url: https://cdn.freesound.org/previews/581/581491_8383609-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Thunder Rush. 28 July 2021.wav" by carthny is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Thunder_Rush._28_July_2021.wav
+  bytes: 994872
+  sha256: da7ccaf684b5e3e7b1ef3312d2e39b605f4a1e756756f143bc6a6ca76a266ef5
+  duration_sec: 40.831
+  acquired_at: '2026-08-26T15:34:16+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-thunder-rush-28-july-2021-wav.html
+  usage: []
+- track_id: openverse-ui-button-click
+  title: UI Button Click
+  artist: benzix2
+  kind: sfx
+  source: openverse
+  source_id: d3ab488b-dee1-4c40-89ab-67837664b616
+  source_url: https://freesound.org/people/benzix2/sounds/467951
+  download_url: https://cdn.freesound.org/previews/467/467951_6769414-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"UI Button Click" by benzix2 is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/UI_Button_Click.mp3
+  bytes: 4593
+  sha256: 0eed6c7af2f5b373ee8869379e6f44937f6378e45ef03d10aeea9a3c67f8a9d6
+  duration_sec: 0.123
+  acquired_at: '2026-08-26T15:35:49+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-ui-button-click.html
+  usage: []
+- track_id: openverse-unsheath_sword-wav
+  title: unsheath_sword.wav
+  artist: Qat
+  kind: sfx
+  source: openverse
+  source_id: 7c17208f-78df-4689-be1f-fcd4bb777d5c
+  source_url: https://freesound.org/people/Qat/sounds/107589
+  download_url: https://cdn.freesound.org/previews/107/107589_1855536-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"unsheath_sword.wav" by Qat is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/unsheath_sword.wav
+  bytes: 23847
+  sha256: 93628a109c8c0904e1f2bf6856fb7b3648039be144c86d7d7fa5620db08235e0
+  duration_sec: 1.013
+  acquired_at: '2026-08-26T15:31:13+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-unsheath_sword-wav.html
+  usage: []
+- track_id: openverse-water-splash
+  title: Water Splash
+  artist: kanalgas
+  kind: sfx
+  source: openverse
+  source_id: c4d3ad35-3ca2-4ad6-b2b4-a3ef36358d53
+  source_url: https://freesound.org/people/kanalgas/sounds/250317
+  download_url: https://cdn.freesound.org/previews/250/250317_551164-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Water Splash" by kanalgas is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Water_Splash.mp3
+  bytes: 106464
+  sha256: f8997de14f7edbf8d32e2e9ecf2a509a06d783aed831260e525196e5725c6ab5
+  duration_sec: 6.28
+  acquired_at: '2026-08-26T15:33:01+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-water-splash.html
+  usage: []
+- track_id: openverse-water-splash-2-wav
+  title: water splash 2.wav
+  artist: VacekH
+  kind: sfx
+  source: openverse
+  source_id: 8fa84d2a-9834-4c79-931b-8afb795c4219
+  source_url: https://freesound.org/people/VacekH/sounds/189499
+  download_url: https://cdn.freesound.org/previews/189/189499_1970026-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"water splash 2.wav" by VacekH is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/water_splash_2.wav
+  bytes: 6889
+  sha256: a61a2883dc1c3e7d28578a3dc72b93fb90a84ea174fd649e2619979d5d1cedc2
+  duration_sec: 0.184
+  acquired_at: '2026-08-26T15:33:06+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-water-splash-2-wav.html
+  usage: []
+- track_id: openverse-water-splash-and-flounder-about-in-a-puddle
+  title: water splash and flounder about in a puddle
+  artist: launemax
+  kind: sfx
+  source: openverse
+  source_id: c394716f-857c-4bf2-91e3-93ae73b3f605
+  source_url: https://freesound.org/people/launemax/sounds/249929
+  download_url: https://cdn.freesound.org/previews/249/249929_389377-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"water splash and flounder about in a puddle" by launemax is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/water_splash_and_flounder_about_in_a_puddle.mp3
+  bytes: 622056
+  sha256: ee857c4f2962d736efe4f8fad7b30283027e335bd1ac5a1f21eb50b69c0d7e3c
+  duration_sec: 24.091
+  acquired_at: '2026-08-26T15:34:47+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-water-splash-and-flounder-about-in-a-puddle.html
+  usage: []
+- track_id: openverse-water-splashing
+  title: water splashing
+  artist: ssierra1202
+  kind: sfx
+  source: openverse
+  source_id: 46712ee7-0f9b-45ec-9e51-430c99c47353
+  source_url: https://freesound.org/people/ssierra1202/sounds/391943
+  download_url: https://cdn.freesound.org/previews/391/391943_6450069-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"water splashing" by ssierra1202 is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/water_splashing.mp3
+  bytes: 82650
+  sha256: 04e69538fc680ad77a475f4a0f9db6f15d8eac411bc77af9464dda9feaba637a
+  duration_sec: 3.464
+  acquired_at: '2026-08-26T15:40:02+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-water-splashing.html
+  usage: []
+- track_id: openverse-whoosh-wav
+  title: Whoosh.wav
+  artist: kingsrow
+  kind: sfx
+  source: openverse
+  source_id: f65497e9-14cc-4e9e-a6a6-4f1a071a0f16
+  source_url: https://freesound.org/people/kingsrow/sounds/181577
+  download_url: https://cdn.freesound.org/previews/181/181577_1857065-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"Whoosh.wav" by kingsrow is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/Whoosh.wav
+  bytes: 221994
+  sha256: 32a39e33c5d5069ab2739f26740b2273af3644101180875f775d47a5bb55720b
+  duration_sec: 9.049
+  acquired_at: '2026-08-26T15:35:00+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-whoosh-wav.html
+  usage: []
+- track_id: openverse-winter-storm-wind-lashing-snow-distilery-190212-flac
+  title: WInter storm wind lashing snow DISTILERY 190212.flac
+  artist: TRP
+  kind: sfx
+  source: openverse
+  source_id: 48a27367-c2d9-4eda-9589-937a3c685730
+  source_url: https://freesound.org/people/TRP/sounds/574552
+  download_url: https://cdn.freesound.org/previews/574/574552_97550-hq.mp3
+  license_id: CC0-1.0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_note: ''
+  attribution_text: '"WInter storm wind lashing snow DISTILERY 190212.flac" by TRP is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.'
+  credit_required: false
+  commercial_ok: true
+  derivative_ok: true
+  isrc: ''
+  path: 공통_효과음/WInter_storm_wind_lashing_snow_DISTILERY_190212.flac
+  bytes: 2952192
+  sha256: d78bea5c72d20168db6712f2dd760a36680170e5f7c72938d6f61efdf090e672
+  duration_sec: 126.422
+  acquired_at: '2026-08-26T15:33:48+09:00'
+  license_snapshot_path: 공통_오디오/스냅샷/openverse-winter-storm-wind-lashing-snow-distilery-190212-flac.html
+  usage: []

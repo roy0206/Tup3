@@ -47,6 +47,8 @@ public class Electric_ball : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
+        if (PauseManager.IsPaused) return;
+
         if (!isLaunched)
             return;
 
@@ -89,6 +91,12 @@ public class Electric_ball : MonoBehaviour
 
         while (timer < chargeDuration)
         {
+            if (PauseManager.IsPaused)
+            {
+                yield return null;
+                continue;
+            }
+
             timer += Time.deltaTime;
 
             float ratio = chargeDuration <= 0f

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 
 [RequireComponent(typeof(Playermovement))]
@@ -55,6 +55,8 @@ public class ComboAttack : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (PauseManager.IsPaused) return;
+
         if (!CanAttackNow())
         {
             if (isAttacking)
@@ -81,6 +83,8 @@ public class ComboAttack : MonoBehaviour
         {
             while (true)
             {
+                yield return PauseManager.WaitWhilePaused();
+
                 if (!CanAttackNow())
                     yield break;
 
@@ -169,6 +173,12 @@ public class ComboAttack : MonoBehaviour
                 float timer = 0f;
                 while (!comboQueued && timer < comboInputWindow)
                 {
+                    if (PauseManager.IsPaused)
+                    {
+                        yield return null;
+                        continue;
+                    }
+
                     if (!CanAttackNow())
                     {
                         cancelRequested = true;
@@ -226,6 +236,12 @@ public class ComboAttack : MonoBehaviour
 
         while (traveled < distance)
         {
+            if (PauseManager.IsPaused)
+            {
+                yield return null;
+                continue;
+            }
+
             if (cancelRequested || !CanAttackNow())
             {
                 cancelRequested = true;
@@ -274,8 +290,15 @@ public class ComboAttack : MonoBehaviour
     {
         return movement != null &&
                attackCollider != null &&
+               !DialogueManager.IsDialogueActive &&
                !movement.IsDashing() &&
                !movement.IsKnockedBack &&
                !(movement.IsInWater && !movement.IsGrounded);
     }
 }
+
+/* [파일 노트]
+ * 일시정지 대응 : Update(입력)와 DashForward(전진 이동)는 PauseManager.IsPaused 동안 정지하고,
+ * 콤보 입력 대기 타이머도 일시정지 중에는 흐르지 않는다. WaitForSeconds 기반 대기(콤보 딜레이 등)는
+ * 실시간으로 흐르지만 이동/판정이 모두 멈춰 있어 체감 영향이 없다.
+ */
