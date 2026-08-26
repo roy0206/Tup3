@@ -1,25 +1,19 @@
 fileFormatVersion: 2
-guid: cbbeafd241505af468c620bd3746eef9
+guid: bea62d6e61da8c94d808afd4494b5d9b
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3297615492833219699
-    second: rising_0
+      213: 2760674798787492502
+    second: water_2_0
   - first:
-      213: -4922294719736455639
-    second: rising_1
+      213: -2515114707237392142
+    second: water_2_1
   - first:
-      213: -5360417021079579684
-    second: rising_2
+      213: -1208307818022381861
+    second: water_2_2
   - first:
-      213: 4097748248231901366
-    second: rising_3
-  - first:
-      213: -6853114472852944900
-    second: rising_4
-  - first:
-      213: -8071755861639042417
-    second: rising_5
+      213: 7318000835019961145
+    second: water_2_3
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -115,13 +109,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: rising_0
+      name: water_2_0
       rect:
         serializedVersion: 2
-        x: 32
-        y: 345
-        width: 377
-        height: 232
+        x: 74
+        y: 113
+        width: 16
+        height: 23
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -130,20 +124,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: d8be9d74e248c32d0800000000000000
-      internalID: -3297615492833219699
+      spriteID: 69af9125a13ef4620800000000000000
+      internalID: 2760674798787492502
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: rising_1
+      name: water_2_1
       rect:
         serializedVersion: 2
-        x: 326
-        y: 346
-        width: 111
-        height: 170
+        x: 88
+        y: 98
+        width: 12
+        height: 17
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -152,20 +146,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 92ed356280f70bbb0800000000000000
-      internalID: -4922294719736455639
+      spriteID: 2f031c9df74881dd0800000000000000
+      internalID: -2515114707237392142
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: rising_2
+      name: water_2_2
       rect:
         serializedVersion: 2
-        x: 384
-        y: 346
-        width: 84
-        height: 154
+        x: 157
+        y: 101
+        width: 13
+        height: 18
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -174,20 +168,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: cd3189abe19fb95b0800000000000000
-      internalID: -5360417021079579684
+      spriteID: bd6d27ff07a3b3fe0800000000000000
+      internalID: -1208307818022381861
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: rising_3
+      name: water_2_3
       rect:
         serializedVersion: 2
-        x: 556
-        y: 346
-        width: 84
-        height: 154
+        x: 59
+        y: 54
+        width: 133
+        height: 22
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -196,52 +190,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 6b877da22502ed830800000000000000
-      internalID: 4097748248231901366
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: rising_4
-      rect:
-        serializedVersion: 2
-        x: 587
-        y: 346
-        width: 111
-        height: 170
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: cf7038042b8d4e0a0800000000000000
-      internalID: -6853114472852944900
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: rising_5
-      rect:
-        serializedVersion: 2
-        x: 615
-        y: 345
-        width: 377
-        height: 232
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: f8ae3515fcc5bff80800000000000000
-      internalID: -8071755861639042417
+      spriteID: 933706dacf2ce8560800000000000000
+      internalID: 7318000835019961145
       vertices: []
       indices: 
       edges: []
@@ -260,12 +210,10 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      rising_0: -3297615492833219699
-      rising_1: -4922294719736455639
-      rising_2: -5360417021079579684
-      rising_3: 4097748248231901366
-      rising_4: -6853114472852944900
-      rising_5: -8071755861639042417
+      water_2_0: 2760674798787492502
+      water_2_1: -2515114707237392142
+      water_2_2: -1208307818022381861
+      water_2_3: 7318000835019961145
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
