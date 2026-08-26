@@ -107,8 +107,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 638401d7e8f38cd4994dfd4348c54bbd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Ice_Bullet
-  maxSpeed: 9
-  lifeTime: 3
+  maxSpeed: 14
+  lifeTime: 5
   speedCurve:
     serializedVersion: 2
     m_Curve:
@@ -139,10 +139,17 @@ MonoBehaviour:
   hitMask:
     serializedVersion: 2
     m_Bits: 128
+  playerHitbox: {fileID: 0}
+  playerHitboxSize: {x: 1, y: 0.2}
+  freezeProbeSize: {x: 0.15, y: 0.12}
+  platformMask:
+    serializedVersion: 2
+    m_Bits: 64
   pathSprite: {fileID: 1193188577515134286}
   pathLength: 30
   pathWidth: 1
   pathFadeDuration: 0.5
+  minimumPathSortingOrder: 6
   iceVisual: {fileID: 5892537651637583862}
   growCurve:
     serializedVersion: 2

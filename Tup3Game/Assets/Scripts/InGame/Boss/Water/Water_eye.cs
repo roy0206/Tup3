@@ -1,8 +1,12 @@
 using UnityEngine;
+using UnityEngine.Rendering;
 
 [RequireComponent(typeof(Animator))]
 public class Water_eye : MonoBehaviour
 {
+    private static readonly int CanAttackEyeHash = Animator.StringToHash("Can_attack_eye");
+    private static readonly int EyeEntryStateHash = Animator.StringToHash("Eye_3_entry");
+
     private Animator Eye_animation;
     [Header("피격 (플레이어로부터)")]
     public float maxHp = 200f;
@@ -21,6 +25,9 @@ public class Water_eye : MonoBehaviour
     public float hitFlashDuration = 0.1f;
     public Color hitFlashColor = Color.red;
 
+    [Header("렌더링 순서")]
+    [SerializeField] private int minimumSortingOrder = 5;
+
     [Header("보스에게 입히는 피해량")]
     public float Damge_to_boss = 10f;
     private BossBase bossRef;
@@ -34,15 +41,47 @@ public class Water_eye : MonoBehaviour
             spriteRenderer = GetComponent<SpriteRenderer>();
         if (spriteRenderer != null)
             originalColor = spriteRenderer.color;
+        ApplySortingOrder();
         if (Collider == null)
             Collider = GetComponent<CircleCollider2D>();
         Scale(scale);
         Eye_animation = GetComponent<Animator>();
         if (Eye_animation != null)
-            Eye_animation.SetBool("Can_attack_eye", true);
+        {
+            RemoveUnnamedAnimationEvents(Eye_animation);
+            Eye_animation.SetBool(CanAttackEyeHash, true);
+        }
     }
 
-    public void Init(BossBase boss, float time, float newscale, bool damageable = true)
+    private static void RemoveUnnamedAnimationEvents(Animator animator)
+    {
+        RuntimeAnimatorController controller = animator.runtimeAnimatorController;
+        if (controller == null)
+            return;
+
+        foreach (AnimationClip clip in controller.animationClips)
+        {
+            if (clip == null)
+                continue;
+
+            AnimationEvent[] events = clip.events;
+            AnimationEvent[] validEvents = System.Array.FindAll(
+                events,
+                animationEvent => !string.IsNullOrWhiteSpace(animationEvent.functionName)
+            );
+
+            if (validEvents.Length != events.Length)
+                clip.events = validEvents;
+        }
+    }
+
+    public void Init(
+        BossBase boss,
+        float time,
+        float newscale,
+        bool damageable = true,
+        bool startClosed = false
+    )
     {
         bossRef = boss;
         lifeTime = time;
@@ -51,6 +90,7 @@ public class Water_eye : MonoBehaviour
         canReceiveDamage = damageable;
         CancelInvoke();
         CancelInvoke(nameof(DestroySelf));
+        ApplySortingOrder();
         Scale(newscale);
         if (Collider != null)
             Collider.enabled = damageable;
@@ -58,7 +98,10 @@ public class Water_eye : MonoBehaviour
         if (Eye_animation != null)
         {
             Eye_animation.enabled = true;
-            Eye_animation.SetBool("Can_attack_eye", true);
+            if (startClosed)
+                HoldClosed();
+            else
+                OpenEye();
         }
 
         Invoke(nameof(ExpireByTime), lifeTime);
@@ -111,6 +154,37 @@ public class Water_eye : MonoBehaviour
         transform.localScale = Vector3.one * scale;
     }
 
+    public void HoldClosed()
+    {
+        if (Eye_animation == null)
+            return;
+
+        Eye_animation.enabled = true;
+        Eye_animation.SetBool(CanAttackEyeHash, false);
+        Eye_animation.Play(EyeEntryStateHash, 0, 0f);
+        Eye_animation.Update(0f);
+        Eye_animation.speed = 0f;
+    }
+
+    public void OpenEye()
+    {
+        if (Eye_animation == null)
+            return;
+
+        Eye_animation.enabled = true;
+        Eye_animation.speed = 1f;
+        Eye_animation.SetBool(CanAttackEyeHash, true);
+    }
+
+    private void ApplySortingOrder()
+    {
+        foreach (SpriteRenderer renderer in GetComponentsInChildren<SpriteRenderer>(true))
+            renderer.sortingOrder = Mathf.Max(renderer.sortingOrder, minimumSortingOrder);
+
+        foreach (SortingGroup sortingGroup in GetComponentsInChildren<SortingGroup>(true))
+            sortingGroup.sortingOrder = Mathf.Max(sortingGroup.sortingOrder, minimumSortingOrder);
+    }
+
     public void ExpireByTime()
     {
         if (IsDead) return;
@@ -133,7 +207,8 @@ public class Water_eye : MonoBehaviour
         if (Eye_animation != null)
         {
             Eye_animation.enabled = true;
-            Eye_animation.SetBool("Can_attack_eye", false);
+            Eye_animation.speed = 1f;
+            Eye_animation.SetBool(CanAttackEyeHash, false);
         }
 
         // Eye_die 애니메이션의 DestroySelf 이벤트가 정상적으로 재생되도록 즉시 삭제하지 않는다.
@@ -152,5 +227,6 @@ public class Water_eye : MonoBehaviour
         lifeTime = Mathf.Max(0f, lifeTime);
         scale = Mathf.Max(0.01f, scale);
         hitFlashDuration = Mathf.Max(0f, hitFlashDuration);
+        minimumSortingOrder = Mathf.Max(1, minimumSortingOrder);
     }
 }

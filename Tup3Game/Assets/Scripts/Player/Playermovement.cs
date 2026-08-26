@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using Unity.Burst.Intrinsics;
 using Unity.VisualScripting;
@@ -54,6 +55,8 @@ public class Playermovement : MonoBehaviour
     [SerializeField] private float waterFastDescendSpeed = 8f;
     [SerializeField] private KeyCode waterDescendKey = KeyCode.DownArrow;
     [SerializeField] private float waterGravityMultiplier = 0.3f;
+    private bool legacyWaterState;
+    private readonly HashSet<int> activeWaterSources = new HashSet<int>();
 
     private BoxCollider2D col;
     private Vector2 velocity;
@@ -100,6 +103,7 @@ public class Playermovement : MonoBehaviour
         skills = GetComponent<Skills>();
         if (animator == null) animator = GetComponent<Animator>();
         if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
+        legacyWaterState = isInWater;
     }
 
     void Update()
@@ -114,7 +118,8 @@ public class Playermovement : MonoBehaviour
             facingDirection = horizontalInput > 0 ? 1f : -1f;
             if (isDashing)
             {
-                dashEffectController.Change_direction(facingDirection);
+                if (dashEffectController != null)
+                    dashEffectController.Change_direction(facingDirection);
             }
         }
 
@@ -447,17 +452,43 @@ public class Playermovement : MonoBehaviour
 
     public void SetInWater(bool value)
     {
-        isInWater = value;
-        if (value)
-        {
-            velocity.y = 0f;
-            
-            if (animator != null)
-            {
-                animator.SetBool("IsGround", false);
-            }
+        legacyWaterState = value;
+        RefreshWaterState();
+    }
 
-        }// 물 진입 시 기존 속도 초기화 (자연스러운 진입감)
+    public void SetInWater(Object source, bool value)
+    {
+        if (ReferenceEquals(source, null))
+        {
+            SetInWater(value);
+            return;
+        }
+
+        int sourceId = source.GetInstanceID();
+        if (value)
+            activeWaterSources.Add(sourceId);
+        else
+            activeWaterSources.Remove(sourceId);
+
+        RefreshWaterState();
+    }
+
+    private void RefreshWaterState()
+    {
+        bool nextState = legacyWaterState || activeWaterSources.Count > 0;
+        if (isInWater == nextState)
+            return;
+
+        isInWater = nextState;
+        if (!isInWater)
+            return;
+
+        velocity.y = 0f;
+
+        if (animator != null)
+            animator.SetBool("IsGround", false);
+
+        // 물 진입 시 기존 수직 속도를 한 번만 초기화한다.
     }
 
     private void HandleWaterMovement()
@@ -526,6 +557,11 @@ public class Playermovement : MonoBehaviour
         slipperyStartAcceleration = Mathf.Max(0f, slipperyStartAcceleration);
         slipperyStopDeceleration = Mathf.Max(0f, slipperyStopDeceleration);
         slipperyTurnAcceleration = Mathf.Max(0f, slipperyTurnAcceleration);
+        moveSpeed = Mathf.Max(0.01f, moveSpeed);
+        waterFlapForce = Mathf.Max(0f, waterFlapForce);
+        waterMaxFallSpeed = Mathf.Max(0f, waterMaxFallSpeed);
+        waterFastDescendSpeed = Mathf.Max(0f, waterFastDescendSpeed);
+        waterGravityMultiplier = Mathf.Max(0f, waterGravityMultiplier);
     }
 
     public bool IsDashing() => isDashing;

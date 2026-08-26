@@ -50,6 +50,7 @@ public class Water : BossBase
     [SerializeField] private Electric_ball electricBallPrefab;
     [SerializeField] private Transform electricBallSpawnPoint;
     [SerializeField] private float electricBallSpawnDelay = 0.5f;
+    [SerializeField] private float electricEyeOpenDuration = 0.35f;
     [SerializeField] private float electricBallPatternDuration = 1.5f;
     [SerializeField] private float electricBallCoolTime = 30f;
 
@@ -70,7 +71,6 @@ public class Water : BossBase
     private bool hasAttemptedEncroachment;
     private bool hasStartedWaterRise;
     private GameObject encroachmentWarningInstance;
-    private Water_eye encroachmentEye;
     private bool hasCleanedUpDeath;
 
     new void Awake()
@@ -172,12 +172,6 @@ public class Water : BossBase
             hasStartedWaterRise = false;
             encroachmentTelegraphRemaining = encroachmentTelegraphDuration;
 
-            encroachmentEye = SpawnEye(
-                2,
-                encroachmentTelegraphDuration + 5f,
-                true
-            );
-
             Transform warningPoint = encroachmentWarningPoint != null
                 ? encroachmentWarningPoint
                 : stormSpawnPoint;
@@ -195,9 +189,6 @@ public class Water : BossBase
         if (!hasStartedWaterRise && IsEncroachmentSealed())
         {
             CleanupEncroachmentWarning();
-            if (encroachmentEye != null)
-                encroachmentEye.ExpireByTime();
-            encroachmentEye = null;
 
             currentPhase = BossPhase.Normal;
             isPatternSetup = false;
@@ -275,7 +266,6 @@ public class Water : BossBase
         }
 
         activeEyes.Clear();
-        encroachmentEye = null;
     }
 
     private void CleanupActiveHazards()
@@ -313,7 +303,12 @@ public class Water : BossBase
 
     private bool isPatternSetup;
 
-    private Water_eye SpawnEye(int eyeIndex, float lifeTime, bool damageable = true)
+    private Water_eye SpawnEye(
+        int eyeIndex,
+        float lifeTime,
+        bool damageable = true,
+        bool startClosed = false
+    )
     {
         if (eyePrefab == null)
             return null;
@@ -341,7 +336,7 @@ public class Water : BossBase
                 ? Scale[eyeIndex]
                 : 1f;
 
-            eye.Init(this, lifeTime, eyeScale, damageable);
+            eye.Init(this, lifeTime, eyeScale, damageable, startClosed);
             activeEyes.RemoveAll(activeEye => activeEye == null);
             activeEyes.Add(eye);
         }
@@ -472,8 +467,13 @@ public class Water : BossBase
             curTimes[4] = electricBallPatternDuration + electricBallCoolTime;
             curTimes[0] = electricBallPatternDuration;
             isPatternSetup = true;
-            SpawnEye(3, normalEyeOpenTime, false);
-            StartCoroutine(SpawnElectricBalls());
+            Water_eye electricEye = SpawnEye(
+                3,
+                normalEyeOpenTime,
+                false,
+                true
+            );
+            StartCoroutine(SpawnElectricBalls(electricEye));
         }
 
         if (curTimes[0] > 0) return TaskStatus.Continue;
@@ -482,9 +482,18 @@ public class Water : BossBase
         return TaskStatus.Success;
     }
 
-    private IEnumerator SpawnElectricBalls()
+    private IEnumerator SpawnElectricBalls(Water_eye electricEye)
     {
         yield return new WaitForSeconds(electricBallSpawnDelay);
+
+        if (IsDead || currentPhase != BossPhase.Encroached)
+            yield break;
+
+        if (electricEye != null)
+            electricEye.OpenEye();
+
+        if (electricEyeOpenDuration > 0f)
+            yield return new WaitForSeconds(electricEyeOpenDuration);
 
         if (electricBallPrefab == null || electricBallSpawnPoint == null)
             yield break;
@@ -534,6 +543,7 @@ public class Water : BossBase
         stormCoolTime = Mathf.Max(0f, stormCoolTime);
 
         electricBallSpawnDelay = Mathf.Max(0f, electricBallSpawnDelay);
+        electricEyeOpenDuration = Mathf.Max(0f, electricEyeOpenDuration);
         electricBallPatternDuration = Mathf.Max(0.1f, electricBallPatternDuration);
         electricBallCoolTime = Mathf.Max(0f, electricBallCoolTime);
 
