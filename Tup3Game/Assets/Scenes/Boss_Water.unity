@@ -2064,6 +2064,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossRoom
   boss: 2
+  DM: {fileID: 0}
 --- !u!4 &1155819030
 Transform:
   m_ObjectHideFlags: 0
