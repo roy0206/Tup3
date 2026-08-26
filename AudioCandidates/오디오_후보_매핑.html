@@ -1,0 +1,1137 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tup3Game 오디오 후보 매핑</title>
+<style>
+:root{--bg:#f7f7f8;--fg:#1b1b1f;--dim:#61616b;--card:#fff;--line:#e2e2e7;--ok:#127a3d;--by:#8a6100;--tag:#0b62c4}
+@media (prefers-color-scheme:dark){:root{--bg:#131316;--fg:#ececf1;--dim:#9a9aa5;--card:#1c1c21;--line:#2e2e36;--ok:#5fd08a;--by:#e8bd57;--tag:#79b8ff}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 system-ui,"Malgun Gothic",sans-serif}
+header{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--line);padding:14px 22px;z-index:5}
+h1{margin:0;font-size:20px} .meta{color:var(--dim);font-size:13px;margin-top:4px}
+main{max-width:1050px;margin:0 auto;padding:16px 22px 60px}
+h2{font-size:16px;margin:28px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+.slot{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin:0 0 12px}
+.sname{font-weight:700;font-size:15px}
+.sdesc{color:var(--dim);font-size:13px;margin:2px 0 10px}
+.cands{display:grid;gap:8px}
+.cand{border:1px solid var(--line);border-radius:9px;padding:8px 10px}
+.cand.miss{color:var(--by)}
+.chead{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;font-size:14px}
+.dim{color:var(--dim);font-size:12px}
+.badge{font-size:11px;border:1px solid var(--line);border-radius:999px;padding:1px 8px;color:var(--dim)}
+.badge.cc0{color:var(--ok);border-color:var(--ok)} .badge.by{color:var(--by);border-color:var(--by)}
+audio{width:100%;height:32px;margin-top:6px}
+a{color:var(--tag)}
+.note{background:var(--card);border:1px solid var(--by);border-radius:12px;padding:12px 16px;margin:14px 0;font-size:14px}
+pre{white-space:pre-wrap;font:12px/1.5 ui-monospace,Consolas,monospace;background:rgba(127,127,127,.12);padding:8px 10px;border-radius:8px}
+.pick{display:flex;align-items:center;gap:7px;margin-top:8px;font-size:13px;color:var(--dim);cursor:pointer;user-select:none;width:fit-content}
+.pick input{width:16px;height:16px;accent-color:var(--tag);cursor:pointer;margin:0}
+.cand.checked{border-color:var(--tag);box-shadow:inset 0 0 0 1px var(--tag)}
+.badge.adopted{color:#fff;background:var(--ok);border-color:var(--ok);font-weight:700}
+#pickbar{position:fixed;right:18px;bottom:18px;z-index:50;display:flex;flex-direction:column;align-items:flex-end;gap:8px;max-width:min(440px,calc(100vw - 36px))}
+#pickbar button{background:var(--tag);color:#fff;border:0;border-radius:999px;padding:11px 20px;font:700 14px/1 system-ui,"Malgun Gothic",sans-serif;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+#pickbar button:active{transform:translateY(1px)}
+#pickresult{display:none;width:min(440px,calc(100vw - 36px));background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+#pickresult.show{display:block}
+#pickresult textarea{display:block;width:100%;height:150px;resize:vertical;background:transparent;color:var(--fg);border:1px solid var(--line);border-radius:6px;font:12px/1.5 ui-monospace,Consolas,monospace;padding:6px}
+#pickstatus{font-size:12px;color:var(--dim);margin-top:5px}
+</style></head><body>
+<header><h1>Tup3Game 오디오 후보 매핑</h1>
+<div class="meta">오행(五行) 2D 보스러시 — BGM 30곡 · SFX 70개 후보 · 재생은 로컬 파일(공통_bgm/, 공통_효과음/) ·
+라이선스 장부: 공통_오디오/장부.yaml · 수집: KSH_AIVidioStation 오디오 수집기</div></header>
+<main>
+<div class="note"><b>라이선스 주의</b> — incompetech(Kevin MacLeod) 곡은 전부 <b>CC-BY 4.0: 크레딧 표기 필수</b>.
+채택 확정 시 게임 크레딧에 아래 "크레딧 표기 문구"를 넣어야 한다. openverse 효과음은 대부분 CC0(표기 불요)이며,
+각 카드의 배지로 구분된다. 출처 스냅샷은 공통_오디오/스냅샷/ 에 보관됨.</div>
+<h2>BGM — 씬별 배경음악</h2><section class="slot">
+<div class="sname">타이틀 (Start)</div>
+<div class="sdesc">부팅→인트로 컷신(20초 패닝, S00_PROLOGUE 대사)→메뉴. 서정적·동양풍. — StartScene.cs</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Eastern Thought</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">4:22 · 10,231KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100682" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/Eastern_Thought.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Guzheng City</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">1:53 · 3,568KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN2100001" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/Guzheng_City.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Lotus</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">5:28 · 12,828KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1900019" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/Lotus.mp3"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">프롤로그 (Prologue)</div>
+<div class="sdesc">죽음·유체이탈 각성 연출(어둠→빛, 독백 36줄). 어둡고 의식(儀式)적인 드론. — PrologueScene.cs, S01_MONOLOGUE</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Ritual</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">4:24 · 10,454KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100466" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/Ritual.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Rites</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">2:07 · 4,959KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100722" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/Rites.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Temple of the Manes</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">2:36 · 6,187KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100053" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/Temple_of_the_Manes.mp3"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">로비 (Lobby)</div>
+<div class="sdesc">거점/휴식 허브. 보스 입구 4개 + 스틱스 입구 + 횃불. 잔잔한 대기 무드. — LobbyIntroDirector.cs, S03_LOBBY</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Meditation Impromptu 01</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">3:32 · 6,877KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100163" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/Meditation_Impromptu_01.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Dream Culture</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">3:34 · 8,375KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1300046" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/Dream_Culture.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Clear Waters</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">2:08 · 5,115KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100290" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/Clear_Waters.mp3"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">보스전 — 토(土) Soil</div>
+<div class="sdesc">묵직한 대지·둔중한 타격의 3패턴 근접 보스. 무겁고 장중한 전투곡. — Soil.cs</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Devastation and Revenge</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">3:05 · 7,238KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100694" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/Devastation_and_Revenge.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>For the Fallen</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">1:35 · 3,719KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100704" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/For_the_Fallen.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Undaunted</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">3:32 · 6,643KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1400025" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/Undaunted.mp3"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">보스전 — 수(水) Water</div>
+<div class="sdesc">유려하고 차가운 무드 + HP 50% 잠식 2페이즈(수위 상승). 신비·긴장 겸비. — Water.cs (BossPhase)</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Water Prelude</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">5:24 · 6,434KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100017" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/Water_Prelude.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Aquarium</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">2:24 · 5,757KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1900026" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/Aquarium.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Atlantean Twilight</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">2:51 · 5,448KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100322" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/Atlantean_Twilight.mp3"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">보스전 — 화(火) Fire</div>
+<div class="sdesc">돌진·화염기둥 16연발의 격렬한 연출 보스. 공격적·질주감. — FIre.cs</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Ready Aim Fire</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">3:37 · 6,781KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1500002" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/Ready_Aim_Fire.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Burn The World Waltz</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">3:20 · 3,909KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN2100009" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/Burn_The_World_Waltz.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Exciting Trailer</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">1:16 · 3,024KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100494" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/Exciting_Trailer.mp3"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">보스전 — 금(金) Gold</div>
+<div class="sdesc">패링·발도 참격의 금속성 검객 보스. 예리하고 긴박한 금속 질감. — Gold.cs</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Steel Rods</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">2:24 · 5,643KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1200052" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/Steel_Rods.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Iron Horse</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">1:40 · 3,895KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100735" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/Iron_Horse.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Shadowlands 3 - Machine</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">3:50 · 7,191KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1700036" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/Shadowlands_3_-_Machine.mp3"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">스틱스 저승길 (Styx)</div>
+<div class="sdesc">보스 4종 클리어 후 도강(渡江). 음산·장송 무드. — StyxRoom.cs (씬은 아직 플레이스홀더)<br>
+※ Styx 씬은 도플갱어 최종보스전으로 확정되어, BGM_Styx 는 아래 "최종보스" 슬롯의
+<b>Final Battle of the Dark Wizards</b> 로 채택됨. 이 슬롯의 후보 3곡은 미채택.</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Ghost Processional</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">1:45 · 3,360KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100219" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/Ghost_Processional.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Ghostpocalypse - 6 Crossing the Threshold</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">1:48 · 4,242KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100663" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/Ghostpocalypse_-_6_Crossing_the_Threshold.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Ghostpocalypse - 4 Temptress</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">1:55 · 4,493KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100665" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/Ghostpocalypse_-_4_Temptress.mp3"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">엔딩 (Ending)</div>
+<div class="sdesc">Ending1(배드)~Ending4 분기 — 엔딩별 전용 씬 + 전용 BGM 4곡 체제로 확정. — Ending.cs, S11/S12/S14/S15<br>
+※ 배정: Ending1(패배·배드)=<b>For the Fallen</b>(토 슬롯 후보에서 채택), Ending2(코인4·트루)=<b>Rains Will Fall</b>,
+Ending3(코인1~3)=<b>Promises to Keep</b>, Ending4(코인0)=<b>Ghostpocalypse - 6 Crossing the Threshold</b>(스틱스 슬롯 후보에서 채택).
+Eternal Hope 는 미채택.</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Eternal Hope</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">4:44 · 11,231KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100238" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/Eternal_Hope.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Promises to Keep</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">5:04 · 11,879KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1200004" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/Promises_to_Keep.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Rains Will Fall</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">3:42 · 8,689KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100723" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/Rains_Will_Fall.mp3"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">최종보스 (구현 대기)</div>
+<div class="sdesc">스크립트·씬 미구현, 대사만 존재(S10_FINAL_BOSS). 어둡고 장대한 최종결전용 슬롯만 확보. — EndingTrigger.cs 노트</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Final Battle of the Dark Wizards</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">4:32 · 8,490KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1500085" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/Final_Battle_of_the_Dark_Wizards.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Curse of the Scarab</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">5:27 · 10,228KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1600014" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/Curse_of_the_Scarab.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Clenched Teeth</b><span class="dim">Kevin MacLeod</span>
+    <span class="badge">CC-BY-4.0</span><span class="badge by">CC 크레딧 필요</span>
+    <span class="dim">1:31 · 3,562KB</span>
+    <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100705" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_bgm/Clenched_Teeth.mp3"></audio>
+</div></div>
+</section><h2>SFX — 플레이어</h2><section class="slot">
+<div class="sname">공격 휘두름 (1·2타)</div>
+<div class="sdesc">C키 3단 콤보의 1·2타 스윙. — ComboAttack.cs (maxCombo 3, AttackIndex)</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Fast Sword Swing Sound</b><span class="dim">qubodup</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">— · 10KB</span>
+    <a href="https://freesound.org/people/qubodup/sounds/60004" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Fast_Sword_Swing_Sound.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Sword Swings</b><span class="dim">SamsterBirdies</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:01 · 40KB</span>
+    <a href="https://freesound.org/people/SamsterBirdies/sounds/353708" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Sword_Swings.mp3"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">공격 3타 강타</div>
+<div class="sdesc">3타는 공격력 ×2.5 + 차징(attack3ChargeTime). 묵직한 마무리 참격. — ComboAttack.cs</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Sword Slash 1</b><span class="dim">smokebomb99</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">— · 8KB</span>
+    <a href="https://freesound.org/people/smokebomb99/sounds/147288" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Sword_Slash_1.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Hit Impact Sword 2</b><span class="dim">Eponn</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:01 · 29KB</span>
+    <a href="https://freesound.org/people/Eponn/sounds/547036" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Hit_Impact_Sword_2.mp3"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">타격 적중(히트)</div>
+<div class="sdesc">히트박스 명중 시. — Attackhitbox.cs</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Hit Impact</b><span class="dim">Mrguff</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">— · 11KB</span>
+    <a href="https://freesound.org/people/Mrguff/sounds/369711" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Hit_Impact.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Hit Impact Sword 3</b><span class="dim">CogFireStudios</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:01 · 31KB</span>
+    <a href="https://freesound.org/people/CogFireStudios/sounds/547042" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Hit_Impact_Sword_3.mp3"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">점프 / 이단점프</div>
+<div class="sdesc">X키, maxJumpCount 2 — 2단 점프는 피치 올려 재활용 가능. — Playermovement.cs</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>jumping</b><span class="dim">Leszek_Szary</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">— · 9KB</span>
+    <a href="https://freesound.org/people/Leszek_Szary/sounds/146726" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/jumping.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Jump sound or Power Up sound</b><span class="dim">Cman634</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:01 · 10KB</span>
+    <a href="https://freesound.org/people/Cman634/sounds/198784" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Jump_sound_or_Power_Up_sound.mp3"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">착지</div>
+<div class="sdesc">collisions.below 착지 판정. — Playermovement.cs (IsGround)</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>jump.wav</b><span class="dim">pcmac</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:01 · 39KB</span>
+    <a href="https://freesound.org/people/pcmac/sounds/464527" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/jump.wav"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">대시</div>
+<div class="sdesc">Z키, 쿨다운 1초, 무적. — Playermovement.cs (DoDash)</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Deep Whoosh #1</b><span class="dim">Kinoton</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:03 · 67KB</span>
+    <a href="https://freesound.org/people/Kinoton/sounds/351256" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Deep_Whoosh_1.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Swipe Whoosh</b><span class="dim">qubodup</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">— · 11KB</span>
+    <a href="https://freesound.org/people/qubodup/sounds/60007" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Swipe_Whoosh.mp3"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">피격</div>
+<div class="sdesc">넉백 + 0.5초 무적. — PlayerKnockBack.cs (TakeHit)</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>PlayerHurt2</b><span class="dim">mrickey13</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">— · 10KB</span>
+    <a href="https://freesound.org/people/mrickey13/sounds/515624" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/PlayerHurt2.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Human AAH!.wav</b><span class="dim">MATRIXXX_</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">— · 9KB</span>
+    <a href="https://freesound.org/people/MATRIXXX_/sounds/486943" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Human_AAH.wav"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">사망</div>
+<div class="sdesc">OnDeath 이벤트. — PlayerHealth.cs (Die)</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Injured Grunts</b><span class="dim">trettfilms</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:11 · 257KB</span>
+    <a href="https://freesound.org/people/trettfilms/sounds/128227" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Injured_Grunts.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>8 bit Death sound</b><span class="dim">MentosLat</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">— · 17KB</span>
+    <a href="https://freesound.org/people/MentosLat/sounds/417486" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/8_bit_Death_sound.mp3"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">스킬1·3 — 버프 발동</div>
+<div class="sdesc">A(공격력)/D(공격속도) 버프 오라. — Skills.cs (Do_skill_1/3)</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Magic Spell 05.wav</b><span class="dim">MATRIXXX_</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:01 · 24KB</span>
+    <a href="https://freesound.org/people/MATRIXXX_/sounds/495453" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Magic_Spell_05.wav"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Metal iron magic spell cast.flac</b><span class="dim">qubodup</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:01 · 32KB</span>
+    <a href="https://freesound.org/people/qubodup/sounds/171100" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Metal_iron_magic_spell_cast.flac"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">스킬2 — 지면 소환</div>
+<div class="sdesc">S키 에이밍 후 땅 솟아오름. — Skills.cs (SpawnGroundAfterDelay)</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Brick on soil.wav</b><span class="dim">deleted_user_2104797</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:03 · 92KB</span>
+    <a href="https://freesound.org/people/deleted_user_2104797/sounds/325268" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Brick_on_soil.wav"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Gravel Impacts and Falls.wav</b><span class="dim">lolamadeus</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:12 · 325KB</span>
+    <a href="https://freesound.org/people/lolamadeus/sounds/179341" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Gravel_Impacts_and_Falls.wav"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">스킬4 — 힐 틱</div>
+<div class="sdesc">F키, 1초 간격 틱 힐. — Skills.cs (Do_skill_4) + PlayerHealth.Heal</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Magic spell (small positive)</b><span class="dim">Nakhas</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:03 · 66KB</span>
+    <a href="https://freesound.org/people/Nakhas/sounds/506939" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Magic_spell_%28small_positive%29.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Magic Spell 09.wav</b><span class="dim">MATRIXXX_</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:01 · 27KB</span>
+    <a href="https://freesound.org/people/MATRIXXX_/sounds/523204" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Magic_Spell_09.wav"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">스킬 획득 팡파레</div>
+<div class="sdesc">보스 클리어 보상. — Skills.cs (OptainSkill)</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Tada Fanfare A</b><span class="dim">plasterbrain</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:01 · 41KB</span>
+    <a href="https://freesound.org/people/plasterbrain/sounds/397355" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Tada_Fanfare_A.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Tada Fanfare F</b><span class="dim">plasterbrain</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:01 · 41KB</span>
+    <a href="https://freesound.org/people/plasterbrain/sounds/397354" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Tada_Fanfare_F.mp3"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">입수 / 수영</div>
+<div class="sdesc">수중 모드 진입·수영 플랩(수 보스 2페이즈). — Playermovement.cs (SetInWater, waterFlapForce)</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Water Splash</b><span class="dim">kanalgas</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:06 · 103KB</span>
+    <a href="https://freesound.org/people/kanalgas/sounds/250317" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Water_Splash.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>lake swimming</b><span class="dim">dawidwmika</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">1:08 · 1,617KB</span>
+    <a href="https://freesound.org/people/dawidwmika/sounds/372518" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/lake_swimming.mp3"></audio>
+</div></div>
+</section><h2>SFX — 금(金) 보스: 패링·발도</h2><section class="slot">
+<div class="sname">패링 성공 (금속 클랭)</div>
+<div class="sdesc">쳐내기 성공 → 그로기. 보스 쪽에서 재생됨. — Gold.cs (Parried, CheckPlayerParry)</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Sword Clash</b><span class="dim">loudernoises</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">— · 14KB</span>
+    <a href="https://freesound.org/people/loudernoises/sounds/334169" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Sword_Clash.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Swords Clash - High Quality #2</b><span class="dim">Christopherderp</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:01 · 43KB</span>
+    <a href="https://freesound.org/people/Christopherderp/sounds/364530" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Swords_Clash_-_High_Quality_2.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Metal Clang sound</b><span class="dim">kermite607</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:01 · 34KB</span>
+    <a href="https://freesound.org/people/kermite607/sounds/362625" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Metal_Clang_sound.mp3"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">발도 참격 (Pattern4)</div>
+<div class="sdesc">화면 암전 → 섬광 → 대참격(데미지 40~50). — Gold.cs (ResolvePattern4Slash, Pattern4Slash.prefab)</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Sword sound 1.wav</b><span class="dim">Merrick079</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">— · 16KB</span>
+    <a href="https://freesound.org/people/Merrick079/sounds/568170" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Sword_sound_1.wav"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Knife/sword swing</b><span class="dim">spycrah</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:03 · 90KB</span>
+    <a href="https://freesound.org/people/spycrah/sounds/471097" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Knife_sword_swing.mp3"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">발도 전 기 모으기 (암전 라이저)</div>
+<div class="sdesc">0.5초 암전 + 패링 신호. — Gold.cs (pattern4DarkOverlay, OpenPattern4ParryWindow)</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>impact riser 01</b><span class="dim">soramoosic</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:14 · 312KB</span>
+    <a href="https://freesound.org/people/soramoosic/sounds/244249" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/impact_riser_01.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Riser</b><span class="dim">Rizzard</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:02 · 48KB</span>
+    <a href="https://freesound.org/people/Rizzard/sounds/561207" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Riser.mp3"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">검 함정 솟아오름 (Pattern2)</div>
+<div class="sdesc">좌우 바닥에서 검이 솟음. — SwordTrap.cs, SwordTrap.prefab</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Sword Unsheath</b><span class="dim">lucabia</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:02 · 66KB</span>
+    <a href="https://freesound.org/people/lucabia/sounds/276872" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Sword_Unsheath.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>unsheath_sword.wav</b><span class="dim">Qat</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:01 · 23KB</span>
+    <a href="https://freesound.org/people/Qat/sounds/107589" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/unsheath_sword.wav"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Sword slide.wav</b><span class="dim">AuDRoger</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:01 · 31KB</span>
+    <a href="https://freesound.org/people/AuDRoger/sounds/471147" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Sword_slide.wav"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">날아드는 검 / 반사 (Pattern3)</div>
+<div class="sdesc">검 5자루 소환 → 쳐내면 보스에게 반사(5회 누적 그로기). — FlyingSword.cs (Reflect)</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Swords Clashing</b><span class="dim">Sam300Productions</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:10 · 195KB</span>
+    <a href="https://freesound.org/people/Sam300Productions/sounds/611765" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Swords_Clashing.mp3"></audio>
+</div></div>
+</section><h2>SFX — 토(土) 보스</h2><section class="slot">
+<div class="sname">낙하물 착탄 (Pattern2)</div>
+<div class="sdesc">0.4초 간격 12회 낙하 폭격. — Soil.cs (SoilDrop), SoilDrop.cs</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Explosion with Debris.wav</b><span class="dim">FxKid2</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:05 · 121KB</span>
+    <a href="https://freesound.org/people/FxKid2/sounds/367622" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Explosion_with_Debris.wav"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Small Rock and Stone Hits.wav</b><span class="dim">lolamadeus</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:14 · 361KB</span>
+    <a href="https://freesound.org/people/lolamadeus/sounds/179365" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Small_Rock_and_Stone_Hits.wav"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">근접 연타 / 장판 밀림</div>
+<div class="sdesc">3연타 히트박스 + DOMoveX 장판. — Soil.cs (Pattern1)</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Gravel Impacts and Falls.wav</b><span class="dim">lolamadeus</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:12 · 325KB</span>
+    <a href="https://freesound.org/people/lolamadeus/sounds/179341" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Gravel_Impacts_and_Falls.wav"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Brick on soil.wav</b><span class="dim">deleted_user_2104797</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:03 · 92KB</span>
+    <a href="https://freesound.org/people/deleted_user_2104797/sounds/325268" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Brick_on_soil.wav"></audio>
+</div></div>
+</section><h2>SFX — 수(水) 보스</h2><section class="slot">
+<div class="sname">얼음 탄환 (Pattern1)</div>
+<div class="sdesc">얼음 생성·발사·깨짐. — Ice_Bullet.cs (SpawnIceBullets)</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Ice Crack 5.wav</b><span class="dim">ecfike</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:03 · 102KB</span>
+    <a href="https://freesound.org/people/ecfike/sounds/177217" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Ice_Crack_5.wav"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Ice Cracks</b><span class="dim">karlis.stigis</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">1:32 · 2,377KB</span>
+    <a href="https://freesound.org/people/karlis.stigis/sounds/168712" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Ice_Cracks.mp3"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">물기둥 분출 (Pattern2)</div>
+<div class="sdesc">물 분출 존. — Water_Sprout.cs (SpawnWaterBullets)</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>water splash 2.wav</b><span class="dim">VacekH</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">— · 6KB</span>
+    <a href="https://freesound.org/people/VacekH/sounds/189499" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/water_splash_2.wav"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>water splashing</b><span class="dim">ssierra1202</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:03 · 80KB</span>
+    <a href="https://freesound.org/people/ssierra1202/sounds/391943" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/water_splashing.mp3"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">폭풍 소용돌이 (Pattern3)</div>
+<div class="sdesc">잠식 후 전용, 플레이어 흡입. — Storm.cs + Playermovement.ApplyGravityPull</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>WInter storm wind lashing snow DISTILERY 190212.flac</b><span class="dim">TRP</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">2:06 · 2,883KB</span>
+    <a href="https://freesound.org/people/TRP/sounds/574552" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/WInter_storm_wind_lashing_snow_DISTILERY_190212.flac"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">천둥 (폭풍 연출)</div>
+<div class="sdesc">폭풍 전조·타격 보조. — Storm.cs</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Thunder</b><span class="dim">Fission9</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:32 · 673KB</span>
+    <a href="https://freesound.org/people/Fission9/sounds/465314" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Thunder.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Thunder Rush. 28 July 2021.wav</b><span class="dim">carthny</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:40 · 971KB</span>
+    <a href="https://freesound.org/people/carthny/sounds/581491" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Thunder_Rush._28_July_2021.wav"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">전기볼 — 충전/발사/감전</div>
+<div class="sdesc">충전 → 발사 → 지속 감전. — Electric_ball.cs (ChargeAndLaunch, OnTriggerStay2D)</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Electric Zap Light</b><span class="dim">Wakerone</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:22 · 550KB</span>
+    <a href="https://freesound.org/people/Wakerone/sounds/393823" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Electric_Zap_Light.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Electrical Shock (Zap).wav</b><span class="dim">BigKahuna360</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:03 · 82KB</span>
+    <a href="https://freesound.org/people/BigKahuna360/sounds/160421" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Electrical_Shock_%28Zap%29.wav"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Electric Zap Loop</b><span class="dim">Resaural</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:04 · 93KB</span>
+    <a href="https://freesound.org/people/Resaural/sounds/531421" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Electric_Zap_Loop.mp3"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">수위 상승 루프</div>
+<div class="sdesc">잠식 파훼 실패 시 물 차오름. — RisingWaterPhase.cs (BeginRise)</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>water splash and flounder about in a puddle</b><span class="dim">launemax</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:24 · 607KB</span>
+    <a href="https://freesound.org/people/launemax/sounds/249929" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/water_splash_and_flounder_about_in_a_puddle.mp3"></audio>
+</div></div>
+</section><h2>SFX — 화(火) 보스</h2><section class="slot">
+<div class="sname">화염기둥 연발 (Pattern1)</div>
+<div class="sdesc">16개 순차 발생. — FireColumn.cs</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>fire-whoosh.wav</b><span class="dim">hnhnh</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:03 · 89KB</span>
+    <a href="https://freesound.org/people/hnhnh/sounds/244926" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/fire-whoosh.wav"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Whoosh.wav</b><span class="dim">kingsrow</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:09 · 216KB</span>
+    <a href="https://freesound.org/people/kingsrow/sounds/181577" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Whoosh.wav"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">돌진 화염 루프 (Rush)</div>
+<div class="sdesc">돌진 + 끝에서 용암 분사. — FIre.cs (Rush, LavaJet)</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>flamewind.wav</b><span class="dim">scarbelly25</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:11 · 241KB</span>
+    <a href="https://freesound.org/people/scarbelly25/sounds/33943" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/flamewind.wav"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">용암 분사·착탄 / 착지 충격</div>
+<div class="sdesc">용암 낙하 착탄, 보스 착지. — Lava.cs (Land), FIre.cs (Land)</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Supernatural Explosion</b><span class="dim">Quaker540</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:02 · 58KB</span>
+    <a href="https://freesound.org/people/Quaker540/sounds/256960" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Supernatural_Explosion.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>low mid afar explosion 1.wav</b><span class="dim">Logicogonist</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:07 · 145KB</span>
+    <a href="https://freesound.org/people/Logicogonist/sounds/264031" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/low_mid_afar_explosion_1.wav"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Swoosh Explosion</b><span class="dim">Electroviolence</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:04 · 104KB</span>
+    <a href="https://freesound.org/people/Electroviolence/sounds/234555" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Swoosh_Explosion.mp3"></audio>
+</div></div>
+</section><h2>SFX — UI·대화·상호작용</h2><section class="slot">
+<div class="sname">버튼 클릭</div>
+<div class="sdesc">타이틀 새 게임/이어하기, 엔딩 복귀. — Start.cs, Ending.cs (Button.onClick)</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>SFX UI Button Click</b><span class="dim">suntemple</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">— · 5KB</span>
+    <a href="https://freesound.org/people/suntemple/sounds/253168" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/SFX_UI_Button_Click.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>UI Button Click</b><span class="dim">benzix2</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">— · 4KB</span>
+    <a href="https://freesound.org/people/benzix2/sounds/467951" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/UI_Button_Click.mp3"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">선택지 커서 이동</div>
+<div class="sdesc">←/→ 하이라이트 이동. — DialogueManager.cs (UpdateChoiceHighlight)</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Hover 1</b><span class="dim">plasterbrain</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">— · 7KB</span>
+    <a href="https://freesound.org/people/plasterbrain/sounds/237422" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Hover_1.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Select, Granted 01.wav</b><span class="dim">MATRIXXX_</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">— · 3KB</span>
+    <a href="https://freesound.org/people/MATRIXXX_/sounds/404151" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Select_Granted_01.wav"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">선택 확정</div>
+<div class="sdesc">Enter 확정. — DialogueManager.cs (ConfirmChoice)</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Select, Granted 06.wav</b><span class="dim">MATRIXXX_</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">— · 18KB</span>
+    <a href="https://freesound.org/people/MATRIXXX_/sounds/523763" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Select_Granted_06.wav"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Beep Space Button</b><span class="dim">GameAudio</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">— · 12KB</span>
+    <a href="https://freesound.org/people/GameAudio/sounds/220206" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Beep_Space_Button.mp3"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">대사 타이핑 블립</div>
+<div class="sdesc">0.04초 문자 단위 출력. — DialogueManager.cs (TypeLine, charDelay)</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Reverse Blip</b><span class="dim">Breviceps</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">— · 7KB</span>
+    <a href="https://freesound.org/people/Breviceps/sounds/450612" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Reverse_Blip.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Textsound No2</b><span class="dim">EdEditz</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:01 · 29KB</span>
+    <a href="https://freesound.org/people/EdEditz/sounds/188340" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Textsound_No2.mp3"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">대사 넘김</div>
+<div class="sdesc">V키 진행/스킵. — DialogueManager.cs (Advance)</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Family Friendly Inspect Sound, UI, or In-Game Notification.wav</b><span class="dim">MATRIXXX_</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">— · 3KB</span>
+    <a href="https://freesound.org/people/MATRIXXX_/sounds/657948" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Family_Friendly_Inspect_Sound_UI_or_In-Game_Notification.wav"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">상호작용 성공</div>
+<div class="sdesc">이미 배선됨 — 사운드 이름만 채우면 됨. — InteractionBase.cs (interactionSucceedSound)</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Correct Blips</b><span class="dim">CogFireStudios</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:04 · 94KB</span>
+    <a href="https://freesound.org/people/CogFireStudios/sounds/531510" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Correct_Blips.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Ping!</b><span class="dim">unfa</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:06 · 124KB</span>
+    <a href="https://freesound.org/people/unfa/sounds/215415" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Ping.mp3"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">상호작용 실패</div>
+<div class="sdesc">InteractionBase.cs (interactionFailSound)</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>error</b><span class="dim">fisch12345</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:03 · 80KB</span>
+    <a href="https://freesound.org/people/fisch12345/sounds/325113" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/error.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>buzzer.mp3</b><span class="dim">Loyalty_Freak_Music</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">— · 13KB</span>
+    <a href="https://freesound.org/people/Loyalty_Freak_Music/sounds/407466" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/buzzer.mp3"></audio>
+</div></div>
+</section><section class="slot">
+<div class="sname">의지 코인 획득/소모</div>
+<div class="sdesc">패배 -1, 생(生) 승리 +5. — BossRoom.cs (willCoins, saengWillCoinReward)</div>
+<div class="cands"><div class="cand">
+  <div class="chead"><b>Coin GET!</b><span class="dim">plasterbrain</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">— · 7KB</span>
+    <a href="https://freesound.org/people/plasterbrain/sounds/242857" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Coin_GET.mp3"></audio>
+</div>
+<div class="cand">
+  <div class="chead"><b>Coins Being Dropped-Assorted</b><span class="dim">TheWoodlandNomad</span>
+    <span class="badge">CC0-1.0</span><span class="badge cc0">크레딧 불요</span>
+    <span class="dim">0:24 · 582KB</span>
+    <a href="https://freesound.org/people/TheWoodlandNomad/sounds/363090" target="_blank">출처</a></div>
+  <audio controls preload="none" src="%EA%B3%B5%ED%86%B5_%ED%9A%A8%EA%B3%BC%EC%9D%8C/Coins_Being_Dropped-Assorted.mp3"></audio>
+</div></div>
+</section>
+<h2>크레딧 표기 문구 (CC-BY — 채택 시 필수)</h2>
+<pre>&quot;Aquarium&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+<pre>&quot;Atlantean Twilight&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+<pre>&quot;Burn The World Waltz&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+<pre>&quot;Clear Waters&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+<pre>&quot;Clenched Teeth&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+<pre>&quot;Curse of the Scarab&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+<pre>&quot;Devastation and Revenge&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+<pre>&quot;Dream Culture&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+<pre>&quot;Eastern Thought&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+<pre>&quot;Eternal Hope&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+<pre>&quot;Exciting Trailer&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+<pre>&quot;Final Battle of the Dark Wizards&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+<pre>&quot;For the Fallen&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+<pre>&quot;Ghost Processional&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+<pre>&quot;Ghostpocalypse - 4 Temptress&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+<pre>&quot;Ghostpocalypse - 6 Crossing the Threshold&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+<pre>&quot;Guzheng City&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+<pre>&quot;Iron Horse&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+<pre>&quot;Lotus&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+<pre>&quot;Meditation Impromptu 01&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+<pre>&quot;Promises to Keep&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+<pre>&quot;Rains Will Fall&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+<pre>&quot;Ready Aim Fire&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+<pre>&quot;Rites&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+<pre>&quot;Ritual&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+<pre>&quot;Shadowlands 3 - Machine&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+<pre>&quot;Steel Rods&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+<pre>&quot;Temple of the Manes&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+<pre>&quot;Undaunted&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+<pre>&quot;Water Prelude&quot; Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/</pre>
+</main>
+<script>
+// 한 번에 한 곡만 재생
+document.querySelectorAll('audio').forEach(a=>a.addEventListener('play',()=>{
+  document.querySelectorAll('audio').forEach(o=>{if(o!==a)o.pause();});}));
+
+// ── BGM 채택 배지 + SFX 선택 체크박스 + 선택 항목 복사 (순수 JS, 외부 의존 없음) ──
+(function(){
+  var ADOPTED=[
+    {slot:'타이틀 (Start)',            title:'Eastern Thought',                  label:'✅ 채택 → BGM_Title'},
+    {slot:'프롤로그 (Prologue)',       title:'Rites',                            label:'✅ 채택 → BGM_Prologue'},
+    {slot:'로비 (Lobby)',              title:'Meditation Impromptu 01',          label:'✅ 채택 → BGM_Lobby'},
+    {slot:'보스전 — 토(土) Soil',      title:'Undaunted',                        label:'✅ 채택 → BGM_Soil'},
+    {slot:'보스전 — 수(水) Water',     title:'Aquarium',                         label:'✅ 채택 → BGM_Water'},
+    {slot:'보스전 — 화(火) Fire',      title:'Ready Aim Fire',                   label:'✅ 채택 → BGM_Fire'},
+    {slot:'보스전 — 금(金) Gold',      title:'Steel Rods',                       label:'✅ 채택 → BGM_Gold'},
+    {slot:'최종보스 (구현 대기)',      title:'Final Battle of the Dark Wizards', label:'✅ 채택 → BGM_Styx (스틱스 최종보스전)'},
+    {slot:'보스전 — 토(土) Soil',      title:'For the Fallen',                   label:'✅ 채택 → BGM_Ending1 (패배·배드 엔딩)'},
+    {slot:'엔딩 (Ending)',             title:'Rains Will Fall',                  label:'✅ 채택 → BGM_Ending2 (코인4 승리·트루 엔딩)'},
+    {slot:'엔딩 (Ending)',             title:'Promises to Keep',                 label:'✅ 채택 → BGM_Ending3 (코인1~3 승리 엔딩)'},
+    {slot:'스틱스 저승길 (Styx)',      title:'Ghostpocalypse - 6 Crossing the Threshold', label:'✅ 채택 → BGM_Ending4 (코인0 승리 엔딩)'}
+  ];
+
+  function fileOf(cand){
+    var a=cand.querySelector('audio');if(!a)return '';
+    var src=a.getAttribute('src')||'';
+    try{src=decodeURIComponent(src);}catch(e){}
+    return src.split('/').pop();
+  }
+  function titleOf(cand){
+    var b=cand.querySelector('.chead b');
+    return b?b.textContent.trim():'';
+  }
+
+  var checkboxes=[];
+  var btn,ta,status;
+
+  function updateButton(){
+    var n=checkboxes.filter(function(c){return c.checked;}).length;
+    btn.textContent='선택 항목 복사 ('+n+')';
+  }
+
+  var mode='';
+  var main=document.querySelector('main');
+  Array.prototype.forEach.call(main.children,function(el){
+    if(el.tagName==='H2'){
+      var t=el.textContent;
+      mode=t.indexOf('SFX')===0?'sfx':(t.indexOf('BGM')===0?'bgm':'');
+      return;
+    }
+    if(!el.classList||!el.classList.contains('slot'))return;
+    var sname=el.querySelector('.sname');
+    var slot=sname?sname.textContent.trim():'';
+    Array.prototype.forEach.call(el.querySelectorAll('.cand'),function(cand){
+      if(mode==='bgm'){
+        var title=titleOf(cand);
+        ADOPTED.forEach(function(ad){
+          if(ad.slot===slot&&ad.title===title){
+            var sp=document.createElement('span');
+            sp.className='badge adopted';
+            sp.textContent=ad.label;
+            cand.querySelector('.chead').appendChild(sp);
+          }
+        });
+      }else if(mode==='sfx'){
+        var lab=document.createElement('label');
+        lab.className='pick';
+        var cb=document.createElement('input');
+        cb.type='checkbox';
+        cb.dataset.slot=slot;
+        cb.dataset.file=fileOf(cand);
+        cb.dataset.title=titleOf(cand);
+        cb.addEventListener('change',function(){
+          cand.classList.toggle('checked',cb.checked);
+          updateButton();
+        });
+        lab.appendChild(cb);
+        lab.appendChild(document.createTextNode('이 후보 선택'));
+        cand.appendChild(lab);
+        checkboxes.push(cb);
+      }
+    });
+  });
+
+  var bar=document.createElement('div');
+  bar.id='pickbar';
+  var result=document.createElement('div');
+  result.id='pickresult';
+  ta=document.createElement('textarea');
+  ta.id='picktext';
+  ta.readOnly=true;
+  status=document.createElement('div');
+  status.id='pickstatus';
+  result.appendChild(ta);
+  result.appendChild(status);
+  btn=document.createElement('button');
+  btn.type='button';
+  bar.appendChild(result);
+  bar.appendChild(btn);
+  document.body.appendChild(bar);
+  updateButton();
+
+  function selectAllText(){
+    ta.focus();
+    ta.select();
+    ta.setSelectionRange(0,ta.value.length);
+  }
+
+  btn.addEventListener('click',function(){
+    var lines=checkboxes.filter(function(c){return c.checked;}).map(function(c){
+      return c.dataset.slot+': '+c.dataset.file+'('+c.dataset.title+')';
+    });
+    if(lines.length===0){
+      result.classList.add('show');
+      ta.value='';
+      status.textContent='선택된 항목이 없습니다. SFX 카드의 체크박스를 먼저 선택하세요.';
+      return;
+    }
+    var text=lines.join('\n');
+    ta.value=text;
+    result.classList.add('show');
+    function fallback(){
+      var ok=false;
+      try{selectAllText();ok=document.execCommand('copy');}catch(e){}
+      status.textContent=ok
+        ?lines.length+'개 항목 복사 완료 (execCommand). 그대로 붙여넣으세요.'
+        :'자동 복사에 실패했습니다. 위 텍스트를 직접 선택·복사하세요.';
+      if(!ok)selectAllText();
+    }
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){
+        status.textContent=lines.length+'개 항목이 클립보드에 복사되었습니다. 그대로 붙여넣으세요.';
+      },fallback);
+    }else{
+      fallback();
+    }
+  });
+})();
+</script>
+</body></html>

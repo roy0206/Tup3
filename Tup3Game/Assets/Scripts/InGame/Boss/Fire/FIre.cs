@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 using CleverCrow.Fluid.BTs.Tasks;
 using CleverCrow.Fluid.BTs.Trees;
@@ -92,6 +92,8 @@ public class Fire : BossBase
 
     private void Update()
     {
+        if (PauseManager.IsPaused || DialogueManager.IsDialogueActive) return;
+
         for (int i = 0; i < curTimes.Count; i++)
         {
             curTimes[i] -= Time.deltaTime;
@@ -131,16 +133,41 @@ public class Fire : BossBase
 
         return TaskStatus.Continue;
     }
+    [SerializeField] private LayerMask rushObstacleMask = (1 << 6) | (1 << 10);
+    [SerializeField] private float rushBodyRadius = 0.5f;
+    [SerializeField] private float rushMaxDistance = 40f;
+
+    private Vector2 ExtendRushToObstacle(Vector2 start, Vector2 aimPos)
+    {
+        Vector2 dir = aimPos - start;
+        if (dir.sqrMagnitude < 0.0001f) return aimPos;
+        dir.Normalize();
+
+        foreach (var hit in Physics2D.CircleCastAll(start, rushBodyRadius, dir, rushMaxDistance, rushObstacleMask))
+        {
+            if (hit.distance > 0.2f)
+                return start + dir * hit.distance;
+        }
+
+        return start + dir * rushMaxDistance;
+    }
+
     private TaskStatus Rush(float waitTime, Vector2 pos, int lavaCount)
     {
         if (!isPatternSetup)
         {
             isPatternSetup = true;
-            curTimes[0] = waitTime;
+            Vector2 start = transform.position;
+            Vector2 extended = ExtendRushToObstacle(start, pos);
+            float baseDistance = Vector2.Distance(start, pos);
+            float duration = baseDistance > 0.01f
+                ? waitTime * (Vector2.Distance(start, extended) / baseDistance)
+                : waitTime;
+            curTimes[0] = duration;
             animator.SetBool("Rush", true);
-            FaceRush(pos - (Vector2)transform.position);
-            transform.DOMove(pos,
-                waitTime).SetEase(Ease.InCubic);
+            FaceRush(extended - start);
+            transform.DOMove(extended,
+                duration).SetEase(Ease.InCubic);
         }
         if (curTimes[0] <= 0)
         {
@@ -347,3 +374,14 @@ public class Fire : BossBase
         }
     }
 }
+
+/* [파일 노트]
+ * 돌진(Rush)은 조준점에서 멈추지 않는다 — 조준 방향으로 CircleCast(rushObstacleMask: ground+wall,
+ * rushBodyRadius) 해서 벽/바닥에 닿는 지점까지 연장하고, 속도 유지를 위해 지속시간을 거리 비례로
+ * 늘린다(플레이어가 점프 중에 조준이 끝나 공중 좌표가 잡혀도 지형까지 계속 돌진). 시작점과 겹친
+ * 콜라이더(distance<=0.2)는 무시하고, 아무것도 안 맞으면 rushMaxDistance 까지 간다.
+ *
+ * 일시정지 대응 : Update 첫 줄 PauseManager.IsPaused 게이트로 BT/타이머가 멈추고,
+ * 이동(DOMove/DOMoveX)과 FireColumn 소환 예약(DOVirtual.DelayedCall)은 DOTween.PauseAll 로 함께 멈춘다.
+ * 몸통 접촉 피해는 PlayerHealth.TakeDamage 쪽 게이트가 차단한다.
+ */

@@ -67,6 +67,8 @@ public class Storm : MonoBehaviour
     }
     private void Update()
     {
+        if (PauseManager.IsPaused) return;
+
         if (!isAlive || player == null)
             return;
         player.ApplyGravityPull(
@@ -124,7 +126,7 @@ public class Storm : MonoBehaviour
                 yield break;
             }
 
-            timer += Time.deltaTime;
+            if (!PauseManager.IsPaused) timer += Time.deltaTime;
             yield return null;
         }
 
@@ -160,6 +162,12 @@ public class Storm : MonoBehaviour
         // 소용돌이가 점점 커지는 과정
         while (timer < growDuration)
         {
+            if (PauseManager.IsPaused)
+            {
+                yield return null;
+                continue;
+            }
+
             timer += Time.deltaTime;
 
             float ratio = Mathf.Clamp01(timer / growDuration);

@@ -29,6 +29,13 @@ MonoBehaviour:
     - BossAsset
     - Pool
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b7d41a90c5e34f2a8e6c1d9f30ab7c15
+    m_Address: Pattern4Slash
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - BossAsset
+    - Pool
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 0a5bfcc833d0b0a4cadf2be628e75e99, type: 2}
   m_SchemaSet:

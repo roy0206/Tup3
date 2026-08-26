@@ -1,4 +1,4 @@
-id,speaker,text,next,choices
+id,speaker,text,next,choices,note
 start,Boss,who are you?,q1,
 q1,Player,(whatshouldido),,letsfigtht:fight/go away:leave
 fight,Boss,then draw your weapon.,,
