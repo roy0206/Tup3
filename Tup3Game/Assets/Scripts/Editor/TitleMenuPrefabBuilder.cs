@@ -15,13 +15,14 @@ public static class TitleMenuPrefabBuilder
     private const string FontPath = "Assets/GameAssets/Fonts/PRETENDARD-REGULAR SDF.asset";
     private const string StartScenePath = "Assets/Scenes/Start.unity";
     private const string RootName = "TitleMenu";
-    private const string KoreanSample = "게임 시작이어하기옵션종료";
+    private const string KoreanSample = "게임 시작이어하기도전과제옵션종료";
 
     private struct Settings
     {
         public float itemFontSize;
         public string newGameLabel;
         public string continueLabel;
+        public string achievementsLabel;
         public string optionsLabel;
         public string quitLabel;
         public Color textColor;
@@ -108,17 +109,22 @@ public static class TitleMenuPrefabBuilder
             settings.newGameLabel, settings, font, uiLayer, out string newGameText);
         Button continueItem = EnsureItem(items, TitleMenuView.ContinueItemName,
             settings.continueLabel, settings, font, uiLayer, out string continueText);
+        Button achievements = EnsureItem(items, TitleMenuView.AchievementsItemName,
+            settings.achievementsLabel, settings, font, uiLayer, out string achievementsText);
         Button options = EnsureItem(items, TitleMenuView.OptionsItemName,
             settings.optionsLabel, settings, font, uiLayer, out string optionsText);
         Button quit = EnsureItem(items, TitleMenuView.QuitItemName,
             settings.quitLabel, settings, font, uiLayer, out string quitText);
 
+        Reorder(newGame, continueItem, achievements, options, quit);
+
         settings.newGameLabel = newGameText;
         settings.continueLabel = continueText;
+        settings.achievementsLabel = achievementsText;
         settings.optionsLabel = optionsText;
         settings.quitLabel = quitText;
 
-        WriteSettings(so, settings, font, items, newGame, continueItem, options, quit);
+        WriteSettings(so, settings, font, items, newGame, continueItem, achievements, options, quit);
 
         root.SetActive(false);
     }
@@ -143,6 +149,7 @@ public static class TitleMenuPrefabBuilder
             itemFontSize = GetFloat(so, "itemFontSize", 34f),
             newGameLabel = GetString(so, "newGameLabel", "게임 시작"),
             continueLabel = GetString(so, "continueLabel", "이어하기"),
+            achievementsLabel = GetString(so, "achievementsLabel", "도전과제"),
             optionsLabel = GetString(so, "optionsLabel", "옵션"),
             quitLabel = GetString(so, "quitLabel", "게임 종료"),
             textColor = GetColor(so, "textColor", Color.white),
@@ -155,8 +162,19 @@ public static class TitleMenuPrefabBuilder
         };
     }
 
+    private static void Reorder(params Button[] ordered)
+    {
+        int index = 0;
+        for (int i = 0; i < ordered.Length; i++)
+        {
+            if (ordered[i] == null) continue;
+            ordered[i].transform.SetSiblingIndex(index);
+            index++;
+        }
+    }
+
     private static void WriteSettings(SerializedObject so, Settings settings, TMP_FontAsset font,
-        RectTransform items, Button newGame, Button continueItem, Button options, Button quit)
+        RectTransform items, Button newGame, Button continueItem, Button achievements, Button options, Button quit)
     {
         var fontProp = so.FindProperty("fontAsset");
         if (fontProp != null && font != null)
@@ -168,11 +186,13 @@ public static class TitleMenuPrefabBuilder
         SetObject(so, "itemsRoot", items);
         SetObject(so, "newGameItem", newGame);
         SetObject(so, "continueItem", continueItem);
+        SetObject(so, "achievementsItem", achievements);
         SetObject(so, "optionsItem", options);
         SetObject(so, "quitItem", quit);
 
         SetString(so, "newGameLabel", settings.newGameLabel);
         SetString(so, "continueLabel", settings.continueLabel);
+        SetString(so, "achievementsLabel", settings.achievementsLabel);
         SetString(so, "optionsLabel", settings.optionsLabel);
         SetString(so, "quitLabel", settings.quitLabel);
 
@@ -501,7 +521,7 @@ public static class TitleMenuPrefabBuilder
             "타이틀 메뉴 구성 완료",
             $"{PrefabPath} 를 만들고 Start.unity 에 배치했습니다.\n\n" +
             "· Canvas(sortingOrder 800) + TitleMenuView\n" +
-            "· Items / NewGameItem · ContinueItem · OptionsItem · QuitItem\n" +
+            "· Items / NewGameItem · ContinueItem · AchievementsItem · OptionsItem · QuitItem\n" +
             "· 각 항목: 투명 Image(클릭 판정) + Button(transition None) + Label(TMP, Pretendard) + 하이라이터\n\n" +
             "자세한 내역은 콘솔 로그를 확인하세요.",
             "확인");
@@ -532,10 +552,11 @@ public static class TitleMenuPrefabBuilder
  *   TitleMenu (비활성, RectTransform + Canvas(Overlay, sortingOrder 800) + CanvasScaler(1920x1080)
  *              + GraphicRaycaster + TitleMenuView)
  *     └ Items (VerticalLayoutGroup + ContentSizeFitter, anchoredPosition (0,-180))
- *         ├ NewGameItem   ┐ 각 항목 = Image(알파 0, raycastTarget true)
- *         ├ ContinueItem  │        + LayoutElement(420x54)
- *         ├ OptionsItem   │        + Button(transition None, targetGraphic = 그 Image)
- *         └ QuitItem      ┘        + TitleMenuItemHighlighter
+ *         ├ NewGameItem      ┐ 각 항목 = Image(알파 0, raycastTarget true)
+ *         ├ ContinueItem     │        + LayoutElement(420x54)
+ *         ├ AchievementsItem │        + Button(transition None, targetGraphic = 그 Image)
+ *         ├ OptionsItem      │        + TitleMenuItemHighlighter
+ *         └ QuitItem         ┘
  *                                  └ Label (TMP, Pretendard Regular, 흰색 34, raycastTarget false)
  * 미니멀 컨셉 그대로다 — 배경 패널도 dim 도 버튼 외형도 없고 흰 글씨만 보인다. 클릭 판정만 필요해
  * 알파 0 Image 를 두고, 호버/선택 강조(볼드)는 TitleMenuItemHighlighter 가 전담한다.
@@ -572,4 +593,13 @@ public static class TitleMenuPrefabBuilder
  * DialogueUIPrefabBuilder 는 프리팹만 만들지만(여러 씬에 쓰이므로) 타이틀 메뉴는 Start 씬 전용이라
  * EndingSceneBuilder 처럼 배치까지 한다. 이미 TitleMenuView 가 있는 씬에는 다시 넣지 않는다.
  * 씬을 여닫으므로 실행 전에 SaveCurrentModifiedScenesIfUserWantsTo 로 현재 씬 저장을 먼저 묻는다.
+ *
+ * [도전과제 항목 추가 (2026-08-29)]
+ * 항목이 5개가 되었다(게임 시작 / 이어하기 / 도전과제 / 옵션 / 게임 종료).
+ * 이 툴을 다시 실행하는 것은 선택 사항이다 — 실행하지 않아도 TitleMenuView 가 런타임에
+ * OptionsItem 을 복제해 AchievementsItem 을 만든다(TitleMenuView 파일 노트 참조).
+ * 실행하면 그 복제 대신 프리팹에 실제 오브젝트가 생겨 에디터에서 미리 볼 수 있다.
+ * 기존 프리팹에 새 항목을 추가하면 자식 맨 뒤에 붙으므로, Reorder 로 다섯 항목의
+ * SiblingIndex 를 원하는 순서대로 다시 매긴다(멱등 — 몇 번을 돌려도 결과가 같다).
+ * KoreanSample 에 "도전과제"를 추가해 폰트 한글 글리프 검사도 새 문구를 포함한다.
  */

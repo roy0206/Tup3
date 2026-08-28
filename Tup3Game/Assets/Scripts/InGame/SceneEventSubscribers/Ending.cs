@@ -22,6 +22,12 @@ public class Ending : MonoBehaviour, ISceneEventListener
     [SerializeField] private Button checkpointButton;
     [SerializeField] private ConfirmDialogView confirmDialog;
 
+    [Header("엔딩 화면 배경 (씬에 저장값이 없어 코드 기본값이 그대로 쓰인다)")]
+    [SerializeField] private bool applyEndingBackground = true;
+    [SerializeField] private string lightBackgroundEndingIds = "Ending4";
+    [SerializeField] private Color darkBackgroundColor = new Color(0f, 0f, 0f, 1f);
+    [SerializeField] private Color lightBackgroundColor = new Color(1f, 1f, 1f, 1f);
+
     [Header("옵션")]
     [SerializeField] private string returnScene = "Start";
     [SerializeField] private bool allowManualAdvance = true;
@@ -55,6 +61,7 @@ public class Ending : MonoBehaviour, ISceneEventListener
     private bool creditsStarted;
     private bool achievementsUnlocked;
     private bool leaving;
+    private bool lightBackground;
 
     private void Awake()
     {
@@ -65,6 +72,7 @@ public class Ending : MonoBehaviour, ISceneEventListener
     {
         ResolveReferences();
         WarnOnEndingMismatch();
+        ApplyEndingBackground();
         Subscribe();
 
         BuildReturnChoices();
@@ -122,6 +130,45 @@ public class Ending : MonoBehaviour, ISceneEventListener
 
         if (savedId != endingId)
             Debug.LogWarning($"[Ending] 저장된 endingId '{savedId}' 와 씬 구성 '{endingId}' 이 다릅니다 — 씬 구성대로 진행합니다");
+    }
+
+    private bool IsLightBackgroundEnding()
+    {
+        if (string.IsNullOrWhiteSpace(lightBackgroundEndingIds)) return false;
+
+        string[] ids = lightBackgroundEndingIds.Split(',');
+        for (int i = 0; i < ids.Length; i++)
+        {
+            string id = ids[i].Trim();
+            if (id.Length == 0) continue;
+            if (string.Equals(id, endingId, System.StringComparison.OrdinalIgnoreCase)) return true;
+        }
+
+        return false;
+    }
+
+    private void ApplyEndingBackground()
+    {
+        if (!applyEndingBackground) return;
+
+        lightBackground = IsLightBackgroundEnding();
+        Color background = lightBackground ? lightBackgroundColor : darkBackgroundColor;
+
+        Camera cam = Camera.main;
+        if (cam == null) cam = FindAnyObjectByType<Camera>(FindObjectsInactive.Exclude);
+
+        if (cam == null)
+        {
+            Debug.LogWarning($"[Ending] 카메라를 찾지 못해 '{endingId}' 배경색을 적용하지 못했습니다");
+        }
+        else
+        {
+            cam.clearFlags = CameraClearFlags.SolidColor;
+            cam.backgroundColor = background;
+        }
+
+        if (DM != null) DM.SetLightBackground(lightBackground);
+        if (creditsView != null) creditsView.SetLightBackground(lightBackground);
     }
 
     private void Subscribe()
@@ -191,6 +238,7 @@ public class Ending : MonoBehaviour, ISceneEventListener
         }
 
         creditsView.SetScrollSpeed(creditsScrollSpeed, creditsFastMultiplier);
+        creditsView.SetLightBackground(lightBackground);
         creditsView.Play(creditsContent, FinishEnding);
     }
 
@@ -473,4 +521,41 @@ public class Ending : MonoBehaviour, ISceneEventListener
  * ── null 안전 ────────────────────────────────────────────────────────────────
  *   DM 이 없으면 대사만, CreditsView 는 즉석 생성이라 항상 동작, 버튼이 없어도 예외 없이
  *   진행된다. 크레딧 이중 시작은 creditsStarted 플래그로 방지.
+ */
+
+/* [파일 노트 — 엔딩 배경색과 대사 가독성 (2026-08-29)]
+ *
+ * ── 사양 ─────────────────────────────────────────────────────────────────────
+ *   엔딩2·3 은 검정 화면, 엔딩4 는 하얀 화면. 그런데 엔딩 독백의 화자는 전부 주인공이고
+ *   주인공의 대사색은 흰색이라, 엔딩4 를 그냥 하얗게 만들면 흰 배경에 흰 글씨가 된다.
+ *   (엔딩1 도 검정 — lightBackgroundEndingIds 에 없으면 전부 검정이다.)
+ *
+ * ── 배경을 까는 방법 : 카메라 배경색 ────────────────────────────────────────
+ *   전체화면 Image 를 새로 만들지 않고 Camera.main 의 clearFlags 를 SolidColor 로 두고
+ *   backgroundColor 만 바꾼다. 이유는 셋이다.
+ *     1. 씬(.unity)을 고칠 수 없는데, 이 방식은 런타임 값 변경이라 씬 파일을 건드리지 않는다.
+ *        (엔딩 씬 4개 모두 이미 Orthographic + SolidColor + 검정으로 저장돼 있다.)
+ *     2. 정렬 순서 사고가 원천적으로 없다. 화면 UI(엔딩 Canvas 20, DialogueUI 500,
+ *        CreditsView 800)는 전부 그 위에 그려지므로 대사를 가릴 수가 없다.
+ *     3. 오브젝트를 만들지 않으니 중복 생성 방지 로직도 필요 없다 —— OnSceneLoadComplete 가
+ *        여러 번 불려도 같은 값을 다시 넣을 뿐이다.
+ *   카메라를 못 찾은 경우에만 경고 로그를 남기고 넘어간다(대사·크레딧은 그대로 진행).
+ *
+ * ── 어느 엔딩이 밝은가 ───────────────────────────────────────────────────────
+ *   lightBackgroundEndingIds(쉼표 구분, 기본 "Ending4")에 endingId 가 들어 있으면 밝은 엔딩.
+ *   문자열 목록으로 둔 이유는 나중에 "엔딩2 도 하얗게" 같은 변경이 와도 씬을 열지 않고
+ *   이 기본값 한 줄만 고치면 되기 때문이다. applyEndingBackground 를 끄면 배경에 손대지 않는다.
+ *   네 필드 모두 씬 yaml 에 저장된 적이 없어 C# 기본값이 그대로 적용된다.
+ *
+ * ── 흰 배경에서의 가독성 ─────────────────────────────────────────────────────
+ *   배경만 하얗게 바꾸면 안 된다. 대사 글자가 실제로 얹히는 바탕은 화면 배경이 아니라
+ *   DialogueUI 의 대사 패널(불투명 검정)이라, 하얀 화면 한가운데 검은 상자만 남는다.
+ *   그래서 배경색과 함께 두 뷰에 밝은 모드를 알려 준다.
+ *     - DM.SetLightBackground(true)        : 대사 패널을 옅은 흰색으로 바꾸고, 모든 화자의
+ *                                            대사색을 DialogueSpeakerPalette 의 OnLight(어두운 잉크)로 전환.
+ *                                            주인공 흰색 → #141414 (밝은 패널 위 대비 16.9:1).
+ *     - creditsView.SetLightBackground(true): 크레딧 막을 흰색, 글씨를 검정 계열로 전환.
+ *   CreditsView 는 StartCredits 에서 즉석 생성될 수 있어 Play 직전에 한 번 더 호출한다.
+ *   복귀 버튼 2개는 검정 배경(0,0,0,0.75) + 밝은 글씨라 하얀 화면 위에서도 그대로 읽히므로
+ *   손대지 않았다(오히려 흰 배경에서 버튼 경계가 더 또렷해진다).
  */

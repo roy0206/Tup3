@@ -28,11 +28,14 @@ public class InteractionManager : DomainSingleton<InteractionManager>
         {
             currentInteraction?.OnHoldUP();
         });
-        view = FindAnyObjectByType<InteractionView>();
+        view = FindAnyObjectByType<InteractionView>(FindObjectsInactive.Include);
+        if (view != null) view.Disable();
     }
 
     private void FixedUpdate()
     {
+        if (player == null || view == null) return;
+
         var nearInteractions =
             interactionObjects.OrderBy(x => (player.transform.position - x.transform.position).sqrMagnitude);
         currentInteraction = null;

@@ -45,8 +45,37 @@ public class RisingWaterPhase : MonoBehaviour
 
     public bool HasReachedTarget { get; private set; }
 
+    private static RisingWaterPhase active;
+
+    /// <summary>
+    /// 물보다 확실히 앞에 그려지는 sortingOrder 를 돌려준다.
+    /// 수위가 올라와도 가려지면 안 되는 런타임 생성물(눈 등)이 이 값을 기준으로 삼는다.
+    /// </summary>
+    public int GetSortingOrderAboveWater(int offset = 1)
+    {
+        return GetHighestWaterSortingOrder() + Mathf.Max(1, offset);
+    }
+
+    /// <summary>
+    /// 대상과 그 자식들의 sortingOrder 를 물보다 앞으로 끌어올린다(내리지는 않는다).
+    /// 물이 없는 씬에서는 아무 일도 하지 않으므로 호출한 쪽에서 씬을 가릴 필요가 없다.
+    /// </summary>
+    public static void LiftAboveWater(GameObject target, int offset = 1)
+    {
+        if (target == null || active == null) return;
+
+        int order = active.GetSortingOrderAboveWater(offset);
+
+        foreach (SpriteRenderer renderer in target.GetComponentsInChildren<SpriteRenderer>(true))
+            renderer.sortingOrder = Mathf.Max(renderer.sortingOrder, order);
+
+        foreach (SortingGroup sortingGroup in target.GetComponentsInChildren<SortingGroup>(true))
+            sortingGroup.sortingOrder = Mathf.Max(sortingGroup.sortingOrder, order);
+    }
+
     private void Awake()
     {
+        active = this;
         CacheSceneStartPosition();
         FindPlayer();
         PrepareWater();
@@ -237,10 +266,10 @@ public class RisingWaterPhase : MonoBehaviour
         return surfacePoint != null ? surfacePoint.position.y : targetY;
     }
 
-    private void KeepCombatantsVisibleAboveWater()
+    private int GetHighestWaterSortingOrder()
     {
         if (waterRoot == null)
-            return;
+            return 0;
 
         int highestWaterOrder = 0;
         bool foundWaterRenderer = false;
@@ -253,9 +282,17 @@ public class RisingWaterPhase : MonoBehaviour
             foundWaterRenderer = true;
         }
 
+        return highestWaterOrder;
+    }
+
+    private void KeepCombatantsVisibleAboveWater()
+    {
+        if (waterRoot == null)
+            return;
+
         int platformOrder = Mathf.Max(
             minimumPlatformSortingOrder,
-            highestWaterOrder + 1
+            GetHighestWaterSortingOrder() + 1
         );
 
         Collider2D[] colliders = FindObjectsByType<Collider2D>(FindObjectsSortMode.None);
@@ -335,6 +372,8 @@ public class RisingWaterPhase : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (active == this) active = null;
+
         riseTween?.Kill();
         SetPlayerSwimming(false);
     }
@@ -362,4 +401,14 @@ public class RisingWaterPhase : MonoBehaviour
  *                  전부 SetPlayerSwimming(false) 를 부르므로 보스 사망·씬 종료 때 엉뚱하게 울린다.
  *                  splashMinInterval(기본 0.4초)은 수면 근처에서 오르내릴 때의 연타를 막는다
  *                  (enterDepth/exitDepth 히스테리시스가 이미 있지만 파도 위에서 반복될 수 있다).
+ *
+ * ── 정렬 순서 기준점 (2026-08-29) ─────────────────────────────────────────────
+ * 물(waterRoot)의 sortingOrder 가 2페이즈에서 화면 앞을 덮는 기준선이다. 이 값은 씬 값이라
+ * (Boss_Water 의 Water_start = 9) 코드 여기저기에 숫자로 박아 두면 씬에서 바꿨을 때 조용히 깨진다.
+ * 그래서 계산을 GetHighestWaterSortingOrder() 한 곳으로 모으고 두 경로가 함께 쓴다.
+ *   - KeepCombatantsVisibleAboveWater() : 씬에 미리 놓인 발판/플레이어 (BeginRise 시점 1회)
+ *   - GetSortingOrderAboveWater(offset) : 런타임 생성물이 물어보는 공개 API.
+ *     Water 가 눈(Water_eye)·폭풍·전기구슬을 생성한 직후 호출해 순서를 끌어올린다.
+ *     한 번 훑고 끝나는 KeepCombatantsVisibleAboveWater 로는 수위가 오른 뒤 생기는 것들을
+ *     잡을 수 없기 때문에 별도 경로가 필요하다.
  */

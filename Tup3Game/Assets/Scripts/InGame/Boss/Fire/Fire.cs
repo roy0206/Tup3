@@ -14,8 +14,12 @@ public class Fire : BossBase
     private GameObject player;
     private Animator animator;
     private SpriteRenderer spriteRenderer;
-    private Transform worldCanvas;
     private bool rushFacingRight;
+
+    [Header("몸통 접촉 피해")]
+    [SerializeField] private Collider2D contactDamageCollider;
+
+    private bool contactDamageActive;
 
     [Header("이동")]
     [SerializeField] private float returnSpeed = 3f;
@@ -91,7 +95,6 @@ public class Fire : BossBase
         animationController = GetComponent<AnimationController>();
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        worldCanvas = transform.Find("WorldCanvas");
         player = GameObject.FindGameObjectWithTag("Player");
     }
 
@@ -135,6 +138,7 @@ public class Fire : BossBase
 
     private TaskStatus Land(float waitTime)
     {
+        SetContactDamage(true);
         if (!isPatternSetup)
         {
             isPatternSetup = true;
@@ -173,6 +177,7 @@ public class Fire : BossBase
 
     private TaskStatus Rush(float waitTime, Vector2 pos, int lavaCount)
     {
+        SetContactDamage(true);
         if (!isPatternSetup)
         {
             isPatternSetup = true;
@@ -203,6 +208,7 @@ public class Fire : BossBase
     }
     private TaskStatus MoveHorizontal(float waitTime)
     {
+        SetContactDamage(false);
         if (!isPatternSetup)
         {
             isPatternSetup = true;
@@ -225,6 +231,7 @@ public class Fire : BossBase
     }
     private TaskStatus Pattern1(float waitTime)
     {
+        SetContactDamage(true);
         if (!isPatternSetup)
         {
             isPatternSetup = true;
@@ -273,6 +280,7 @@ public class Fire : BossBase
 
     private TaskStatus Freeze(float waitTime)
     {
+        SetContactDamage(false);
         if (!isPatternSetup)
         {
             isPatternSetup = true;
@@ -293,6 +301,7 @@ public class Fire : BossBase
     private Vector2 targetPosition;
     private TaskStatus Targeting(float waitTime)
     {
+        SetContactDamage(false);
         if (!isPatternSetup)
         {
             isPatternSetup = true;
@@ -324,6 +333,7 @@ public class Fire : BossBase
     
     private TaskStatus Return(float waitTime)
     {
+        SetContactDamage(false);
         /*Vector2 dir = (Vector2)transform.position - idlePosition;
         if (dir.magnitude <= 0.1f)
         {
@@ -350,6 +360,7 @@ public class Fire : BossBase
 
     private TaskStatus Idle(float waitTime)
     {
+        SetContactDamage(false);
         if (!isPatternSetup)
         {
             isPatternSetup = true;
@@ -394,6 +405,7 @@ public class Fire : BossBase
     private void OnDisable()
     {
         StopFloatPulse();
+        SetContactDamage(false);
     }
 
     
@@ -414,14 +426,21 @@ public class Fire : BossBase
 
     private void SetRushRotation(float angle)
     {
-        Vector3 canvasPosition = worldCanvas.position;
-        Quaternion canvasRotation = worldCanvas.rotation;
         transform.localRotation = Quaternion.Euler(0f, 0f, angle);
-        worldCanvas.SetPositionAndRotation(canvasPosition, canvasRotation);
+    }
+
+    private void SetContactDamage(bool active)
+    {
+        if (contactDamageActive == active) return;
+        contactDamageActive = active;
+
+        if (contactDamageCollider != null) contactDamageCollider.enabled = active;
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        if (!contactDamageActive) return;
+
         if (!other.TryGetComponent(out PlayerKnockBack knockBack))
         {
             if (other.TryGetComponent(out PlayerHealth _))

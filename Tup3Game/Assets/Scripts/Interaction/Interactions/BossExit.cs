@@ -63,7 +63,7 @@ public class BossExit : InteractionBase
     {
         revealed = false;
         SetVisualsEnabled(false);
-        InteractionManager.Current.Unregister(this);
+        if (InteractionManager.Current != null) InteractionManager.Current.Unregister(this);
     }
 
     private void Reveal()
@@ -72,7 +72,7 @@ public class BossExit : InteractionBase
 
         revealed = true;
         SetVisualsEnabled(true);
-        InteractionManager.Current.Register(this);
+        if (InteractionManager.Current != null) InteractionManager.Current.Register(this);
     }
 
     private void SetVisualsEnabled(bool value)

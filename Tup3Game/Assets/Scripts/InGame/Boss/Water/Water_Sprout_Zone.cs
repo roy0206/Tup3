@@ -85,6 +85,7 @@ public class Water_Sprout_Zone : MonoBehaviour
                 continue;
             }
 
+            RisingWaterPhase.LiftAboveWater(obj);
             sprout.SetTargetWidth(width);
             sprout.SetTargetLength(height);
             sprout.Launch(Vector2.up);

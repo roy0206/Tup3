@@ -33,8 +33,10 @@ public abstract class InteractionBase : MonoBehaviour
     
     protected virtual void Start()
     {
-        InteractionManager.Current.Register(this);
-        view = FindAnyObjectByType<InteractionView>();
+        if (InteractionManager.Current != null) InteractionManager.Current.Register(this);
+        else Debug.LogError($"[InteractionBase] 씬에 InteractionManager 가 없어 '{name}' 을(를) 등록하지 못했습니다", this);
+
+        view = FindAnyObjectByType<InteractionView>(FindObjectsInactive.Include);
     }
 
     private void Update()
@@ -54,7 +56,7 @@ public abstract class InteractionBase : MonoBehaviour
         }
 
         AudioManager.Instance.PlaySound(interactionSucceedSound);
-        if(interactOnce) InteractionManager.Current.Unregister(this);
+        if (interactOnce && InteractionManager.Current != null) InteractionManager.Current.Unregister(this);
         if(hideInteractionObjects) gameObject.GetComponent<SpriteRenderer>().enabled = false;
         return true;
     }

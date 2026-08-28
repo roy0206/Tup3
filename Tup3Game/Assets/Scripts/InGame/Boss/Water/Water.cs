@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering;
 using CleverCrow.Fluid.BTs.Tasks;
 using CleverCrow.Fluid.BTs.Trees;
 using System.Collections;
@@ -374,6 +375,15 @@ public class Water : BossBase
 
     private bool isPatternSetup;
 
+    /// <summary>
+    /// 2페이즈에서 수위가 올라오면 물(waterRoot)이 앞을 덮으므로,
+    /// 런타임에 생성한 연출물의 sortingOrder 를 물보다 위로 끌어올린다.
+    /// </summary>
+    private void LiftAboveWater(GameObject target, int offset = 1)
+    {
+        RisingWaterPhase.LiftAboveWater(target, offset);
+    }
+
     private Water_eye SpawnEye(
         int eyeIndex,
         float lifeTime,
@@ -408,6 +418,10 @@ public class Water : BossBase
                 : 1f;
 
             eye.Init(this, lifeTime, eyeScale, damageable, startClosed);
+
+            if (risingWaterPhase != null)
+                eye.SetMinimumSortingOrder(risingWaterPhase.GetSortingOrderAboveWater());
+
             activeEyes.RemoveAll(activeEye => activeEye == null);
             activeEyes.Add(eye);
         }
@@ -515,11 +529,12 @@ public class Water : BossBase
 
                 if (stormPrefab != null && stormSpawnPoint != null)
                 {
-                    Instantiate(
+                    Storm storm = Instantiate(
                         stormPrefab,
                         stormSpawnPoint.position,
                         stormSpawnPoint.rotation
                     );
+                    LiftAboveWater(storm.gameObject);
                 }
             }).SetLink(gameObject, LinkBehaviour.KillOnDestroy);
         }
@@ -594,11 +609,12 @@ public class Water : BossBase
             if (IsDead || currentPhase != BossPhase.Encroached)
                 yield break;
 
-            Instantiate(
+            Electric_ball electricBall = Instantiate(
                 electricBallPrefab,
                 electricBallSpawnPoint.position,
                 electricBallSpawnPoint.rotation
             );
+            LiftAboveWater(electricBall.gameObject);
 
             if (electricBallPrefab.ChargeDuration > 0f)
                 yield return new WaitForSeconds(electricBallPrefab.ChargeDuration);
@@ -671,4 +687,18 @@ public class Water : BossBase
  * 나머지 수보스 소리는 전부 소환물 쪽에 있다 :
  *   Water_Sprout(Water_Sprout.cs) / Water_IceBullet(Ice_Bullet.cs) / Water_Tornado(Storm.cs) /
  *   Water_Skill(Electric_ball.cs) / Water_Rising · Water_Splash(RisingWaterPhase.cs).
+ *
+ * ── 2페이즈 생성물이 물에 가리는 문제 (2026-08-29) ────────────────────────────
+ * 수위가 올라오면 물(Boss_Water 의 Water_start, sortingOrder 9)이 화면 앞을 덮는다.
+ * RisingWaterPhase.KeepCombatantsVisibleAboveWater() 는 BeginRise 시점에 한 번만 돌면서
+ * 씬에 미리 놓인 발판과 플레이어만 올려 주므로, 수위가 오른 뒤 Instantiate 되는 것들은 그대로 묻힌다.
+ * LiftAboveWater(go) 가 그 구멍을 메운다 — risingWaterPhase 에게 물의 실제 순서를 물어 +1 로 올린다.
+ * 적용 대상 :
+ *   - 눈(Water_eye)   : SpawnEye 안에서 eye.SetMinimumSortingOrder(...) 로 처리 (모든 패턴 공용)
+ *   - 폭풍(Storm)     : Pattern3_Storm — 2페이즈 전용 패턴
+ *   - 전기구슬        : SpawnElectricBalls — 2페이즈 전용 패턴. 프리팹 순서가 0 이라 특히 심했다.
+ * 패턴3·4 는 PatternStarter 의 `num >= 3` 가드 때문에 Encroached(2페이즈)에서만 도는 패턴이라
+ * 물에 가리면 패턴 자체가 보이지 않는 것과 같다.
+ * 얼음탄(IceBullet)은 프리팹 순서가 7 / 경로 6 으로 물(9)보다 낮지만 1·2페이즈 공용 패턴이고
+ * 별도 minimumPathSortingOrder 체계를 갖고 있어 이번 변경 범위에서 제외했다 — 별도 확인 필요.
  */

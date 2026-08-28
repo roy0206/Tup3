@@ -15,6 +15,7 @@ public class TitleMenuView : MonoBehaviour
     [Header("문구")]
     [SerializeField] private string newGameLabel = "게임 시작";
     [SerializeField] private string continueLabel = "이어하기";
+    [SerializeField] private string achievementsLabel = "도전과제";
     [SerializeField] private string optionsLabel = "옵션";
     [SerializeField] private string quitLabel = "게임 종료";
 
@@ -36,18 +37,21 @@ public class TitleMenuView : MonoBehaviour
     [SerializeField] private RectTransform itemsRoot;
     [SerializeField] private Button newGameItem;
     [SerializeField] private Button continueItem;
+    [SerializeField] private Button achievementsItem;
     [SerializeField] private Button optionsItem;
     [SerializeField] private Button quitItem;
 
     public const string ItemsRootName = "Items";
     public const string NewGameItemName = "NewGameItem";
     public const string ContinueItemName = "ContinueItem";
+    public const string AchievementsItemName = "AchievementsItem";
     public const string OptionsItemName = "OptionsItem";
     public const string QuitItemName = "QuitItem";
     public const string ItemLabelName = "Label";
 
     public event Action NewGameRequested;
     public event Action ContinueRequested;
+    public event Action AchievementsRequested;
     public event Action OptionsRequested;
     public event Action QuitRequested;
 
@@ -87,6 +91,7 @@ public class TitleMenuView : MonoBehaviour
         var chain = new List<Selectable>();
         AddNavigable(chain, newGameItem);
         AddNavigable(chain, continueItem);
+        AddNavigable(chain, achievementsItem);
         AddNavigable(chain, optionsItem);
         AddNavigable(chain, quitItem);
 
@@ -126,6 +131,8 @@ public class TitleMenuView : MonoBehaviour
 
         newGameItem = BuildItem(column, NewGameItemName, newGameLabel, () => NewGameRequested?.Invoke());
         continueItem = BuildItem(column, ContinueItemName, continueLabel, () => ContinueRequested?.Invoke());
+        achievementsItem = BuildItem(column, AchievementsItemName, achievementsLabel,
+            () => AchievementsRequested?.Invoke());
         optionsItem = BuildItem(column, OptionsItemName, optionsLabel, () => OptionsRequested?.Invoke());
         quitItem = BuildItem(column, QuitItemName, quitLabel, () => QuitRequested?.Invoke());
 
@@ -147,7 +154,46 @@ public class TitleMenuView : MonoBehaviour
         optionsItem = AdoptItem(optionsItem, OptionsItemName, () => OptionsRequested?.Invoke());
         quitItem = AdoptItem(quitItem, QuitItemName, () => QuitRequested?.Invoke());
 
+        achievementsItem = AdoptItem(achievementsItem, AchievementsItemName,
+            () => AchievementsRequested?.Invoke());
+        if (achievementsItem == null) achievementsItem = CloneAchievementsItem();
+
         return true;
+    }
+
+    private Button CloneAchievementsItem()
+    {
+        Button source = optionsItem != null ? optionsItem : (quitItem != null ? quitItem : newGameItem);
+        if (source == null) return null;
+
+        GameObject clone = Instantiate(source.gameObject, source.transform.parent);
+        clone.name = AchievementsItemName;
+        clone.SetActive(true);
+        clone.transform.SetSiblingIndex(source.transform.GetSiblingIndex());
+
+        var button = clone.GetComponent<Button>();
+        if (button == null)
+        {
+            Destroy(clone);
+            return null;
+        }
+
+        button.onClick = new Button.ButtonClickedEvent();
+        button.onClick.AddListener(() =>
+        {
+            if (!keyboardNavigation && EventSystem.current != null)
+                EventSystem.current.SetSelectedGameObject(null);
+            AchievementsRequested?.Invoke();
+        });
+
+        var label = clone.GetComponentInChildren<TextMeshProUGUI>(true);
+        if (label != null) label.text = achievementsLabel;
+
+        var highlighter = clone.GetComponent<TitleMenuItemHighlighter>();
+        if (highlighter == null) highlighter = clone.AddComponent<TitleMenuItemHighlighter>();
+        highlighter.Setup(label);
+
+        return button;
     }
 
     private Button AdoptItem(Button assigned, string name, Action callback)
@@ -257,7 +303,7 @@ public class TitleMenuView : MonoBehaviour
         if (!keyboardNavigation) return;
 
         UiFocus.AttachKeeper(
-            gameObject, sortingOrder, newGameItem, continueItem, optionsItem, quitItem);
+            gameObject, sortingOrder, newGameItem, continueItem, achievementsItem, optionsItem, quitItem);
     }
 }
 
@@ -344,4 +390,21 @@ public class TitleMenuView : MonoBehaviour
  * StartScene 의 Menu 상태는 씬에 배치된 TitleMenuView 를 먼저 찾고 없을 때만 코드로 만든다
  * (PauseManager 가 PauseMenuView 를 찾는 방식과 동일). 표준 배치본은
  * Assets/Prefabs/TitleMenu.prefab 이며 Tools / Tup3 / Build Title Menu 로 만들고 갱신한다.
+ *
+ * [도전과제 항목 — 배치본에 없으면 런타임 복제 (2026-08-29)]
+ * 항목이 4개에서 5개로 늘었다: 게임 시작 / 이어하기 / 도전과제 / 옵션 / 게임 종료.
+ * 그런데 Assets/Prefabs/TitleMenu.prefab 에는 AchievementsItem 오브젝트가 없다.
+ * 프리팹을 다시 굽지 않아도(= 유저가 Unity 에서 아무것도 하지 않아도) 항목이 나오도록,
+ * AdoptPlacedHierarchy 는 이름으로 찾는 데 실패하면 CloneAchievementsItem 으로
+ * OptionsItem 을 Instantiate 해 복제한다 — Ending.cs 가 ReturnButton 을 복제해
+ * CheckpointButton 을 만드는 것과 같은 관례다. 복제본은
+ *   · 폰트·색·크기·투명 Image·LayoutElement·하이라이터를 원본 그대로 물려받고(모양이 자동 일치)
+ *   · SetSiblingIndex 로 원본(옵션) 바로 위에 끼워 넣고
+ *   · onClick 을 새 ButtonClickedEvent 로 갈아끼워 원본의 연결을 물려받지 않으며
+ *     (Instantiate 는 런타임 AddListener 를 복사하지 않지만 명시적으로 한 번 더 비운다)
+ *   · 라벨 문구를 achievementsLabel 로, 하이라이터 대상을 복제본의 라벨로 다시 지정한다.
+ * 나중에 TitleMenuPrefabBuilder 를 고쳐 프리팹에 AchievementsItem 을 구워 두면
+ * AdoptItem 이 먼저 찾아내므로 복제는 자동으로 건너뛴다(둘이 겹쳐 보일 일이 없다).
+ * 코드 생성 폴백 경로(BuildColumn)에도 같은 순서로 항목을 추가해 두었다.
+ * 방향키 연결(ApplyNavigation)과 파수꾼(AttachKeeper) 목록에도 함께 들어간다.
  */

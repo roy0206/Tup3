@@ -5,6 +5,7 @@ public class FinalBossRoom : MonoBehaviour, ISceneEventListener
     [Header("참조")]
     [SerializeField] private DialogueManager DM;
     [SerializeField] private BossBase bossBehaviour;
+    [SerializeField] private BossHealthView healthView;
 
     [Header("대사")]
     [SerializeField] private string introDialogueFile = "S10_FINAL_BOSS";
@@ -15,16 +16,21 @@ public class FinalBossRoom : MonoBehaviour, ISceneEventListener
     [SerializeField] private float victoryDelay = 2f;
     [SerializeField] private float defeatDelay = 1.5f;
 
-    [Header("엔딩 분기 (willCoins 판독)")]
-    [SerializeField] private int trueEndingCoinCount = 4;
-    [SerializeField] private string victoryFullCoinEndingId = "Ending2";
-    [SerializeField] private string victorySomeCoinEndingId = "Ending3";
-    [SerializeField] private string victoryNoCoinEndingId = "Ending4";
-    [SerializeField] private string defeatEndingId = "Ending1";
+    [Header("엔딩 분기 (성불 횟수 판독)")]
+    [SerializeField] private int totalBossCount = 4;
+    [SerializeField] private string saengNoneEndingId = "Ending2";
+    [SerializeField] private string saengSomeEndingId = "Ending3";
+    [SerializeField] private string saengAllEndingId = "Ending4";
 
     [Header("패배 연출")]
     [SerializeField] private DefeatCutscene defeatCutscene;
     [SerializeField] private float defeatCutsceneTimeout = 20f;
+
+    [Header("패배 복귀 (다른 보스방과 동일)")]
+    [SerializeField] private GameOverView gameOverView;
+    [SerializeField] private string defeatReturnScene = "Lobby";
+    [SerializeField] private string titleSceneName = "Start";
+    [SerializeField] private bool restoreHealthOnDefeat = true;
 
     [Header("옵션")]
     [SerializeField] private bool allowManualAdvance = true;
@@ -41,6 +47,8 @@ public class FinalBossRoom : MonoBehaviour, ISceneEventListener
     private bool endingResolved;
     private bool defeatCutsceneDone;
     private bool pauseBlocked;
+    private bool gameOverSubscribed;
+    private bool leavingRoom;
 
     public RoomState CurrentRoomState { get; private set; } = RoomState.None;
     public BattleOutcome Outcome { get; private set; } = BattleOutcome.None;
@@ -84,6 +92,7 @@ public class FinalBossRoom : MonoBehaviour, ISceneEventListener
         if (DM == null) DM = DialogueManager.Current;
         if (bossBehaviour == null) bossBehaviour = FindObjectOfType<BossBase>();
         if (defeatCutscene == null) defeatCutscene = FindObjectOfType<DefeatCutscene>(true);
+        if (healthView == null) healthView = FindObjectOfType<BossHealthView>(true);
     }
 
     private void Subscribe()
@@ -140,6 +149,7 @@ public class FinalBossRoom : MonoBehaviour, ISceneEventListener
             case RoomState.Battle:
                 SetBossActive(true);
                 SetPlayerCombatEnabled(true);
+                if (healthView != null) healthView.PlayIntro();
                 Debug.Log("[FinalBossRoom] 최종보스전 시작");
                 break;
 
@@ -151,6 +161,10 @@ public class FinalBossRoom : MonoBehaviour, ISceneEventListener
 
             case RoomState.DefeatCutscene:
                 StartDefeatCutscene();
+                break;
+
+            case RoomState.GameOver:
+                ShowGameOver();
                 break;
         }
     }
@@ -187,6 +201,9 @@ public class FinalBossRoom : MonoBehaviour, ISceneEventListener
             case RoomState.DefeatCutscene:
                 TickDefeatCutscene();
                 break;
+
+            case RoomState.GameOver:
+                break;
         }
     }
 
@@ -215,7 +232,7 @@ public class FinalBossRoom : MonoBehaviour, ISceneEventListener
     {
         if (defeatCutsceneDone)
         {
-            ResolveEnding();
+            ChangeState(RoomState.GameOver);
             return;
         }
 
@@ -224,8 +241,64 @@ public class FinalBossRoom : MonoBehaviour, ISceneEventListener
         stateTimer -= Time.deltaTime;
         if (stateTimer > 0f) return;
 
-        Debug.LogWarning($"[FinalBossRoom] 패배 컷씬이 {defeatCutsceneTimeout}초 안에 완료 콜백을 호출하지 않아 엔딩으로 넘어갑니다");
-        ResolveEnding();
+        Debug.LogWarning($"[FinalBossRoom] 패배 컷씬이 {defeatCutsceneTimeout}초 안에 완료 콜백을 호출하지 않아 게임오버로 넘어갑니다");
+        ChangeState(RoomState.GameOver);
+    }
+
+    private void ShowGameOver()
+    {
+        EnsureGameOverView();
+
+        if (gameOverView == null)
+        {
+            Debug.LogError("[FinalBossRoom] GameOverView 를 준비하지 못해 곧바로 복귀합니다");
+            ReturnToLobby();
+            return;
+        }
+
+        gameOverView.Show();
+    }
+
+    private void EnsureGameOverView()
+    {
+        if (gameOverView == null) gameOverView = FindObjectOfType<GameOverView>(true);
+
+        if (gameOverView == null)
+        {
+            var go = new GameObject("GameOverView");
+            go.transform.SetParent(transform, false);
+            gameOverView = go.AddComponent<GameOverView>();
+        }
+
+        if (gameOverSubscribed) return;
+        gameOverSubscribed = true;
+
+        gameOverView.ContinueRequested += ReturnToLobby;
+        gameOverView.TitleRequested += ReturnToTitle;
+    }
+
+    private void ReturnToLobby()
+    {
+        LeaveRoom(defeatReturnScene);
+    }
+
+    private void ReturnToTitle()
+    {
+        LeaveRoom(titleSceneName);
+    }
+
+    private void LeaveRoom(string sceneName)
+    {
+        if (leavingRoom) return;
+        leavingRoom = true;
+
+        if (gameOverView != null) gameOverView.Hide();
+        SetPauseBlocked(false);
+
+        if (restoreHealthOnDefeat && playerHealth != null)
+            playerHealth.SetHealth(playerHealth.MaxHealth);
+
+        SceneController.Instance.LoadScene(sceneName);
     }
 
     private void StopDefeatCutscene()
@@ -314,20 +387,17 @@ public class FinalBossRoom : MonoBehaviour, ISceneEventListener
         SetPauseBlocked(false);
 
         var data = UserDataManager.Instance.Data;
-        int coins = data != null && data.Play != null ? data.Play.willCoins : 0;
+        int saengCount = data != null && data.Play != null ? data.Play.willCoins : 0;
 
-        string endingId = defeatEndingId;
-        if (Outcome == BattleOutcome.Victory)
-        {
-            if (coins >= trueEndingCoinCount) endingId = victoryFullCoinEndingId;
-            else if (coins > 0) endingId = victorySomeCoinEndingId;
-            else endingId = victoryNoCoinEndingId;
-        }
+        string endingId;
+        if (saengCount <= 0) endingId = saengNoneEndingId;
+        else if (saengCount >= Mathf.Max(1, totalBossCount)) endingId = saengAllEndingId;
+        else endingId = saengSomeEndingId;
 
         if (data != null && data.Play != null) data.Play.endingId = endingId;
         UserDataManager.Instance.SaveAsync();
 
-        Debug.Log($"[FinalBossRoom] {Outcome} / 의지 코인 {coins}개 → 엔딩 씬 '{endingId}' 로드");
+        Debug.Log($"[FinalBossRoom] 승리 / 성불 {saengCount}회 → 엔딩 씬 '{endingId}' 로드");
         SceneController.Instance.LoadScene(endingId);
     }
 
@@ -368,17 +438,18 @@ public class FinalBossRoom : MonoBehaviour, ISceneEventListener
  *                  화면 페이드는 컷씬이 아니라 SceneController 의 씬 전환 효과가 담당한다.
  *
  * ── 결과 처리 (승리 선택지·보상·재도전 없음, 즉시 엔딩 분기) ──────────────────
- *   PlayData.willCoins 판독:
- *     승리 & 코인 >= trueEndingCoinCount(4) → victoryFullCoinEndingId ("Ending2", S12 트루)
- *     승리 & 코인 1~3                       → victorySomeCoinEndingId ("Ending3")
- *     승리 & 코인 0                         → victoryNoCoinEndingId  ("Ending4")
- *     패배                                  → defeatEndingId          ("Ending1", S11 배드)
- *   기획 확정값은 "코인==4 → 트루"지만 생(生) 승리 누적으로 4를 넘길 수 있어 >= 로 판정한다.
- *   endingId 세팅 + SaveAsync 후 endingId 와 같은 이름의 엔딩 전용 씬("Ending1"~"Ending4",
- *   EndingSceneBuilder 가 생성/등록)을 직접 로드한다 — 엔딩 id = 씬 이름 = SceneSO 이름 계약.
- *   endingId 저장은 유지한다(엔딩 씬의 구성 일치 검사 + 통계용).
- *   승패 어느 쪽도 willCoins 를 변경하지 않고, clearedBosses 도 기록하지 않는다.
- *   ※ 씬에 저장된 구 endingSceneName("Ending") 필드는 코드에서 제거됨 — 단일 Ending 씬은 폐기 예정.
+ *   PlayData.willCoins 판독 (willCoins == 성불 횟수):
+ *     코인 0      → saengNoneEndingId ("Ending2", 성불 0회 / 약한 의지)
+ *     코인 1~3    → saengSomeEndingId ("Ending3", 성불 1~3회 / 보통 의지)
+ *     코인 4 이상 → saengAllEndingId  ("Ending4", 성불 4회 / 강한 의지)
+ *
+ *   코인이 곧 성불 횟수인 근거 : 시작값 4(UserData.PlayData.willCoins) 에서 극(剋) 승리마다
+ *   geukWillCoinCost(1) 만큼 빠지고 생(生) 승리는 증감이 없다. Styx 입장이 clearedBosses == 15
+ *   (4보스 전부 클리어)로 막혀 있으므로 성불 + 극 = 4 가 항상 성립하고,
+ *   따라서 남은 코인 = 4 - 극 = 성불 횟수다.
+ *   예전에는 생 승리가 +5 를 줘서 코인이 0/6/12/18/24 로만 튀었고, 그 탓에 옛 임계값의
+ *   1~3 구간에 걸리는 경우가 없어 Ending3 이 도달 불가능했다. BossRoom 에서 그 지급을 없앴다.
+ *   보스 씬에 남아 있는 saengWillCoinReward: 5 직렬화 값은 필드가 사라져 무시된다.
  *
  * ── 대체 관계 ────────────────────────────────────────────────────────────────
  *   기존 StyxRoom(빈 껍데기)을 이 컴포넌트가 대체한다 — 씬에서 StyxRoom 을 제거하고 이걸 배치할 것.

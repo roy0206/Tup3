@@ -27,7 +27,7 @@ public class Water_eye : MonoBehaviour
     public Color hitFlashColor = Color.red;
 
     [Header("렌더링 순서")]
-    [SerializeField] private int minimumSortingOrder = 5;
+    [SerializeField] private int minimumSortingOrder = 10;
 
     [Header("눈 파괴 시 보스에게 입히는 피해량")]
     [SerializeField, FormerlySerializedAs("Damge_to_boss")]
@@ -175,6 +175,19 @@ public class Water_eye : MonoBehaviour
         Eye_animation.SetBool(CanAttackEyeHash, true);
     }
 
+    /// <summary>
+    /// 수위 상승(2페이즈) 중에도 물에 가려지지 않도록 최소 정렬 순서를 올린다.
+    /// Water 가 생성 직후 RisingWaterPhase 에서 읽은 값으로 호출한다.
+    /// </summary>
+    public void SetMinimumSortingOrder(int order)
+    {
+        if (order <= minimumSortingOrder)
+            return;
+
+        minimumSortingOrder = order;
+        ApplySortingOrder();
+    }
+
     private void ApplySortingOrder()
     {
         foreach (SpriteRenderer renderer in GetComponentsInChildren<SpriteRenderer>(true))
@@ -230,3 +243,20 @@ public class Water_eye : MonoBehaviour
         minimumSortingOrder = Mathf.Max(1, minimumSortingOrder);
     }
 }
+
+/* [파일 노트]
+ * ── 2페이즈에서 눈이 안 보이던 문제 (2026-08-29) ──────────────────────────────
+ * minimumSortingOrder 가 5 였는데 Boss_Water 씬의 물(Water_start)이 sortingOrder 9 라
+ * 수위가 올라오는 2페이즈에서 눈이 물 뒤로 들어가 통째로 가려졌다. 1페이즈에는 waterRoot 가
+ * 비활성이라 멀쩡히 보였기 때문에 눈에 안 띄던 버그다.
+ * 같은 씬의 Water_Sprout / WaterPump 는 이미 10 을 쓰고 있었다 — 눈만 빠져 있었다.
+ *
+ * 두 겹으로 막았다.
+ *   1) 기본값을 5 → 10 으로 올려 risingWaterPhase 연결이 없어도 물 위로 온다.
+ *   2) Water.SpawnEye 가 생성 직후 SetMinimumSortingOrder(risingWaterPhase.GetSortingOrderAboveWater())
+ *      로 실제 물의 순서 + 1 을 밀어 넣는다. 씬에서 물의 sortingOrder 를 바꿔도 따라간다.
+ * SetMinimumSortingOrder 는 현재 값보다 높을 때만 올린다(내리지 않는다).
+ *
+ * 프리팹(Water_eye_1)에는 minimumSortingOrder 키가 직렬화돼 있지 않아 C# 기본값이 그대로 적용된다.
+ * 즉 프리팹을 고치지 않아도 이 변경이 먹는다.
+ */

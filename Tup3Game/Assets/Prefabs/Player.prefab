@@ -5145,10 +5145,38 @@ MonoBehaviour:
   skill_4_cool: 10
   skill_4_duration: 5
   isSkillEquiped: 00000000
-  barrierEffectSprites: []
-  healEffectSprites: []
-  attackSpeedEffectSprites: []
-  attackUpEffectSprites: []
+  barrierEffectSprites:
+  - {fileID: 21300000, guid: 26f3939ec20c2444194dcb826f559572, type: 3}
+  - {fileID: 21300000, guid: 215ecdd347fe5834a96d7154b94a05b8, type: 3}
+  - {fileID: 21300000, guid: fa1928fefecc61244bcc5759391a8921, type: 3}
+  - {fileID: 21300000, guid: 52f193939ebe2924ba34fe1bc3d05d4c, type: 3}
+  healEffectSprites:
+  - {fileID: 21300000, guid: 8a941eefe0a72e64d908e94ea8c49529, type: 3}
+  - {fileID: 21300000, guid: bea62d6e61da8c94d808afd4494b5d9b, type: 3}
+  - {fileID: 21300000, guid: b96dbd646c819334ea2b830befffb0a4, type: 3}
+  - {fileID: 21300000, guid: e2a70c5dcb5ffaf49b4d5a34df593e52, type: 3}
+  attackSpeedEffectSprites:
+  - {fileID: 21300000, guid: 1d47636bdf7f4df4b812a33bcf33792a, type: 3}
+  - {fileID: 21300000, guid: 2f35b2b5f3e274e4a9aceb20e78a7996, type: 3}
+  - {fileID: 21300000, guid: c2cec614c18561a40ac1e083a01b08c3, type: 3}
+  - {fileID: 21300000, guid: c3cb5a3fcf51e924db2fe1f3db0aa48f, type: 3}
+  - {fileID: 21300000, guid: 979066f3f23590945921dd942916535d, type: 3}
+  attackUpEffectSprites:
+  - {fileID: 3693481443840674367, guid: 17552c186d9570d47b58784fa71180ac, type: 3}
+  - {fileID: 6089938863183634414, guid: 17552c186d9570d47b58784fa71180ac, type: 3}
+  - {fileID: -5001269540682270139, guid: 17552c186d9570d47b58784fa71180ac, type: 3}
+  - {fileID: -5030503411882623264, guid: 17552c186d9570d47b58784fa71180ac, type: 3}
+  - {fileID: -2434426277870749779, guid: 17552c186d9570d47b58784fa71180ac, type: 3}
+  - {fileID: -1391208907647420949, guid: 17552c186d9570d47b58784fa71180ac, type: 3}
+  - {fileID: 7065184326920217099, guid: 17552c186d9570d47b58784fa71180ac, type: 3}
+  - {fileID: 4631066046229678954, guid: 17552c186d9570d47b58784fa71180ac, type: 3}
+  - {fileID: -4187081270024719033, guid: 17552c186d9570d47b58784fa71180ac, type: 3}
+  - {fileID: -4382247799195180692, guid: 17552c186d9570d47b58784fa71180ac, type: 3}
+  - {fileID: -8836194086743612974, guid: 17552c186d9570d47b58784fa71180ac, type: 3}
+  - {fileID: 3627694840256299788, guid: 17552c186d9570d47b58784fa71180ac, type: 3}
+  - {fileID: 1819161008542646880, guid: 17552c186d9570d47b58784fa71180ac, type: 3}
+  - {fileID: -8724628805179971932, guid: 17552c186d9570d47b58784fa71180ac, type: 3}
+  - {fileID: 7563837465924604944, guid: 17552c186d9570d47b58784fa71180ac, type: 3}
   backgroundEffectFrameRate: 12
   backgroundEffectOffset: {x: 0, y: 0.2}
   backgroundEffectScale: 1.4

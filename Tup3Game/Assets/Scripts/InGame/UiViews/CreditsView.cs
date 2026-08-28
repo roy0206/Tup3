@@ -15,6 +15,11 @@ public class CreditsView : MonoBehaviour
     [SerializeField] private Color textColor = new Color(0.9f, 0.9f, 0.9f, 1f);
     [SerializeField] private Color hintColor = new Color(1f, 1f, 1f, 0.35f);
 
+    [Header("밝은 배경 모드 (엔딩4 처럼 화면이 하얀 연출)")]
+    [SerializeField] private Color lightBackColor = new Color(1f, 1f, 1f, 0.92f);
+    [SerializeField] private Color lightTextColor = new Color(0.08f, 0.08f, 0.08f, 1f);
+    [SerializeField] private Color lightHintColor = new Color(0f, 0f, 0f, 0.45f);
+
     [Header("스크롤")]
     [SerializeField] private float scrollSpeed = 90f;
     [SerializeField] private float fastMultiplier = 8f;
@@ -40,16 +45,32 @@ public class CreditsView : MonoBehaviour
     private RectTransform canvasRect;
     private RectTransform contentRect;
     private TextMeshProUGUI contentLabel;
+    private Image dimImage;
+    private TextMeshProUGUI hintLabel;
     private Action onFinished;
     private float contentHeight;
     private float holdTimer;
     private bool built;
     private bool playing;
+    private bool lightBackground;
+
+    private Color ActiveBackColor => lightBackground ? lightBackColor : backColor;
+    private Color ActiveTextColor => lightBackground ? lightTextColor : textColor;
+    private Color ActiveHintColor => lightBackground ? lightHintColor : hintColor;
 
     public void SetScrollSpeed(float speed, float fastMult)
     {
         if (speed > 0f) scrollSpeed = speed;
         if (fastMult >= 1f) fastMultiplier = fastMult;
+    }
+
+    public void SetLightBackground(bool enabled)
+    {
+        lightBackground = enabled;
+
+        if (dimImage != null) dimImage.color = ActiveBackColor;
+        if (contentLabel != null) contentLabel.color = ActiveTextColor;
+        if (hintLabel != null) hintLabel.color = ActiveHintColor;
     }
 
     public void Play(string personalContent, Action finishedCallback)
@@ -142,8 +163,8 @@ public class CreditsView : MonoBehaviour
         UiViewBuilder.SetupOverlayCanvas(gameObject, sortingOrder);
         canvasRect = (RectTransform)transform;
 
-        Image dim = UiViewBuilder.BuildDim(transform, backColor);
-        dim.raycastTarget = false;
+        dimImage = UiViewBuilder.BuildDim(transform, ActiveBackColor);
+        dimImage.raycastTarget = false;
 
         var contentGo = new GameObject("Content", typeof(RectTransform));
         contentRect = (RectTransform)contentGo.transform;
@@ -157,15 +178,15 @@ public class CreditsView : MonoBehaviour
         contentLabel = contentGo.AddComponent<TextMeshProUGUI>();
         if (fontAsset != null) contentLabel.font = fontAsset;
         contentLabel.fontSize = fontSize;
-        contentLabel.color = textColor;
+        contentLabel.color = ActiveTextColor;
         contentLabel.alignment = TextAlignmentOptions.Top;
         contentLabel.textWrappingMode = TextWrappingModes.Normal;
         contentLabel.raycastTarget = false;
         contentLabel.text = string.Empty;
 
-        var hint = UiViewBuilder.BuildLabel(transform, "Hint", HintMessage, fontAsset, 22f, hintColor);
-        hint.alignment = TextAlignmentOptions.BottomRight;
-        var hintRect = (RectTransform)hint.transform;
+        hintLabel = UiViewBuilder.BuildLabel(transform, "Hint", HintMessage, fontAsset, 22f, ActiveHintColor);
+        hintLabel.alignment = TextAlignmentOptions.BottomRight;
+        var hintRect = (RectTransform)hintLabel.transform;
         hintRect.anchorMin = new Vector2(1f, 0f);
         hintRect.anchorMax = new Vector2(1f, 0f);
         hintRect.pivot = new Vector2(1f, 0f);
@@ -211,4 +232,11 @@ public class CreditsView : MonoBehaviour
  *   전부 SerializeField 라 씬에 미리 배치해 꾸밀 수도 있고, Ending.cs 가 SetScrollSpeed 로
  *   속도/배속만 주입할 수도 있다. sortingOrder 800 은 DialogueUI(10)보다 위,
  *   PauseMenuView(900)보다 아래.
+ *
+ * ── 밝은 배경 모드 (SetLightBackground) ──────────────────────────────────────
+ *   엔딩4 처럼 화면 전체가 하얀 연출에서는 기존의 "검정 92% 막 + 밝은 회색 글씨"가
+ *   하얀 화면 한가운데 시커먼 판을 깔아 버린다. Ending.cs 가 이 함수를 켜면
+ *   막/본문/힌트 색이 각각 lightBackColor / lightTextColor / lightHintColor 로 바뀐다.
+ *   EnsureBuilt 전에 불러도(색 필드만 바뀜) 후에 불러도(이미 만들어진 그래픽까지 갱신) 동작하며,
+ *   Ending.cs 는 CreditsView 를 즉석 생성하는 경로가 있어 Play 직전에 한 번 더 호출한다.
  */

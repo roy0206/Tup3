@@ -487,108 +487,6 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!1 &1826095630729858487
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 6927753899349016617}
-  - component: {fileID: 5996238702561288944}
-  - component: {fileID: 6692390549055726018}
-  - component: {fileID: 8839938286300602958}
-  m_Layer: 0
-  m_Name: WorldCanvas
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &6927753899349016617
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1826095630729858487}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 8631684435463600935}
-  m_Father: {fileID: 4693074106360104828}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 10, y: 10}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!223 &5996238702561288944
-Canvas:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1826095630729858487}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_RenderMode: 2
-  m_Camera: {fileID: 0}
-  m_PlaneDistance: 100
-  m_PixelPerfect: 0
-  m_ReceivesEvents: 1
-  m_OverrideSorting: 0
-  m_OverridePixelPerfect: 0
-  m_SortingBucketNormalizedSize: 0
-  m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 0
-  m_UpdateRectTransformForStandalone: 0
-  m_SortingLayerID: 0
-  m_SortingOrder: 100
-  m_TargetDisplay: 0
---- !u!114 &6692390549055726018
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1826095630729858487}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
-  m_UiScaleMode: 0
-  m_ReferencePixelsPerUnit: 100
-  m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
-  m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
-  m_PhysicalUnit: 3
-  m_FallbackScreenDPI: 96
-  m_DefaultSpriteDPI: 96
-  m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
---- !u!114 &8839938286300602958
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1826095630729858487}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GraphicRaycaster
-  m_IgnoreReversedGraphics: 1
-  m_BlockingObjects: 0
-  m_BlockingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
 --- !u!1 &2158238344831696689
 GameObject:
   m_ObjectHideFlags: 0
@@ -1080,7 +978,6 @@ Transform:
   - {fileID: 2553905985325669525}
   - {fileID: 8002391524493450959}
   - {fileID: 4542850696404533328}
-  - {fileID: 6927753899349016617}
   - {fileID: 6974856875012770412}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1364,12 +1261,21 @@ MonoBehaviour:
   boxColliders:
   - {fileID: 8940346401425348526}
   maxHp: 300
+  enableHitFlash: 1
+  hitFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  hitFlashDuration: 0.12
+  hitSoundName: 
+  deathSoundName: 
+  hitSoundVolume: 1
+  hitSoundMinInterval: 0.08
+  deathSoundVolume: 1
   moveSpeed: 3
   gravity: -40
   groundMask:
     serializedVersion: 2
     m_Bits: 64
   groundCheckDistance: 0.1
+  groundProbeDistance: 40
   approachStopRange: 3
   animator: {fileID: 6507843439492397937}
   spriteRenderer: {fileID: 3549863626624594959}
@@ -1382,8 +1288,9 @@ MonoBehaviour:
   counterDamage: 20
   counterKnockBackForce: 0.5
   counterHitRange: 999
+  hitFollowsAttackAnimation: 1
+  counterHitNormalizedTime: 0.4
   counterParryStart: 0
-  counterParryEnd: 0.18
   counterParryRange: 4
   soilWaveCooldown: 8
   soilWaveRange: 100
@@ -1391,10 +1298,27 @@ MonoBehaviour:
   soilWaveSpawnDelay: 0.7
   soilWavePoolKey: SoilWave
   soilWaveSpawnOffset: {x: 1.5, y: 0}
-  enableAbsorption: 0
-  absorptionCooldown: 20
-  absorptionRange: 100
-  absorptionDuration: 3
+  soilMeleeStart: 0.6
+  soilMeleeEnd: 0.9
+  soilMeleeDamage: 50
+  soilMeleeKnockBackForce: 0
+  soilMeleeOffset: {x: 4.39, y: 2.2}
+  soilMeleeSize: {x: 2, y: 4}
+  enableWaterSprout: 1
+  waterSproutCooldown: 12
+  waterSproutRange: 100
+  waterSproutDuration: 3
+  waterSproutCount: 5
+  waterSproutSpawnInterval: 0.25
+  waterSproutSortingOrder: 1
+  waterSproutShowPathPreview: 0
+  waterSproutShowHitboxGizmo: 0
+  waterSproutSpacing: 2
+  waterSproutWarnTime: 1
+  waterSproutDamage: 10
+  waterSproutHeight: 5
+  waterSproutWidth: 1
+  waterSproutPoolKey: Water_Pump
   flyingSwordCooldown: 60
   flyingSwordRange: 100
   flyingSwordCastTime: 8
@@ -1403,6 +1327,7 @@ MonoBehaviour:
   flyingSwordPoolKey: FlyingSword
   flyingSwordLifeTime: 10
   swordReflectHitCount: 5
+  reflectedSwordDamage: 10
   fireRushCooldown: 15
   fireRushRange: 100
   fireRushWindup: 0.5
@@ -1413,6 +1338,41 @@ MonoBehaviour:
   fireRushHitWidth: 1.5
   fireRushHitHeight: 2
   fireRushRecoverTime: 1
+  fireRushLavaCount: 8
+  fireRushLavaSpreadX: 7
+  fireRushLavaFlightTime: {x: 2, y: 3}
+  fireRushLavaGroundRetries: 6
+  fireRushLavaWallMask:
+    serializedVersion: 2
+    m_Bits: 1024
+  fireRushLavaWallMargin: 0.5
+  fireRushLavaPoolKey: Lava
+  fireRushLavaLifeTime: 5
+  lavaHardenTime: 3
+  lavaHardenedColor: {r: 0, g: 0, b: 0, a: 1}
+  lavaHardenedMaxCount: 60
+  enablePlayerCombo: 1
+  playerComboCooldown: 20
+  playerComboRange: 100
+  playerComboApproachRange: 2
+  playerComboApproachSpeed: 8
+  playerComboApproachTimeout: 3
+  playerComboDamage1: 10
+  playerComboDamage2: 15
+  playerComboDamage3: 20
+  playerComboKnockBackForce: 0.5
+  playerComboRecoverTime: 0.5
+  playerComboHitNormalizedTime: 0.4
+  playerComboParryable: 1
+  playerComboParryRange: 999
+  playerComboCopyPlayerProfile: 1
+  playerComboLungeScale: 1
+  playerComboFallbackAttackSpeed: 1.5
+  playerComboFallbackDurations: {x: 0.278, y: 0.278, z: 0.278}
+  playerComboFallbackGap: 0.2
+  playerComboFallbackCharge: 0.2
+  playerComboFallbackHitboxSize: {x: 5, y: 2}
+  playerComboFallbackHitboxOffset: {x: 0.18, y: -0.14}
   iaiDamage: 45
   iaiCooldown: 30
   iaiRange: 999
@@ -1429,10 +1389,11 @@ MonoBehaviour:
   iaiSlashPoolKey: Pattern4Slash
   iaiSlashLifeTime: 0.8
   soilWaveStartDelay: 3
-  absorptionStartDelay: 10
+  waterSproutStartDelay: 10
   flyingSwordStartDelay: 12
   fireRushStartDelay: 6
   iaiStartDelay: 30
+  playerComboStartDelay: 20
   phantomLeadTime: 1
   phantomAlpha: 0.5
   phantomOffset: {x: 0, y: 0}
@@ -1442,6 +1403,23 @@ MonoBehaviour:
   soilPhantom: {fileID: 965875730265496472}
   waterPhantom: {fileID: 2382184803515229062}
   firePhantom: {fileID: 6735783301924809496}
+  enableSwordEffect: 1
+  swordEffectDuration: 0.28
+  swordEffectScaleMultiplier: 1
+  forceLocomotionState: 1
+  runStateName: Move_2
+  idleStateName: Idle
+  enableStandPlatform: 1
+  standPlatformFollowsHurtbox: 1
+  standPlatformSize: {x: 0.875, y: 0.953125}
+  standPlatformOffset: {x: 0, y: 0}
+  standPlatformLayer: -1
+  hurtboxLayer: -1
+  swingSoundVolume: 1
+  dashSoundVolume: 0.8
+  parrySoundVolume: 1
+  soilWaveSoundVolume: 1
+  fireRushSoundVolume: 1
   normalHurtbox: {fileID: 8940346401425348526}
   soilHurtbox: {fileID: 9178770567938044125}
   waterHurtbox: {fileID: 2869078215917923100}
@@ -1757,81 +1735,6 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!1 &5708086713215968902
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 7710603740846534157}
-  - component: {fileID: 441873133496694354}
-  - component: {fileID: 8229226329865017650}
-  m_Layer: 0
-  m_Name: Red
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &7710603740846534157
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5708086713215968902}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 8631684435463600935}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!222 &441873133496694354
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5708086713215968902}
-  m_CullTransparentMesh: 1
---- !u!114 &8229226329865017650
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5708086713215968902}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: -8722196975301495718, guid: e1a07fe9b17c0ce48847131f88a041a7, type: 3}
-  m_Type: 3
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 0
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &5953336551084456830
 GameObject:
   m_ObjectHideFlags: 0
@@ -1923,97 +1826,6 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
---- !u!1 &5963526521243624365
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 8631684435463600935}
-  - component: {fileID: 3028874983941694119}
-  - component: {fileID: 3900794367096318063}
-  - component: {fileID: 3438391688271113230}
-  m_Layer: 0
-  m_Name: Health
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &8631684435463600935
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5963526521243624365}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 7710603740846534157}
-  m_Father: {fileID: 6927753899349016617}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 2.6}
-  m_SizeDelta: {x: 4.8, y: 0.8}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!222 &3028874983941694119
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5963526521243624365}
-  m_CullTransparentMesh: 1
---- !u!114 &3900794367096318063
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5963526521243624365}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
-  m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.6}
-  m_RaycastTarget: 0
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!114 &3438391688271113230
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5963526521243624365}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1b905c650b11400aa9377275ab1fef0a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HealthView
-  linkedText: {fileID: 0}
-  healthSubject: {fileID: 4187684186339194275}
 --- !u!1 &6735783301924809496
 GameObject:
   m_ObjectHideFlags: 0

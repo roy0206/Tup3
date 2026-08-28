@@ -5,6 +5,8 @@ public static class CsvParser
 {
     public static List<List<string>> Parse(string text)
     {
+        if (!string.IsNullOrEmpty(text) && text[0] == (char)0xFEFF) text = text.Substring(1);
+
         var rows = new List<List<string>>();
         var currentRow = new List<string>();
         var field = new StringBuilder();

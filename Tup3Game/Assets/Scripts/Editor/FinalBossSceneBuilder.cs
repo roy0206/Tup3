@@ -210,11 +210,8 @@ public static class FinalBossSceneBuilder
         }
         if (normalCol == null) normalCol = boss.GetComponent<BoxCollider2D>();
 
-        var canvas = boss.GetComponentInChildren<Canvas>(true);
-        if (canvas != null) canvas.worldCamera = FindMainCamera(scene);
-
         SnapBossAboveGround(scene, boss, normalCol, placedNow);
-        report.Add("씬 인스턴스 오버라이드 적용 (groundMask/체력바 카메라/바닥 스냅)");
+        report.Add("씬 인스턴스 오버라이드 적용 (groundMask/바닥 스냅)");
     }
 
     private static GameObject BuildFinalBossInScene(Scene scene)
@@ -337,7 +334,7 @@ public static class FinalBossSceneBuilder
         SetObjectReference(so, "iaiFlashEffect", flashEffect);
         so.ApplyModifiedPropertiesWithoutUndo();
 
-        BuildBossHealthBar(boss, worldCamera);
+        RemoveLegacyBossHealthBar(boss);
 
         report.Add("FinalBoss 컴포넌트 배선 완료 (maxHp 300, 히트박스 4종/환영 3종/거합 연출 — groundMask 는 씬 오버라이드)");
         return normalCol;
@@ -722,72 +719,13 @@ public static class FinalBossSceneBuilder
         return flash;
     }
 
-    private static void BuildBossHealthBar(GameObject boss, Camera worldCamera)
+    private static void RemoveLegacyBossHealthBar(GameObject boss)
     {
-        bool created;
-        GameObject canvasGo = EnsureChild(boss, "WorldCanvas", out created);
-        var canvasRect = EnsureRectTransform(canvasGo);
-        var canvas = EnsureComponent<Canvas>(canvasGo);
-        EnsureComponent<CanvasScaler>(canvasGo);
-        EnsureComponent<GraphicRaycaster>(canvasGo);
+        Transform legacy = boss.transform.Find("WorldCanvas");
+        if (legacy == null) return;
 
-        canvas.renderMode = RenderMode.WorldSpace;
-        canvas.sortingOrder = 100;
-        canvas.worldCamera = worldCamera;
-        canvasRect.sizeDelta = new Vector2(10f, 10f);
-
-        if (created)
-        {
-            canvasGo.transform.localPosition = Vector3.zero;
-            NeutralizeParentScale(canvasGo.transform, Vector3.one);
-        }
-
-        bool healthCreated;
-        GameObject healthGo = EnsureChild(canvasGo, "Health", out healthCreated);
-        var healthRect = EnsureRectTransform(healthGo);
-        var bg = EnsureComponent<Image>(healthGo);
-        bg.color = new Color(0f, 0f, 0f, 0.6f);
-        bg.raycastTarget = false;
-        if (healthCreated)
-        {
-            healthRect.anchorMin = new Vector2(0.5f, 0.5f);
-            healthRect.anchorMax = new Vector2(0.5f, 0.5f);
-            healthRect.pivot = new Vector2(0.5f, 0.5f);
-            healthRect.anchoredPosition = new Vector2(0f, 2.6f);
-            healthRect.sizeDelta = new Vector2(4.8f, 0.8f);
-        }
-
-        bool redCreated;
-        GameObject redGo = EnsureChild(healthGo, "Red", out redCreated);
-        var redRect = EnsureRectTransform(redGo);
-        var red = EnsureComponent<Image>(redGo);
-        Sprite redSprite = LoadSpriteByGuid(HealthRedSpriteGuid);
-        if (redSprite == null) redSprite = LoadSpriteByGuid(SquareSpriteGuid);
-        red.sprite = redSprite;
-        red.color = redSprite != null && AssetDatabase.GUIDToAssetPath(HealthRedSpriteGuid) != string.Empty
-            ? Color.white
-            : Color.red;
-        red.type = Image.Type.Filled;
-        red.fillMethod = Image.FillMethod.Horizontal;
-        red.fillOrigin = 0;
-        red.fillAmount = 1f;
-        red.raycastTarget = false;
-        if (redCreated)
-        {
-            redRect.anchorMin = Vector2.zero;
-            redRect.anchorMax = Vector2.one;
-            redRect.pivot = new Vector2(0.5f, 0.5f);
-            redRect.anchoredPosition = Vector2.zero;
-            redRect.sizeDelta = Vector2.zero;
-        }
-        redGo.transform.SetSiblingIndex(0);
-
-        var healthView = EnsureComponent<HealthView>(healthGo);
-        var so = new SerializedObject(healthView);
-        SetObjectReference(so, "healthSubject", boss);
-        so.ApplyModifiedPropertiesWithoutUndo();
-
-        report.Add("보스 체력바: Boss_Gold 방식 재현 (보스 자식 WorldCanvas > Health(HealthView) > Red)");
+        Object.DestroyImmediate(legacy.gameObject);
+        report.Add("구 보스 체력바(WorldCanvas) 제거 — 체력바는 PlayerUI 의 BossHealth(BossHealthView)가 담당한다");
     }
 
     private static void BuildFinalBossRoom(Scene scene, GameObject boss)
@@ -1244,7 +1182,7 @@ public static class FinalBossSceneBuilder
         todo.Add("보스 SpriteRenderer 틴트 색을 취향대로 조정 (기본: 어두운 보라)");
         todo.Add("spriteFacesRight 확인 — 보스가 플레이어를 등지고 보면 인스펙터에서 꺼주세요");
         todo.Add("환영(Soil/Water/FirePhantom) 위치·크기, IaiDarkOverlay 크기(화면 전체 덮는지), IaiFlashEffect 모양 확인");
-        todo.Add("보스 체력바(WorldCanvas > Health) 높이/크기 조정");
+        todo.Add("보스 체력바는 PlayerUI > BossHealth(BossHealthView) 담당 — scalePerHp 로 길이 조정");
         todo.Add("Addressables 그룹에 SoilWave 가 등록됐는지 확인 후 플레이 테스트 (에디터 Play Mode Script 가 Use Asset Database 면 별도 빌드 불필요)");
 
         sb.AppendLine("── 유저가 조정할 것 ──");
@@ -1278,7 +1216,7 @@ public static class FinalBossSceneBuilder
  *   - 씬에 FinalBoss 가 없으면 프리팹 인스턴스를 배치(BossSpawnPosition). 이름은 같지만 프리팹과
  *     연결되지 않은 구 오브젝트가 있으면 위치를 승계해 프리팹 인스턴스로 교체한다.
  *   - 인스턴스 오버라이드: groundMask(씬 Square 레이어 — 씬 의존이라 프리팹에 넣지 않음),
- *     WorldCanvas 의 worldCamera(씬 카메라), SnapBossAboveGround(바닥 위 스냅 — 새 배치 또는 파묻힘 시).
+ *     SnapBossAboveGround(바닥 위 스냅 — 새 배치 또는 파묻힘 시).
  *   - FinalBossRoom 배선, StyxRoom/EndingTrigger/InteractionIcon 정리, DialogueUI 배치는 기존과 동일.
  *
  * ConfigureBoss 가 하는 일 (프리팹 루트든 씬 오브젝트든 동일):
@@ -1289,8 +1227,10 @@ public static class FinalBossSceneBuilder
  *   - FinalBoss 배선: maxHp 300, boxColliders[0]=기본, spriteFacesRight=true. groundMask 는 제외(씬 몫).
  *   - 환영: 수(eye3_1)/화(boss_fire)는 단일 SpriteRenderer + AttachPhantomAnimation(기존 방식).
  *     토는 BuildSoilPhantomRig — 아래 참조.
- *   - 거합 연출(IaiDarkOverlay/IaiFlashEffect), 체력바(WorldCanvas > Health(HealthView) > Red,
- *     worldCamera 는 프리팹 저장 시 null 로 두고 씬 오버라이드로 채운다).
+ *   - 거합 연출(IaiDarkOverlay/IaiFlashEffect).
+ *   - 구 체력바 제거(RemoveLegacyBossHealthBar): 예전에는 보스 자식으로 WorldCanvas > Health(HealthView)
+ *     를 만들었으나, 보스 체력바가 PlayerUI 의 BossHealth(BossHealthView)로 옮겨져 폐기됐다.
+ *     빌더를 다시 돌리면 남아 있는 구 캔버스를 지운다(2026-08-29 유저 확정).
  *
  * SoilPhantom = Soil 프리팹 비주얼 복제 (본 리깅):
  *   토보스 애니메이션(SoilIdle/SoilPattern1, 레거시)은 Body/LArm 등 자식 트랜스폼 경로에 커브가

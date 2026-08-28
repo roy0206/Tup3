@@ -98,7 +98,10 @@ public class FinalBoss : BossBase
     [SerializeField] private float fireRushRange = 100f;
     [SerializeField] private float fireRushWindup = 0.5f;
     [SerializeField] private float fireRushDuration = 0.5f;
-    [SerializeField] private float fireRushOvershoot = 3f;
+    [SerializeField] private LayerMask fireRushObstacleMask = (1 << 6) | (1 << 10);
+    [SerializeField] private float fireRushBodyRadius = 0.5f;
+    [SerializeField] private float fireRushMaxDistance = 40f;
+    [SerializeField] private float fireRushWallMargin = 0.1f;
     [SerializeField] private float fireRushDamage = 20f;
     [SerializeField] private float fireRushKnockBackForce = 1f;
     [SerializeField] private float fireRushHitWidth = 1.5f;
@@ -1142,11 +1145,34 @@ public class FinalBoss : BossBase
     {
         if (player == null) return;
 
-        float dir = Mathf.Sign(player.transform.position.x - transform.position.x);
+        float dx = player.transform.position.x - transform.position.x;
+        float dir = Mathf.Approximately(dx, 0f) ? 1f : Mathf.Sign(dx);
         Face(dir);
-        float targetX = player.transform.position.x + fireRushOvershoot * dir;
+
+        float targetX = ResolveFireRushTargetX(dir);
         KillFireRushTween();
         fireRushTween = transform.DOMoveX(targetX, fireRushDuration).SetEase(Ease.InCubic);
+    }
+
+    private float ResolveFireRushTargetX(float dir)
+    {
+        Vector2 start = transform.position;
+        Vector2 direction = dir >= 0f ? Vector2.right : Vector2.left;
+        float radius = Mathf.Max(0.01f, fireRushBodyRadius);
+        float distance = Mathf.Max(0f, fireRushMaxDistance);
+
+        RaycastHit2D[] hits = Physics2D.CircleCastAll(start, radius, direction, distance, fireRushObstacleMask);
+        for (int i = 0; i < hits.Length; i++)
+        {
+            RaycastHit2D hit = hits[i];
+            if (hit.collider == null) continue;
+            if (hit.collider.transform.IsChildOf(transform)) continue;
+            if (hit.distance <= 0.2f) continue;
+
+            distance = Mathf.Min(distance, Mathf.Max(0f, hit.distance - fireRushWallMargin));
+        }
+
+        return start.x + dir * distance;
     }
 
     private Vector2 FireRushLavaLandPoint()
@@ -2459,4 +2485,26 @@ public class FinalBoss : BossBase
  *     Fire_LavaLand / Fire_LavaSizzle : 화염구 착지(Lava.cs)와 용암 장판(LavaPool.cs)이 스스로 재생한다.
  * 연타 방지 : 여기서 직접 부르는 소리들은 전부 패턴당 1회(또는 콤보 타당 1회)라 스로틀이 필요 없다.
  * 여러 개가 동시에 생기는 소환물(물기둥 5개·화염구 8개)의 소리는 각 소환물 스크립트가 스로틀을 건다.
+
+ * ── 화 돌진이 벽을 뚫던 문제 (2026-08-29 유저 요청) ──────────────────────────
+ * 예전 StartFireRush 는 목적지를 "플레이어 x + fireRushOvershoot" 로 잡았다. 지형을 전혀 보지
+ * 않으므로 플레이어가 벽에 붙어 있으면 보스가 그대로 벽을 통과했다.
+ *
+ * 이제 화보스(Fire.ExtendRushToObstacle)와 같은 방식으로 바꿨다 —
+ * 현재 위치에서 플레이어 쪽 방향으로 CircleCast 해서 처음 막히는 지형까지만 간다.
+ * 즉 출발점은 현위치, 방향은 플레이어 쪽, 도착점은 그 방향의 맵 끝(벽)이다.
+ * 플레이어 좌표는 방향을 정하는 데만 쓰이고 거리에는 관여하지 않으므로,
+ * 화보스처럼 "양 끝까지 밀고 나가는" 돌진이 된다.
+ *
+ *   fireRushObstacleMask : 기본 ground(6) | wall(10) — 화보스 rushObstacleMask 와 같은 값
+ *   fireRushBodyRadius   : 캐스트 반지름. 몸통이 벽에 파묻히지 않게 한다
+ *   fireRushMaxDistance  : 아무것도 안 맞았을 때의 상한
+ *   fireRushWallMargin   : 벽에서 이만큼 앞에 멈춘다
+ *
+ * 자기 콜라이더 제외를 두 겹으로 막았다 — 보스 루트가 ground 레이어라 캐스트가 자기 몸을
+ * 먼저 잡을 수 있다. transform.IsChildOf 로 걸러내고, 캐스트 시작점 안쪽 히트(distance <= 0.2)도
+ * 무시한다(화보스와 같은 기준). 예전 화염구가 보스 자신의 콜라이더를 바닥으로 오인해 공중에
+ * 떠 있던 것과 같은 함정이다.
+ *
+ * fireRushOvershoot 필드는 제거했다. FinalBoss.prefab 에 남아 있는 값(3)은 필드가 사라져 무시된다.
  */

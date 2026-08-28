@@ -18,6 +18,17 @@ public class Gold : BossBase
     [SerializeField] private Animator animator;
     [SerializeField] private SpriteRenderer spriteRenderer;
 
+    [Header("패턴 지속시간 / 이벤트 시각")]
+    [SerializeField] private float pattern1Duration = 1f;
+    [SerializeField] private float pattern2Duration = 3f;
+    [SerializeField] private float pattern2TrapDelay = 1f;
+    [SerializeField] private float pattern3Duration = 8f;
+    [SerializeField] private float pattern3SummonDelay = 1f;
+    [SerializeField] private float counterDuration = 1f;
+    [SerializeField] private float counterHitDelay = 0.2f;
+    [SerializeField] private float counterDamage = 20f;
+    [SerializeField] private float counterKnockBackForce = 0.5f;
+
     [Header("그로기 지속시간")]
     [SerializeField] private float pattern1GroggyTime = 5f;
     [SerializeField] private float pattern2GroggyTime = 5f;
@@ -87,6 +98,13 @@ public class Gold : BossBase
     private const string BlockedHitSound = "Block_Blunt";
     private const string ParrySuccessSound = "Parry_Success";
 
+    private const string AnimSpeedParameter = "AnimSpeed";
+    private const float Cut1ClipLength = 1.6666667f;
+    private const float Cut1StrikeKeyTime = 0.16666667f;
+    private const float Pattern2ClipLength = 3f;
+    private const float Pattern2PlantKeyTime = 0.5f;
+    private const float Pattern3ClipLength = 5.0833335f;
+
     private bool hasPlayedIntroRoar;
 
     protected override string DefaultHitSoundName => LightHitSound;
@@ -102,6 +120,8 @@ public class Gold : BossBase
 
     private Tween counterAuraTween;
     private bool counterAuraShown;
+    private SpriteRenderer counterAuraRenderer;
+    private float counterAuraBaseOffsetX;
 
     private BoxCollider2D bodyCollider;
     private ComboAttack playerCombo;
@@ -115,12 +135,17 @@ public class Gold : BossBase
     private bool isPattern4Parried;
     private bool wasPlayerAttacking;
     private bool playerAttackStarted;
+    private bool warnedMissingPlayerRefs;
     private bool isPattern1EffectShown;
     private bool isFacingRight;
     private float patternElapsed;
     private int reflectedSwordHits;
     private Sequence pattern4Sequence;
     private float groggyTime;
+    private string pendingAnimTrigger;
+    private float pendingAnimTriggerTime;
+    private float pendingAnimSpeed = 1f;
+    private bool hasAnimSpeedParameter;
 
     public float GroggyTime => groggyTime;
     public bool IsGroggy => !IsDead && groggyTime > 0f;
@@ -165,6 +190,8 @@ public class Gold : BossBase
         curTimes = new List<float> { 0f, 0f, 10f, 60, pattern4Cooldown };
         if (animator == null) animator = GetComponent<Animator>();
         if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
+        hasAnimSpeedParameter = HasAnimatorParameter(AnimSpeedParameter);
+        InitCounterAura();
         transform.localRotation = Quaternion.identity;
         player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
@@ -201,6 +228,7 @@ public class Gold : BossBase
         animator.SetBool("IsDead", IsDead);
         animator.SetBool("IsGroggy", !IsDead && GroggyTime >= 0f);
         behaviorTree.Tick();
+        FlushPendingAnimation();
         ApplyGravity();
     }
 
@@ -209,6 +237,87 @@ public class Gold : BossBase
         CancelPattern4();
         HidePattern1Effect();
         SetCounterAuraShown(false);
+        pendingAnimTrigger = null;
+    }
+
+    private bool HasAnimatorParameter(string parameterName)
+    {
+        if (animator == null) return false;
+        if (animator.runtimeAnimatorController == null) return false;
+
+        foreach (AnimatorControllerParameter parameter in animator.parameters)
+        {
+            if (parameter.name == parameterName) return true;
+        }
+
+        Debug.LogWarning(
+            $"[금 보스] 애니메이터에 '{parameterName}' 파라미터가 없어 배속 보정을 건너뜁니다. " +
+            "메뉴 Tools/Tup3/금 보스 애니메이터 동기화 설정 을 한 번 실행하세요.", this);
+        return false;
+    }
+
+    private void QueueAttackAnimation(
+        string trigger,
+        float clipLength,
+        float clipKeyTime,
+        float eventTime,
+        float patternDuration)
+    {
+        float duration = Mathf.Max(0.01f, patternDuration);
+        float keyTime = Mathf.Clamp(clipKeyTime, 0f, clipLength);
+        float eventAt = Mathf.Clamp(eventTime, 0f, duration);
+        float tail = duration - eventAt;
+
+        float speed;
+        float triggerTime;
+
+        if (tail > 0.01f && clipLength - keyTime > 0.01f)
+        {
+            speed = Mathf.Clamp((clipLength - keyTime) / tail, 0.05f, 20f);
+            triggerTime = eventAt - keyTime / speed;
+        }
+        else
+        {
+            speed = Mathf.Clamp(clipLength / duration, 0.05f, 20f);
+            triggerTime = 0f;
+        }
+
+        pendingAnimTrigger = trigger;
+        pendingAnimSpeed = speed;
+        pendingAnimTriggerTime = Mathf.Clamp(triggerTime, 0f, duration);
+    }
+
+    private void FlushPendingAnimation()
+    {
+        if (pendingAnimTrigger == null) return;
+
+        if (!isPatternSetup || IsDead || GroggyTime > 0f)
+        {
+            pendingAnimTrigger = null;
+            return;
+        }
+
+        if (patternElapsed < pendingAnimTriggerTime) return;
+
+        if (hasAnimSpeedParameter) animator.SetFloat(AnimSpeedParameter, pendingAnimSpeed);
+        animator.SetTrigger(pendingAnimTrigger);
+        pendingAnimTrigger = null;
+    }
+
+    private void InitCounterAura()
+    {
+        ResolveCounterAura();
+        if (counterAura == null) return;
+
+        counterAuraRenderer = counterAura.GetComponent<SpriteRenderer>();
+        counterAuraBaseOffsetX = Mathf.Abs(counterAura.localPosition.x);
+        MirrorCounterAura();
+
+        counterAuraShown = false;
+        counterAuraTween?.Kill();
+        counterAuraTween = null;
+        counterAura.localScale = Vector3.one * counterAuraScaleRange.x;
+        counterAura.gameObject.SetActive(false);
     }
 
     private void ResolveCounterAura()
@@ -278,9 +387,39 @@ public class Gold : BossBase
 
     private void UpdatePlayerAttackDetection()
     {
+        EnsurePlayerRefs();
+
         bool attacking = playerCombo != null && playerCombo.IsLunging;
         playerAttackStarted = attacking && !wasPlayerAttacking;
         wasPlayerAttacking = attacking;
+    }
+
+    private void EnsurePlayerRefs()
+    {
+        if (playerCombo != null && playerMovement != null) return;
+
+        if (player == null) player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null) return;
+
+        if (playerCombo == null)
+        {
+            playerCombo = player.GetComponent<ComboAttack>();
+            if (playerCombo == null) playerCombo = player.GetComponentInChildren<ComboAttack>(true);
+        }
+
+        if (playerMovement == null)
+        {
+            playerMovement = player.GetComponent<Playermovement>();
+            if (playerMovement == null) playerMovement = player.GetComponentInChildren<Playermovement>(true);
+        }
+
+        if (warnedMissingPlayerRefs) return;
+        if (playerCombo != null && playerMovement != null) return;
+
+        warnedMissingPlayerRefs = true;
+        Debug.LogError(
+            $"[금 보스] 플레이어에서 ComboAttack/Playermovement 를 찾지 못했습니다 " +
+            $"(ComboAttack={playerCombo != null}, Playermovement={playerMovement != null}). 쳐내기 판정이 동작하지 않습니다.", this);
     }
 
     private bool CheckPlayerParry(float range)
@@ -323,6 +462,7 @@ public class Gold : BossBase
 
     private void ResetPatternTriggers()
     {
+        pendingAnimTrigger = null;
         if (animator == null) return;
         animator.ResetTrigger("Pattern1");
         animator.ResetTrigger("Pattern2");
@@ -374,15 +514,21 @@ public class Gold : BossBase
         if(!isCounterAttacking) return  TaskStatus.Failure;
         if (!isPatternSetup)
         {
-            curTimes[0] = 1f;
+            curTimes[0] = counterDuration;
             patternElapsed = 0f;
             isPatternSetup = true;
             animator.SetBool("IsMoving", false);
             animator.SetBool("IsIdle", false);
-            animator.SetTrigger("CounterAttack");
-            BossSound.Play(SwingMeleeSound, swingSoundVolume);
-            DOVirtual.DelayedCall(0.2f,
-                () => player.GetComponent<PlayerKnockBack>().TakeHit(transform.position, 0.5f, 20));
+            QueueAttackAnimation(
+                "CounterAttack", Cut1ClipLength, Cut1StrikeKeyTime, counterHitDelay, counterDuration);
+
+            DOVirtual.DelayedCall(counterHitDelay, () =>
+            {
+                if (IsDead || GroggyTime > 0f) return;
+
+                BossSound.Play(SwingMeleeSound, swingSoundVolume);
+                DamagePlayer(counterDamage, counterKnockBackForce);
+            });
         }
 
         isCounterAttackReady = true;
@@ -411,14 +557,16 @@ public class Gold : BossBase
 
         if (!isPatternSetup)
         {
-            curTimes[0] = 1f;
-            curTimes[1] = 10f;
+            curTimes[0] = pattern1Duration;
+            curTimes[1] = 2f;
             patternElapsed = 0f;
             isPatternSetup = true;
             isPattern1EffectShown = false;
             animator.SetBool("IsMoving", false);
             animator.SetBool("IsIdle", false);
-            animator.SetTrigger("Pattern1");
+            QueueAttackAnimation(
+                "Pattern1", Cut1ClipLength, Cut1StrikeKeyTime,
+                Mathf.Max(0f, pattern1SlashStart), pattern1Duration);
         }
 
         if (CheckPatternParry(pattern1ParryRange, pattern1ParryStart, pattern1ParryEnd))
@@ -489,15 +637,16 @@ public class Gold : BossBase
 
         if (!isPatternSetup)
         {
-            curTimes[0] = 3f;
+            curTimes[0] = pattern2Duration;
             curTimes[2] = 10f;
             patternElapsed = 0f;
             isPatternSetup = true;
             animator.SetBool("IsMoving", false);
             animator.SetBool("IsIdle", false);
-            animator.SetTrigger("Pattern2");
+            QueueAttackAnimation(
+                "Pattern2", Pattern2ClipLength, Pattern2PlantKeyTime, pattern2TrapDelay, pattern2Duration);
 
-            DOVirtual.DelayedCall(1f, () =>
+            DOVirtual.DelayedCall(pattern2TrapDelay, () =>
             {
                 if (IsDead || GroggyTime > 0) return;
 
@@ -532,16 +681,16 @@ public class Gold : BossBase
 
         if (!isPatternSetup)
         {
-            curTimes[0] = 8f;
+            curTimes[0] = pattern3Duration;
             curTimes[3] = 60f;
             patternElapsed = 0f;
             reflectedSwordHits = 0;
             isPatternSetup = true;
             animator.SetBool("IsMoving", false);
             animator.SetBool("IsIdle", false);
-            animator.SetTrigger("Pattern3");
+            QueueAttackAnimation("Pattern3", Pattern3ClipLength, 0f, 0f, pattern3Duration);
 
-            DOVirtual.DelayedCall(1f, () =>
+            DOVirtual.DelayedCall(pattern3SummonDelay, () =>
             {
                 if (IsDead || GroggyTime > 0) return;
 
@@ -588,7 +737,7 @@ public class Gold : BossBase
 
             animator.SetBool("IsMoving", false);
             animator.SetBool("IsIdle", false);
-            animator.SetTrigger("Pattern4");
+            QueueAttackAnimation("Pattern4", Cut1ClipLength, Cut1StrikeKeyTime, slashTime, endTime);
             BossSound.Play(DrawSound, swingSoundVolume);
             if (player != null) Face(Mathf.Sign(player.transform.position.x - transform.position.x));
 
@@ -786,6 +935,18 @@ public class Gold : BossBase
         isFacingRight = facingRight;
         MirrorChild(pattern1SlashEffect);
         MirrorChild(pattern4FlashEffect);
+        MirrorCounterAura();
+    }
+
+    private void MirrorCounterAura()
+    {
+        if (counterAura == null) return;
+
+        Vector3 p = counterAura.localPosition;
+        p.x = counterAuraBaseOffsetX * (isFacingRight ? 1f : -1f);
+        counterAura.localPosition = p;
+
+        if (counterAuraRenderer != null) counterAuraRenderer.flipX = isFacingRight;
     }
 
     private static void MirrorChild(GameObject child)
@@ -860,6 +1021,8 @@ public class Gold : BossBase
  * 예전에는 PlayerKnockBack 을 못 찾으면 PlayerHealth.TakeDamage 로 조용히 떨어졌는데,
  * 그 경로는 넉백과 무적 점멸을 통째로 건너뛰어 버그를 숨겼다. 지금은 루트→자식→부모 순으로
  * 참조를 찾고 그래도 없으면 에러 로그를 남기고 피해를 주지 않는다(조용한 실패 금지).
+ * 카운터 반격도 이제 이 경로를 쓴다. 예전에는 player.GetComponent<PlayerKnockBack>().TakeHit 을
+ * 직접 불러서 컴포넌트가 없으면 NRE 였고, 쳐내기로 캔슬된 뒤에도 0.2초 뒤 피해가 그대로 들어갔다.
  *
  * ─────────────────────────────────────────────────────────────
  * 그로기 진입 = 쳐내기 성공
@@ -943,8 +1106,51 @@ public class Gold : BossBase
  *               curTimes[4] 는 Awake 에서 pattern4Cooldown 으로 초기화 → 전투 시작 30초 뒤 첫 발동.
  * 패턴2/3 의 소환 DelayedCall 은 실행 시점에 사망·그로기면 소환을 건너뛴다(쳐내기로 캔슬된 뒤
  * 뒤늦게 함정/검이 튀어나오는 것을 막기 위함).
- * 애니메이터 요구 파라미터는 기존과 동일(IsDead/IsGroggy/IsMoving/IsIdle, 트리거 Pattern1~4,
- * CounterAttack). 쳐내기 캔슬 시 모든 패턴 트리거를 ResetTrigger 하고 IsGroggy 로 넘어간다.
+ * 애니메이터 요구 파라미터는 기존 + Float AnimSpeed (아래 "애니메이션 동기화" 참고).
+ * 쳐내기 캔슬 시 모든 패턴 트리거를 ResetTrigger 하고 IsGroggy 로 넘어간다.
+ *
+ * ─────────────────────────────────────────────────────────────
+ * 애니메이션 동기화 (QueueAttackAnimation / FlushPendingAnimation)
+ * ─────────────────────────────────────────────────────────────
+ * 금 보스 클립은 코드 타이밍과 길이도, 타격 프레임 위치도 맞지 않는다(실측).
+ *   Cut1     1.6667초, 스프라이트 키 0 / 0.1667 / 1.5833
+ *            cut_1(검을 뒤로 당긴 준비) → cut_2(앞으로 뻗은 타격) → cut_3(마무리)
+ *            즉 "베는 순간" = 0.1667초. 이 클립을 Cut1(패턴1) / Pattern4 / CounterAttack 세 상태가 공유한다.
+ *   Pattern2 3.0000초, 키 0 / 0.5 / 2.9167
+ *            counter_1(서서 검 세움) → counter_2(무릎 꿇고 검을 땅에 꽂음)
+ *            즉 "검을 꽂는 순간" = 0.5초.
+ *   Pattern3 5.0833초, 단일 스프라이트(hold_up) — 이벤트 프레임 없음.
+ * 클립은 아트 자산이라 고치지 않는다. 대신 코드가 두 가지를 계산해서 맞춘다.
+ *   1) 트리거 시각   : 클립의 타격 프레임이 코드의 이벤트 시각에 정확히 오도록 트리거를 늦춘다.
+ *   2) 재생 배속     : 클립이 패턴 종료와 정확히 같이 끝나도록 AnimSpeed 파라미터에 배속을 넣는다.
+ * 클립 길이 L, 클립 내 타격 키 K, 코드의 이벤트 시각 E, 패턴 지속 D 일 때
+ *   배속 s   = (L - K) / (D - E)        ← 타격 이후 잔여 클립이 패턴 잔여 시간을 정확히 채운다
+ *   트리거 T = E - K / s                ← 그래야 타격 프레임이 E 에 온다
+ * 계산 결과(기본값 기준)
+ *   패턴1 : L1.667 K0.167 E0.35 D1.0  → s 2.31, T 0.278  (0~0.278 대기, 0.35 타격, 1.0 종료)
+ *   패턴2 : L3.000 K0.500 E1.00 D3.0  → s 1.25, T 0.600  (1.0 에 검 꽂기+함정, 3.0 종료)
+ *   패턴3 : L5.083 K0     E0    D8.0  → s 0.635, T 0     (8.0 까지 검을 든 채 유지)
+ *   패턴4 : L1.667 K0.167 E1.50 D3.0  → s 1.00, T 1.333  (섬광 1.3 직후 발도, 1.5 참격, 3.0 종료)
+ *   반격  : L1.667 K0.167 E0.20 D1.0  → s 1.88, T 0.111  (0.2 에 타격+피해, 1.0 종료)
+ * 고치기 전에는 패턴4가 진입 0.167초에 이미 베는 자세를 취하고 실제 참격은 1.5초에 나갔고(1.33초 어긋남),
+ * 패턴3은 애니가 5.08초에 끝나 남은 2.9초를 서 있었고, 패턴1/반격은 패턴이 끝난 뒤에도 클립이
+ * 0.667초 더 재생돼 벤 자세로 걸어다녔다.
+ *
+ * 트리거 대기는 코루틴/트윈이 아니라 patternElapsed 로 센다. 그래서 일시정지·쳐내기 캔슬·그로기·사망이
+ * 전부 공짜로 처리된다 — FlushPendingAnimation 은 isPatternSetup 이 풀렸거나 그로기/사망이면
+ * 예약을 버리고 아무것도 재생하지 않는다. 대기 구간 동안 보스는 GoldIdle(기본 자세)로 서 있다.
+ *
+ * AnimSpeed 는 Float 파라미터이고 Cut1/Cut2/Pattern3/Pattern4/CounterAttack 상태의 Multiplier 에
+ * 연결돼 있어야 한다. 연결은 에디터 메뉴 Tools/Tup3/금 보스 애니메이터 동기화 설정
+ * (Assets/Scripts/Editor/GoldAnimatorSyncSetup.cs) 이 담당한다. 파라미터가 없으면 Awake 가 경고를
+ * 한 번 남기고 배속 보정만 건너뛴다(트리거 타이밍 보정은 그대로 동작).
+ *
+ * 남은 한계 — 클립 자체 문제라 코드로는 못 고친다(아트 작업)
+ *   - Cut1 의 준비 동작이 전체의 10%(0.167/1.667)뿐이라 배속 보정 후 백스윙이 0.07~0.09초로 짧다.
+ *   - Cut1 의 cut_2 가 1.42초를 그대로 유지해 뻗은 자세로 굳어 보인다. 중간 키가 없다.
+ *   - Pattern3 는 스프라이트 1장이라 8초 내내 정지 화면이다.
+ *   - 패턴4 전용 발도 클립이 없어 Cut1 을 재활용한다. 준비 구간(1.33초)은 GoldIdle 로 때운다.
+ *   - Dead 상태에 클립이 없다(m_Motion 비어 있음).
  *
  * ─────────────────────────────────────────────────────────────
  * 일시정지 대응
@@ -972,7 +1178,9 @@ public class Gold : BossBase
  *   Gold_Roar        : 전투가 실제로 시작되는 첫 프레임(Update 의 일시정지·대사 게이트를 처음 통과할 때) 1회.
  *                      금보스 애니메이터에 포효 상태가 따로 없어 등장 시점에 붙였다.
  *   Gold_SwingMelee  : 패턴1 검기가 켜지는 순간(ShowPattern1Effect = 실제 베는 프레임),
- *                      패턴2 검 함정을 뽑아내는 순간(1초 DelayedCall), 카운터 반격 시작.
+ *                      패턴2 검 함정을 뽑아내는 순간(pattern2TrapDelay),
+ *                      카운터 반격의 타격 순간(counterHitDelay). 카운터 사운드는 예전에 패턴 진입
+ *                      시점이었는데, 배속 보정 후 실제 베는 프레임이 0.2초라 거기로 옮겼다.
  *   Gold_SwingSword  : 패턴3 어검 5자루를 뿌리는 순간(1초 DelayedCall) 1회 — 검마다가 아니라 투척 1회 기준.
  *   Gold_Draw        : 패턴4 진입(기마자세 발도 준비) — 발도 전조.
  *   Gold_ScreenSlash : 패턴4 참격이 확정되는 순간(ResolvePattern4Slash, 쳐내기에 실패했을 때만).

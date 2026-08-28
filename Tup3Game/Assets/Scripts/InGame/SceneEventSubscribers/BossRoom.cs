@@ -38,12 +38,12 @@ public class BossRoom : MonoBehaviour, ISceneEventListener
     [Header("참조")]
     [SerializeField] private DialogueManager DM;
     [SerializeField] private BossBase bossBehaviour;
+    [SerializeField] private BossHealthView healthView;
 
     [Header("대사 파일")]
     [SerializeField] private string introDialogueFile;
     [SerializeField] private string victoryDialogueFile;
     [SerializeField] private string victoryStartId;
-    [SerializeField] private string defeatDialogueFile = "";
 
     [Header("지급 판정 행 id (비우면 _skill / _coin 접미사로 자동 판정)")]
     [SerializeField] private string skillGrantEntryId;
@@ -55,7 +55,6 @@ public class BossRoom : MonoBehaviour, ISceneEventListener
     [SerializeField] private float defeatDelay = 1.5f;
 
     [Header("보상")]
-    [SerializeField] private int saengWillCoinReward = 5;
     [SerializeField] private int geukWillCoinCost = 1;
 
     [Header("패배 연출")]
@@ -139,6 +138,7 @@ public class BossRoom : MonoBehaviour, ISceneEventListener
         if (DM == null) DM = DialogueManager.Current;
         if (bossBehaviour == null) bossBehaviour = FindObjectOfType<BossBase>();
         if (defeatCutscene == null) defeatCutscene = FindObjectOfType<DefeatCutscene>(true);
+        if (healthView == null) healthView = FindObjectOfType<BossHealthView>(true);
         resolvedSkillIndex = skillIndex >= 0 ? skillIndex : DefaultSkillIndex(boss);
     }
 
@@ -233,6 +233,7 @@ public class BossRoom : MonoBehaviour, ISceneEventListener
             case RoomState.Battle:
                 SetBossActive(true);
                 SetPlayerCombatEnabled(true);
+                if (healthView != null) healthView.PlayIntro();
                 Debug.Log($"[BossRoom] 전투 시작 — {boss}");
                 break;
 
@@ -248,10 +249,7 @@ public class BossRoom : MonoBehaviour, ISceneEventListener
 
             case RoomState.PostDialogue:
                 SetBossActive(false);
-                if (Outcome == BattleOutcome.Victory)
-                    PlayDialogue(victoryDialogueFile, victoryStartId);
-                else
-                    PlayDialogue(defeatDialogueFile, null);
+                PlayDialogue(victoryDialogueFile, victoryStartId);
                 break;
 
             case RoomState.GameOver:
@@ -358,8 +356,13 @@ public class BossRoom : MonoBehaviour, ISceneEventListener
         DM.StartDialogueFromCsv(fileName, startId);
 
         dialogueRunning = DM.IsPlaying;
-        if (!dialogueRunning)
-            Debug.LogError($"[BossRoom] '{fileName}' 대사를 시작하지 못했습니다");
+        if (dialogueRunning) return;
+
+        string where = string.IsNullOrWhiteSpace(startId) ? "처음부터" : $"'{startId}' 행부터";
+        Debug.LogError(
+            $"[BossRoom] '{fileName}' 대사를 {where} 시작하지 못했습니다 — {boss}. " +
+            $"CSV 에 그 id 가 있는지 확인하세요(화·금보스는 파일이 2개라 행 id 에 1/2 가 붙습니다: hwa1_win, geum1_win). " +
+            $"이대로면 승리 대사·선택지·스킬/의지코인 지급이 전부 건너뛰어집니다.", this);
     }
 
     private void StopRunningDialogue()
@@ -433,9 +436,8 @@ public class BossRoom : MonoBehaviour, ISceneEventListener
         var data = UserDataManager.Instance.Data;
         if (data != null && data.Play != null)
         {
-            data.Play.willCoins += saengWillCoinReward;
             UserDataManager.Instance.SaveAsync();
-            Debug.Log($"[BossRoom] 생(生) 승리 — 의지 코인 {saengWillCoinReward}개 획득 (보유 {data.Play.willCoins}개)");
+            Debug.Log($"[BossRoom] 생(生) 승리 — 의지 코인 소모 없음 (보유 {data.Play.willCoins}개 = 성불 횟수)");
         }
     }
 
@@ -473,7 +475,7 @@ public class BossRoom : MonoBehaviour, ISceneEventListener
     {
         if (defeatCutsceneDone)
         {
-            ChangeState(RoomState.PostDialogue);
+            ChangeState(RoomState.GameOver);
             return;
         }
 
@@ -483,7 +485,7 @@ public class BossRoom : MonoBehaviour, ISceneEventListener
         if (stateTimer > 0f) return;
 
         Debug.LogWarning($"[BossRoom] 패배 컷씬이 {defeatCutsceneTimeout}초 안에 완료 콜백을 호출하지 않아 다음 단계로 넘어갑니다 — {boss}");
-        ChangeState(RoomState.PostDialogue);
+        ChangeState(RoomState.GameOver);
     }
 
     private void StopDefeatCutscene()
@@ -621,17 +623,19 @@ public class BossRoom : MonoBehaviour, ISceneEventListener
  *                  · 승리 → victoryDialogueFile 을 victoryStartId 행부터 재생.
  *                    그 행이 "받아들인다 / 거절한다" 선택지 행이고, 선택 결과로 _skill 또는 _coin 행에 도달한다.
  *                    도달 감지는 DialogueManager.OnEntryShown 으로 하고 거기서 실제 지급이 일어난다.
- *                  · 패배 → 대사 없음. defeatDialogueFile 은 기본값이 빈 문자열이라 PlayDialogue 가
- *                    곧바로 반환하고, dialogueRunning 이 false 인 채로 다음 프레임에 GameOver 로 넘어간다.
- *                    (2026-08-28 유저 확인) 기획서 "#전투 패배시" 항목이 "메시지 없이 바로 시작"이라
- *                    패배 대사는 애초에 기획에 없었다. 구 사양의 S13_BATTLE_LOSE 재생을 제거했고
- *                    4개 보스 씬에 직렬화돼 있던 값도 함께 비웠다. CSV 파일 자체는 남겨 두었지만
- *                    이제 어디서도 재생되지 않는다. 되살리려면 이 필드에 파일명을 넣으면 된다.
+ *                  이 상태는 이제 승리 전용이다. 패배는 여기를 거치지 않는다.
  *   Clear        : clearedBosses 에 이 보스 플래그를 기록하고 즉시 SaveAsync.
  *                  플레이어 조작을 돌려주고, 이후 퇴장은 기존 BossExit 상호작용에 맡긴다.
  *
- * ── 패배 흐름 (2026-08-28 유저 확정) ──────────────────────────────────────────
- *   Battle(패배) → PostCutscene(defeatDelay) → DefeatCutscene → PostDialogue(S13) → GameOver
+ * ── 패배 흐름 (2026-08-29 유저 확정: 대사 없이 바로 컷씬) ─────────────────────
+ *   Battle(패배) → PostCutscene(defeatDelay) → DefeatCutscene → GameOver
+ *
+ *   패배 대사는 코드 경로에서 완전히 제거했다(defeatDialogueFile 필드도 삭제). 기획서
+ *   "#전투 패배시" 항목이 "메시지 없이 바로 시작"이므로 애초에 기획에 없던 것이다.
+ *   처음에는 필드를 빈 문자열로 두는 방식으로 껐지만, 씬에 직렬화된 값이 남아 있으면
+ *   그쪽이 이기고 Unity 가 열어둔 씬을 저장하면서 옛 값을 되살리는 일이 실제로 발생했다
+ *   (Boss_Gold). 그래서 필드 자체를 없애 씬 값과 무관하게 동작하도록 바꿨다.
+ *   S13_BATTLE_LOSE.csv 는 남아 있지만 어디서도 재생되지 않는다.
  *
  *   DefeatCutscene : defeatCutscene(추상 DefeatCutscene 컴포넌트).Play(onComplete) 를 한 번 호출하고
  *                    onComplete 를 기다린다. 필드가 비어 있으면 씬에서 자동으로 찾고, 그래도 없으면
@@ -652,7 +656,7 @@ public class BossRoom : MonoBehaviour, ISceneEventListener
  *
  * ── 의지 코인 경제 (PlayData.willCoins, 항상 0 미만 금지) ─────────────────────
  *   극(剋) 승리(스킬 획득) : -geukWillCoinCost (기본 1)
- *   생(生) 승리(스킬 거절) : +saengWillCoinReward (기본 5)
+ *   생(生) 승리(스킬 거절) : 증감 없음 — 쓰지 않는 것 자체가 보상이다
  *   패배                  : 변동 없음. 차감은 극 승리에서만 일어난다(2026-08-28 유저 정정).
  *   시작값은 PlayData 기본값 4. 잔여 코인은 최종보스 결과와 함께 엔딩 분기에 쓰인다.
  *

@@ -1,5 +1,5 @@
-id,speaker,text,next,choices,note
-start,Boss,who are you?,q1,
-q1,Player,(whatshouldido),,letsfigtht:fight/go away:leave
-fight,Boss,then draw your weapon.,,
-leave,Boss,coward.,,
+﻿id,speaker,text,next,choices,note,tag
+start,Boss,who are you?,q1,,※ 대사 데이터가 아니라 DialogueManager 동작 확인용 더미 샘플. Test.unity 의 DummyLogue 컴포넌트만 이 파일을 재생한다(본편 씬에서는 사용하지 않음). 원문 서사에 대응 내용이 없고 화자도 더미(Boss/Player)라 화자 규칙 대상이 아니다. 본편에 쓰지 않을 것이면 삭제 권장.,추가함
+q1,Player,(whatshouldido),,letsfigtht:fight/go away:leave,,추가함
+fight,Boss,then draw your weapon.,,,,추가함
+leave,Boss,coward.,,,,추가함

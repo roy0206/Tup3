@@ -27,13 +27,26 @@ public class DialogueManager : DomainSingleton<DialogueManager>
     {
         public string id;
         public Speaker speaker;
-        [TextArea] public string text; 
+        public string speakerName;
+        [TextArea] public string text;
         public string next;
         public string choices;
     }
-    
+
+    [System.Serializable]
+    public class SpeakerColorOverride
+    {
+        public string speaker;
+        public Color onDark = Color.white;
+        public Color onLight = Color.black;
+    }
+
     [SerializeField] private Transform dialogueRoot;
     [SerializeField] private float charDelay = 0.04f;
+
+    [Header("화자별 대사 색 (비워 두면 DialogueSpeakerPalette 기본표를 쓴다)")]
+    [SerializeField] private List<SpeakerColorOverride> speakerColorOverrides = new List<SpeakerColorOverride>();
+    [SerializeField] private Color lightPanelColor = new Color(0.96f, 0.96f, 0.96f, 0.90f);
 
     [Header("화자별 대화창")]
     private GameObject playerPanel;
@@ -42,6 +55,10 @@ public class DialogueManager : DomainSingleton<DialogueManager>
     private TextMeshProUGUI bossText;
     private GameObject narrationPanel;   // dialogueRoot에 "NarrationPanel"이 없으면 null → 플레이어 패널로 대체
     private TextMeshProUGUI narrationText;
+
+    private readonly List<Image> panelBackgrounds = new List<Image>();
+    private readonly List<Color> panelBaseColors = new List<Color>();
+    private bool lightBackground;
 
 
     [Header("선택지 UI")]
@@ -76,6 +93,7 @@ public class DialogueManager : DomainSingleton<DialogueManager>
 
     public int ShownLineCount { get; private set; }
     public bool IsPlaying => state != State.Inactive;
+    public bool IsLightBackground => lightBackground;
     public static bool IsDialogueActive => Current != null && Current.IsPlaying;
     public string CurrentEntryId => currentEntry != null ? currentEntry.id : string.Empty;
 
@@ -144,9 +162,88 @@ public class DialogueManager : DomainSingleton<DialogueManager>
         for (int i = 0; i < choiceTexts.Length; i++)
             choiceObjects[i] = choiceTexts[i].transform.parent.gameObject;
 
+        CachePanelBackgrounds();
+
         playerPanel.SetActive(false);
         bossPanel.SetActive(false);
         choicePanel.SetActive(false);
+    }
+
+    private void CachePanelBackgrounds()
+    {
+        panelBackgrounds.Clear();
+        panelBaseColors.Clear();
+
+        CachePanelBackground(playerPanel);
+        CachePanelBackground(bossPanel);
+        CachePanelBackground(narrationPanel);
+    }
+
+    private void CachePanelBackground(GameObject panel)
+    {
+        if (panel == null) return;
+
+        var image = panel.GetComponent<Image>();
+        if (image == null) return;
+
+        panelBackgrounds.Add(image);
+        panelBaseColors.Add(image.color);
+    }
+
+    public void SetLightBackground(bool enabled)
+    {
+        if (lightBackground == enabled) return;
+        lightBackground = enabled;
+
+        ApplyPanelBackground();
+
+        if (state != State.Inactive && activeText != null && currentEntry != null)
+            activeText.color = ResolveSpeakerColor(currentEntry);
+    }
+
+    private void ApplyPanelBackground()
+    {
+        for (int i = 0; i < panelBackgrounds.Count; i++)
+        {
+            Image image = panelBackgrounds[i];
+            if (image == null) continue;
+            image.color = lightBackground ? lightPanelColor : panelBaseColors[i];
+        }
+    }
+
+    private static string DefaultSpeakerName(Speaker speaker)
+    {
+        switch (speaker)
+        {
+            case Speaker.Player: return "주인공";
+            case Speaker.Narration: return "나레이션";
+            default: return "Boss";
+        }
+    }
+
+    private Color ResolveSpeakerColor(DialogueEntry entry)
+    {
+        string speaker = entry.speakerName;
+        if (string.IsNullOrWhiteSpace(speaker)) speaker = DefaultSpeakerName(entry.speaker);
+
+        string key = DialogueSpeakerPalette.Normalize(speaker);
+
+        for (int i = 0; i < speakerColorOverrides.Count; i++)
+        {
+            SpeakerColorOverride entryOverride = speakerColorOverrides[i];
+            if (entryOverride == null || string.IsNullOrWhiteSpace(entryOverride.speaker)) continue;
+
+            string overrideKey = DialogueSpeakerPalette.Normalize(entryOverride.speaker);
+            if (!string.Equals(overrideKey, key, System.StringComparison.OrdinalIgnoreCase)) continue;
+
+            return lightBackground ? entryOverride.onLight : entryOverride.onDark;
+        }
+
+        if (DialogueSpeakerPalette.TryGet(key, out DialogueSpeakerPalette.SpeakerColors colors))
+            return lightBackground ? colors.OnLight : colors.OnDark;
+
+        DialogueSpeakerPalette.WarnUnknownOnce(speaker);
+        return DialogueSpeakerPalette.Fallback(lightBackground);
     }
 
     private Dictionary<string, DialogueEntry> entryMap;
@@ -247,6 +344,8 @@ public class DialogueManager : DomainSingleton<DialogueManager>
         playerPanel.SetActive(panel == playerPanel);
         bossPanel.SetActive(panel == bossPanel);
         if (narrationPanel != null) narrationPanel.SetActive(panel == narrationPanel);
+
+        if (activeText != null) activeText.color = ResolveSpeakerColor(entry);
 
         if (typingRoutine != null) StopCoroutine(typingRoutine);
         typingRoutine = StartCoroutine(TypeLine(entry.text));
@@ -443,6 +542,7 @@ public class DialogueManager : DomainSingleton<DialogueManager>
             var entry = new DialogueEntry();
 
             entry.speaker = ParseSpeaker(row[1]);
+            entry.speakerName = row[1] != null ? row[1].Trim() : string.Empty;
 
             entry.id = row[0].Trim();
             entry.text = row[2];                              // 2번 = text
@@ -608,4 +708,40 @@ public class DialogueManager : DomainSingleton<DialogueManager>
  *    선택 커서가 실제로 옮겨간 경우에만 재생한다. ShowChoices 에서 -1 로 초기화하므로
  *    선택지가 처음 뜨는 순간에는 울리지 않는다.
  *    DialogueChoiceView 가 있는 씬에서는 이 분기를 타지 않고 뷰 쪽 ApplyHighlight 가 같은 소리를 낸다.
+ */
+
+/* [파일 노트 — 화자별 대사 색]
+ *
+ * 1) 왜 speakerName 을 따로 들고 있나
+ *    Speaker enum 은 Player / Boss / Narration 셋뿐이라 "화보스"와 "금보스"가 똑같이 Boss 로 뭉개진다.
+ *    색은 화자마다 달라야 하므로 CSV 의 speaker 칸 원문을 DialogueEntry.speakerName 에 그대로 보관한다.
+ *    enum(speaker)은 어느 패널을 켤지 고르는 기존 역할 그대로 남겨 두었다 —— 패널 배치는 건드리지 않았다.
+ *    JSON 경로(StartDialogueFromFile)나 손으로 만든 DialogueEntry 처럼 speakerName 이 비어 있으면
+ *    DefaultSpeakerName(enum) 으로 "주인공/나레이션/Boss" 를 채워 넣어 색을 찾는다.
+ *
+ * 2) 색이 붙는 대상
+ *    대사 본문(activeText)의 TMP_Text.color 하나뿐이다. 유저 지시가 "대사 색"이고, 이 UI 에는
+ *    별도의 화자 이름표가 아예 없다(패널 안에 본문 TMP 하나뿐). 선택지(DialogueChoiceView)는
+ *    화자가 아니라 플레이어의 입력지라 기존 노란 강조색을 그대로 둔다.
+ *    ShowEntry 에서 패널을 고른 직후, TypeLine 을 돌리기 전에 색을 넣는다. 타이핑 연출은
+ *    maxVisibleCharacters 로 글자 수를 세므로 <color> 태그를 문자열에 끼워 넣으면 글자 수가 어긋난다 —
+ *    그래서 태그가 아니라 .color 를 직접 바꾼다.
+ *
+ * 3) 색을 고르는 순서
+ *    speakerColorOverrides(인스펙터) → DialogueSpeakerPalette 기본표 → 폴백색.
+ *    overrides 는 기본값이 빈 리스트라, 씬/프리팹에 아무 값이 없어도 기본표만으로 정상 동작한다
+ *    (씬 yaml 을 고칠 수 없는 상황을 전제로 한 설계). 특정 씬에서만 색을 바꾸고 싶을 때만 채운다.
+ *    표에 없는 화자는 폴백색으로 나오고 에디터에서만 화자당 1회 경고가 뜬다(WarnUnknownOnce).
+ *
+ * 4) 밝은 배경 모드 — SetLightBackground(bool)
+ *    엔딩4 처럼 화면이 하얀 연출에서는 흰 글씨가 보이지 않는다. 이 함수를 켜면
+ *      - 대사 패널 Image 색이 lightPanelColor(옅은 흰색)로 바뀌고,
+ *      - 이후 모든 대사가 DialogueSpeakerPalette 의 OnLight(어두운 잉크) 색으로 나온다.
+ *      - 이미 한 줄이 떠 있는 중이면 그 줄의 색도 즉시 다시 칠한다.
+ *    끄면 Awake 때 기억해 둔 패널 원래 색(panelBaseColors)으로 되돌린다.
+ *    DialogueManager 는 DomainSingleton(씬 전용)이라 씬을 나가면 함께 파괴되므로,
+ *    엔딩4 에서 켠 밝은 모드가 다른 씬으로 새어 나가는 일은 없다.
+ *    패널 배경을 같이 바꾸는 이유 : 대사 글자가 실제로 얹히는 바탕은 화면 배경이 아니라
+ *    대사 패널(현재 불투명 검정)이다. 배경만 하얗게 하고 패널을 그대로 두면 하얀 화면 위에
+ *    시커먼 대사 상자가 남고, 반대로 글자만 어둡게 하면 검정 패널 위 검정 글씨가 되어 아예 안 보인다.
  */

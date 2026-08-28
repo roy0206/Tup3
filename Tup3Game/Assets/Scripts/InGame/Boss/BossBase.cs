@@ -27,6 +27,7 @@ public abstract class BossBase : MonoBehaviour, IHealthUIEvent
 
     private float hp;
     public float Hp => hp;
+    public float MaxHp => maxHp;
 
     private bool isDead = false;
     public bool IsDead => isDead;

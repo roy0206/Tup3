@@ -30,7 +30,7 @@ public class BossEnterence : InteractionBase, ISceneEventListener
     {
         if (UserDataManager.Instance.Data.Play.clearedBosses.HasFlag(boss))
         {
-            InteractionManager.Current.Unregister(this);
+            if (InteractionManager.Current != null) InteractionManager.Current.Unregister(this);
         }
     }
 

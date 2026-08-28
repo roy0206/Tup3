@@ -103,6 +103,7 @@ public class IceBulletSpawnZone : MonoBehaviour
                 continue;
             }
 
+            RisingWaterPhase.LiftAboveWater(obj);
             bullet.Launch(dir, telegraphDuration);
         }
     }

@@ -78,6 +78,22 @@ public class AspectRatioEnforcer : Singleton<AspectRatioEnforcer>
     }
 
     private readonly HashSet<int> convertedCanvasIds = new();
+    private static readonly HashSet<int> keepOverlayIds = new();
+
+    public static void KeepOverlay(Canvas canvas)
+    {
+        if (canvas == null) return;
+
+        keepOverlayIds.Add(canvas.GetInstanceID());
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+    }
+
+    public static void ReleaseOverlay(Canvas canvas)
+    {
+        if (canvas == null) return;
+
+        keepOverlayIds.Remove(canvas.GetInstanceID());
+    }
 
     private void ConvertOverlayCanvases()
     {
@@ -88,6 +104,7 @@ public class AspectRatioEnforcer : Singleton<AspectRatioEnforcer>
         {
             if (!canvas.isRootCanvas) continue;
             if (canvas.GetComponent<ScreenFader>() != null) continue;
+            if (keepOverlayIds.Contains(canvas.GetInstanceID())) continue;
 
             if (canvas.renderMode == RenderMode.ScreenSpaceOverlay)
             {
@@ -135,5 +152,12 @@ public class AspectRatioEnforcer : Singleton<AspectRatioEnforcer>
  *   생성 시점에 이미 카메라 모드로 만든다. 카메라가 없는 씬(Loading 등)은 Overlay 로 남는다.
  * - 예외: ScreenFader 는 의도적으로 Overlay 유지 — 씬 전환 중 카메라 교체 순간에도 페이드가
  *   끊기면 안 되고, 검은 띠까지 덮는 편이 자연스럽다.
+ * - 예외 2 (KeepOverlay/ReleaseOverlay, 2026-08-29): 카메라 공간으로 옮기면 그 캔버스는
+ *   카메라의 렌더 경로에 들어가 URP Volume 포스트프로세싱을 그대로 받는다. Overlay 는 후처리
+ *   이후에 합성되므로 영향을 받지 않는다. 시작씬 인트로처럼 Volume 이 강하게 걸린 구간에서
+ *   자막이 블룸/색보정에 먹히면 안 될 때 이 API 로 해당 캔버스를 변환 대상에서 빼고 즉시
+ *   Overlay 로 되돌린다(StartScene.IntroCutscene 이 대사 캔버스에 사용).
+ *   대가: 그 캔버스는 16:9 레터박스 밖(검은 띠)까지 그릴 수 있다. 자막은 화면 중앙·하단
+ *   안전 영역에 있어 실질적인 문제가 없다고 판단했다. 넓은 UI 에는 쓰지 말 것.
  * - 대상 비율을 바꾸려면 TargetAspect 상수를 수정.
  */

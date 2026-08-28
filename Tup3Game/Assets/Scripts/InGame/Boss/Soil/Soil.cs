@@ -31,6 +31,15 @@ public class Soil : BossBase
     [SerializeField] private float pattern2Cooltime;
     [SerializeField] private float pattern3Cooltime;
 
+    [Header("사망 페이드")]
+    [SerializeField] private bool fadeOnDeath = true;
+    [SerializeField] private float deathFadeDelay = 0.6f;
+    [SerializeField] private float deathFadeDuration = 1.2f;
+    [SerializeField] private Ease deathFadeEase = Ease.InQuad;
+
+    private Sequence deathFadeSequence;
+    private bool deathFadeStarted;
+
     [Header("사운드")]
     [SerializeField] private float smashSoundVolume = 1f;
     [SerializeField] private float footstepSoundVolume = 0.6f;
@@ -88,6 +97,39 @@ public class Soil : BossBase
 
         SnapToGround();
         if (!snappedToGround) StartCoroutine(SnapToGroundWhenReady());
+
+        OnDeath += PlayDeathFade;
+    }
+
+    private void OnDestroy()
+    {
+        OnDeath -= PlayDeathFade;
+
+        if (deathFadeSequence == null) return;
+        Sequence seq = deathFadeSequence;
+        deathFadeSequence = null;
+        seq.Kill();
+    }
+
+    private void PlayDeathFade()
+    {
+        if (!fadeOnDeath || deathFadeStarted) return;
+        deathFadeStarted = true;
+
+        SpriteRenderer[] renderers = GetComponentsInChildren<SpriteRenderer>(true);
+        if (renderers.Length == 0) return;
+
+        float delay = Mathf.Max(0f, deathFadeDelay);
+        float duration = Mathf.Max(0.01f, deathFadeDuration);
+
+        deathFadeSequence = DOTween.Sequence().SetTarget(this);
+        foreach (SpriteRenderer renderer in renderers)
+        {
+            if (renderer == null) continue;
+            deathFadeSequence.Insert(delay, renderer.DOFade(0f, duration).SetEase(deathFadeEase));
+        }
+
+        deathFadeSequence.OnComplete(() => deathFadeSequence = null);
     }
 
     private IEnumerator SnapToGroundWhenReady()
@@ -440,4 +482,27 @@ public class Soil : BossBase
  *                 Move 는 매 프레임 호출되므로 간격 제한이 없으면 초당 수십 번 울린다.
  *                 타이머는 이동한 프레임에만 줄어들어 멈춰 있는 동안에는 발소리가 나지 않는다.
  *   Soil_RockFall : 낙석 본체(SoilDrop.cs)가 스스로 재생한다.
+ *
+ * ── 사망 페이드 (2026-08-29 유저 요청) ────────────────────────────────────────
+ * 체력이 0 이 되면 자식 SpriteRenderer 전부의 알파를 0 으로 내린다.
+ * 구동은 BT 의 Dead() 태스크가 아니라 BossBase.OnDeath 구독이다 — Dead() 는 Tick 마다 불리는데
+ * Update 가 PauseManager.IsPaused / DialogueManager.IsDialogueActive 에서 조기 return 하므로
+ * 승리 대사가 시작되면 Tick 자체가 멈춘다. OnDeath 는 체력 0 시점에 정확히 1회 발생해 타이밍이 확실하다.
+ * (deathFadeStarted 로 한 번 더 막아 둔다.)
+ *
+ * 페이드 대상은 GetComponentsInChildren<SpriteRenderer>(true) 전부다. 토보스는 본 리깅이라
+ * 몸통 파츠가 자식 SR 여러 개로 쪼개져 있어 루트 하나만 건드리면 안 된다.
+ *
+ * 피격 점멸(SpriteFlashGroup)과 충돌하지 않는다 — 점멸은 MaterialPropertyBlock 의
+ * _FlashAmount/_FlashColor 만 쓰고 SpriteRenderer.color 는 건드리지 않으며, 셰이더가 알파는
+ * 원본(=여기서 낮추는 값)을 그대로 통과시키기 때문에 페이드가 그대로 먹는다.
+ *
+ * DOTween 기반이라 PauseManager 의 DOTween.PauseAll 에 함께 멈춘다.
+ * 기본값 0.6초 대기 후 1.2초 페이드 = 총 1.8초로, BossRoom 의 victoryDelay(씬 값 2초) 안에 끝나
+ * 승리 대사가 뜨는 시점에는 이미 사라져 있다. 대기 시간에 사망 애니메이션(animationController.Play(0))이
+ * 보이도록 delay 를 둔 것이므로, 애니메이션 길이를 바꾸면 deathFadeDelay 도 같이 조정할 것.
+ *
+ * 오브젝트를 비활성화하거나 콜라이더를 끄지는 않는다 — 승리 처리(BossRoom)와 BossExit 가
+ * 보스 오브젝트를 참조하고 있어 파괴/비활성은 별개 판단이 필요하다. 알파만 0 이라 몸체 콜라이더는
+ * 그대로 남는다는 점만 유의(현재 Dead() 가 layer 를 바꾸므로 플레이어 공격 판정에는 걸리지 않는다).
  */
