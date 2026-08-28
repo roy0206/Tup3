@@ -4974,7 +4974,9 @@ MonoBehaviour:
   dashCooldown: 1
   coyoteTime: 0.15
   jumpCutMultiplier: 0.5
-  slipperyAcceleration: 10
+  slipperyStartAcceleration: 20
+  slipperyStopDeceleration: 28
+  slipperyTurnAcceleration: 36
   isInWater: 0
   waterFlapForce: 8
   waterMaxFallSpeed: 3
@@ -5125,9 +5127,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   skill_2_groundCheckDistance: 50
-  skill_2_groundPrefab: {fileID: 3380133263288657416, guid: c2ea03694011b3b49bf241d1fb89a714, type: 3}
+  skill_2_groundPrefab: {fileID: 905068586263194264, guid: db410d4cc89c0ba49bce505135abe6c3, type: 3}
   skill_2_spawnDelay: 0.5
-  skill_2_aimMarker: {fileID: 0}
+  skill_2_overlapPushClearance: 0.05
+  skill_2_aimMarker: {fileID: 657428899378459154, guid: 566fb955c80ea7e41927cc035d25d142, type: 3}
   skill_3_attackSpeedMultiplier: 1.5
   skill_3_duration: 5
   skill_3_cool: 10

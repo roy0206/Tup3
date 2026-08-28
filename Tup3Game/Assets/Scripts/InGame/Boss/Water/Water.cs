@@ -51,6 +51,8 @@ public class Water : BossBase
     [SerializeField] private Transform electricBallSpawnPoint;
     [SerializeField] private float electricBallSpawnDelay = 0.5f;
     [SerializeField] private float electricEyeOpenDuration = 0.35f;
+    [SerializeField] private int electricBallShotCount = 3;
+    [SerializeField] private float electricBallRechargeDelay = 3f;
     [SerializeField] private float electricBallPatternDuration = 1.5f;
     [SerializeField] private float electricBallCoolTime = 30f;
 
@@ -135,7 +137,7 @@ public class Water : BossBase
             StopAllCoroutines();
             CleanupEncroachmentWarning();
             CleanupActiveHazards();
-            risingWaterPhase?.StopAndHide();
+            risingWaterPhase?.BeginDrainAndHide();
             ExpireAllEyes();
 
             WaterBossAbsorption absorption = GetComponent<WaterBossAbsorption>();
@@ -184,6 +186,11 @@ public class Water : BossBase
                     encroachmentWarningPrefab,
                     warningPoint.position,
                     warningPoint.rotation
+                );
+
+                MatchWarningAnimationToTelegraph(
+                    encroachmentWarningInstance,
+                    encroachmentTelegraphDuration
                 );
             }
         }
@@ -256,6 +263,29 @@ public class Water : BossBase
             Destroy(encroachmentWarningInstance);
             encroachmentWarningInstance = null;
         }
+    }
+
+    private static void MatchWarningAnimationToTelegraph(
+        GameObject warningInstance,
+        float telegraphDuration
+    )
+    {
+        if (warningInstance == null || telegraphDuration <= 0f)
+            return;
+
+        Animator warningAnimator = warningInstance.GetComponentInChildren<Animator>();
+        RuntimeAnimatorController controller = warningAnimator != null
+            ? warningAnimator.runtimeAnimatorController
+            : null;
+
+        if (controller == null)
+            return;
+
+        AnimationClip[] clips = controller.animationClips;
+        if (clips == null || clips.Length == 0 || clips[0] == null)
+            return;
+
+        warningAnimator.speed = clips[0].length / telegraphDuration;
     }
 
     private void ExpireAllEyes()
@@ -466,12 +496,13 @@ public class Water : BossBase
         if (IsDead) return TaskStatus.Failure;
         if (!isPatternSetup)
         {
-            curTimes[4] = electricBallPatternDuration + electricBallCoolTime;
-            curTimes[0] = electricBallPatternDuration;
+            float patternDuration = GetElectricBallSequenceDuration();
+            curTimes[4] = patternDuration + electricBallCoolTime;
+            curTimes[0] = patternDuration;
             isPatternSetup = true;
             Water_eye electricEye = SpawnEye(
                 3,
-                normalEyeOpenTime,
+                patternDuration,
                 false,
                 true
             );
@@ -482,6 +513,22 @@ public class Water : BossBase
 
         isPatternSetup = false;
         return TaskStatus.Success;
+    }
+
+    private float GetElectricBallSequenceDuration()
+    {
+        float chargeDuration = electricBallPrefab != null
+            ? electricBallPrefab.ChargeDuration
+            : 0f;
+        int shotCount = Mathf.Max(1, electricBallShotCount);
+        int rechargeCount = Mathf.Max(0, shotCount - 1);
+        float sequenceDuration =
+            electricBallSpawnDelay +
+            electricEyeOpenDuration +
+            chargeDuration * shotCount +
+            electricBallRechargeDelay * rechargeCount;
+
+        return Mathf.Max(electricBallPatternDuration, sequenceDuration);
     }
 
     private IEnumerator SpawnElectricBalls(Water_eye electricEye)
@@ -500,7 +547,8 @@ public class Water : BossBase
         if (electricBallPrefab == null || electricBallSpawnPoint == null)
             yield break;
 
-        for (int i = 0; i < 3; i++)
+        int shotCount = Mathf.Max(1, electricBallShotCount);
+        for (int i = 0; i < shotCount; i++)
         {
             yield return PauseManager.WaitWhilePaused();
 
@@ -513,8 +561,11 @@ public class Water : BossBase
                 electricBallSpawnPoint.rotation
             );
 
-            if (i < 2)
+            if (electricBallPrefab.ChargeDuration > 0f)
                 yield return new WaitForSeconds(electricBallPrefab.ChargeDuration);
+
+            if (i < shotCount - 1 && electricBallRechargeDelay > 0f)
+                yield return new WaitForSeconds(electricBallRechargeDelay);
         }
     }
 
@@ -548,6 +599,8 @@ public class Water : BossBase
 
         electricBallSpawnDelay = Mathf.Max(0f, electricBallSpawnDelay);
         electricEyeOpenDuration = Mathf.Max(0f, electricEyeOpenDuration);
+        electricBallShotCount = Mathf.Max(1, electricBallShotCount);
+        electricBallRechargeDelay = Mathf.Max(0f, electricBallRechargeDelay);
         electricBallPatternDuration = Mathf.Max(0.1f, electricBallPatternDuration);
         electricBallCoolTime = Mathf.Max(0f, electricBallCoolTime);
 

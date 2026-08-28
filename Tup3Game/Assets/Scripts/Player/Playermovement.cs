@@ -115,6 +115,7 @@ public class Playermovement : MonoBehaviour
         
         bool isAiming = skills != null && skills.IsAiming;
         bool isLunging = combo != null && combo.IsLunging;
+        bool isAttacking = combo != null && combo.IsAttacking;
 
         if (horizontalInput != 0 && !isAiming && !isLunging)
         {
@@ -252,17 +253,20 @@ public class Playermovement : MonoBehaviour
 
         if (animator != null)
         {
-            animator.SetFloat("Speed", Mathf.Abs(velocity.x));
-            animator.SetFloat("VerticalVelocity", velocity.y);
-            
-            if (collisions.below && !isDashing)
+            if (!isAttacking)
             {
-                float speedRatio = Mathf.Abs(velocity.x) / moveSpeed;
-                animator.speed = Mathf.Clamp(speedRatio, 0.7f, 1.3f);
-            }
-            else
-            {
-                animator.speed = 1f;   // 공중이나 대쉬 중엔 정상 속도로 복구
+                animator.SetFloat("Speed", Mathf.Abs(velocity.x));
+                animator.SetFloat("VerticalVelocity", velocity.y);
+
+                if (collisions.below && !isDashing)
+                {
+                    float speedRatio = Mathf.Abs(velocity.x) / moveSpeed;
+                    animator.speed = Mathf.Clamp(speedRatio, 0.7f, 1.3f);
+                }
+                else
+                {
+                    animator.speed = 1f;   // 공중이나 대쉬 중엔 정상 속도로 복구
+                }
             }
         }
         if (!isDashing)

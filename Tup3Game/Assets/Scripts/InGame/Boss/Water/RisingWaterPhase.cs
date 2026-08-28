@@ -14,6 +14,10 @@ public class RisingWaterPhase : MonoBehaviour
     [SerializeField] private float riseDuration = 4f;
     [SerializeField] private Ease riseEase = Ease.InOutSine;
 
+    [Header("사망 시 배수")]
+    [SerializeField] private float drainDuration = 2.5f;
+    [SerializeField] private Ease drainEase = Ease.InSine;
+
     [Header("수영 판정 여유")]
     [SerializeField, Min(0f)] private float enterDepth = 0.05f;
     [SerializeField, Min(0f)] private float exitDepth = 0.15f;
@@ -124,6 +128,42 @@ public class RisingWaterPhase : MonoBehaviour
             SetWaterY(GetRiseStartY());
             waterRoot.gameObject.SetActive(false);
         }
+    }
+
+    public void BeginDrainAndHide()
+    {
+        riseTween?.Kill();
+        riseTween = null;
+        HasReachedTarget = false;
+
+        if (waterRoot == null)
+        {
+            hasStarted = false;
+            SetPlayerSwimming(false);
+            return;
+        }
+
+        if (!waterRoot.gameObject.activeSelf)
+        {
+            StopAndHide();
+            return;
+        }
+
+        // Update의 수면 판정을 유지해 물이 플레이어 아래로 빠질 때 수영 상태도 해제한다.
+        hasStarted = true;
+        float drainEndY = GetRiseStartY();
+
+        if (drainDuration <= 0f || Mathf.Approximately(waterRoot.position.y, drainEndY))
+        {
+            StopAndHide();
+            return;
+        }
+
+        riseTween = waterRoot
+            .DOMoveY(drainEndY, drainDuration)
+            .SetEase(drainEase)
+            .OnComplete(CompleteDrain)
+            .SetLink(gameObject, LinkBehaviour.KillOnDestroy);
     }
 
     private void PrepareWater()
@@ -258,6 +298,20 @@ public class RisingWaterPhase : MonoBehaviour
             player.SetInWater(this, value);
     }
 
+    private void CompleteDrain()
+    {
+        riseTween = null;
+        hasStarted = false;
+        HasReachedTarget = false;
+        SetPlayerSwimming(false);
+
+        if (waterRoot != null)
+        {
+            SetWaterY(GetRiseStartY());
+            waterRoot.gameObject.SetActive(false);
+        }
+    }
+
     private void OnDisable()
     {
         riseTween?.Kill();
@@ -276,6 +330,7 @@ public class RisingWaterPhase : MonoBehaviour
     private void OnValidate()
     {
         riseDuration = Mathf.Max(0f, riseDuration);
+        drainDuration = Mathf.Max(0f, drainDuration);
         enterDepth = Mathf.Max(0f, enterDepth);
         exitDepth = Mathf.Max(enterDepth, exitDepth);
         playerOrderAbovePlatforms = Mathf.Max(0, playerOrderAbovePlatforms);

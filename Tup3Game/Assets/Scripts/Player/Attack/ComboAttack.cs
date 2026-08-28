@@ -5,6 +5,11 @@ using System.Collections;
 
 public class ComboAttack : MonoBehaviour
 {
+    private static readonly int AttackTriggerHash = Animator.StringToHash("AttackTrigger");
+    private static readonly int AttackIndexHash = Animator.StringToHash("AttackIndex");
+    private static readonly int IsAttackingHash = Animator.StringToHash("IsAttacking");
+    private static readonly int JumpTriggerHash = Animator.StringToHash("JumpTrigger");
+    private static readonly int DashTriggerHash = Animator.StringToHash("DashTrigger");
 
     public float currentDamage { get; private set; }
     public int maxCombo = 3;
@@ -38,6 +43,7 @@ public class ComboAttack : MonoBehaviour
     private Playermovement movement;
 
     public bool IsLunging => isLunging;
+    public bool IsAttacking => isAttacking;
     void Awake()
     {
         movement = GetComponent<Playermovement>();
@@ -77,6 +83,7 @@ public class ComboAttack : MonoBehaviour
     private IEnumerator Comboattack()
     {
         isAttacking = true;
+        SetAttackAnimationActive(true);
         comboStep = 0;
         comboQueued = false;
         try
@@ -100,9 +107,12 @@ public class ComboAttack : MonoBehaviour
                 // 여기서 comboStep에 따라 애니메이션 트리거, 데미지, 히트박스 크기 등을 다르게 조작
 
                 if (movement.animator != null)
-                { 
-                    movement.animator.SetTrigger("AttackTrigger");
-                    movement.animator.SetInteger("AttackIndex", comboStep);
+                {
+                    // 공격 정보를 먼저 확정한 뒤 트리거를 발동해 다른 상태보다 우선 진입시킨다.
+                    movement.animator.ResetTrigger(JumpTriggerHash);
+                    movement.animator.ResetTrigger(DashTriggerHash);
+                    movement.animator.SetInteger(AttackIndexHash, comboStep);
+                    movement.animator.SetTrigger(AttackTriggerHash);
                 }
 
                 float duration = comboStep switch
@@ -218,6 +228,7 @@ public class ComboAttack : MonoBehaviour
             comboStep = 0;
             currentDamage = 0f;
             isAttacking = false;
+            SetAttackAnimationActive(false);
             cancelRequested = false;
         }
     }
@@ -278,6 +289,19 @@ public class ComboAttack : MonoBehaviour
         return Mathf.Max(0.01f, baseDuration / attackSpeedMultiplier);
     }
 
+    private void SetAttackAnimationActive(bool active)
+    {
+        if (movement == null || movement.animator == null)
+            return;
+
+        movement.animator.SetBool(IsAttackingHash, active);
+        movement.animator.speed = active ? attackSpeedMultiplier : 1f;
+        if (!active)
+        {
+            movement.animator.ResetTrigger(AttackTriggerHash);
+        }
+    }
+
     private bool cancelRequested = false;
 
     public void CancelCombo()
@@ -292,8 +316,7 @@ public class ComboAttack : MonoBehaviour
                attackCollider != null &&
                !DialogueManager.IsDialogueActive &&
                !movement.IsDashing() &&
-               !movement.IsKnockedBack &&
-               !(movement.IsInWater && !movement.IsGrounded);
+               !movement.IsKnockedBack;
     }
 }
 
