@@ -2710,7 +2710,7 @@ MonoBehaviour:
   introDialogueFile: 
   victoryDialogueFile: 
   victoryStartId: 
-  defeatDialogueFile: S13_BATTLE_LOSE
+  defeatDialogueFile:
   skillGrantEntryId: 
   coinGrantEntryId: 
   introDelay: 0.5
@@ -3224,7 +3224,7 @@ MonoBehaviour:
   introDialogueFile: 
   victoryDialogueFile: 
   victoryStartId: hwa_win
-  defeatDialogueFile: S13_BATTLE_LOSE
+  defeatDialogueFile:
   skillGrantEntryId: 
   coinGrantEntryId: 
   introDelay: 0.5

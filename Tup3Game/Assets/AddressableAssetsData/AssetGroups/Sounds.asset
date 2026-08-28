@@ -15,8 +15,8 @@ MonoBehaviour:
   m_GroupName: Sounds
   m_GUID: 50653995060d64c48a9bafd729199b39
   m_SerializeEntries:
-  - m_GUID: a485170d6d7f13d438b4da209f0ff4b5
-    m_Address: ItemObtain
+  - m_GUID: 0427d73293861be4a91ea3a9edc16644
+    m_Address: Soil_RockFall
     m_ReadOnly: 0
     m_SerializedLabels:
     - Sound
@@ -27,20 +27,32 @@ MonoBehaviour:
     m_SerializedLabels:
     - Sound
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 093f612eef740024ea1fb2095eb61a82
+    m_Address: Water_Sprout
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 101f1e6ef364bae4e8166ca4699c0845
+    m_Address: Player_LandHeavy
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 123e642544c5c1448975170fc48d3e3e
+    m_Address: Block_Blunt
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 1871cb4897934b099370d2e0390305c5
     m_Address: BGM_Prologue
     m_ReadOnly: 0
     m_SerializedLabels:
     - Sound
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: b6079b1f95e9485b9eb49cb8dd9526bf
-    m_Address: BGM_Lobby
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Sound
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: b4dbc502813b4651863cdba96828f442
-    m_Address: BGM_Soil
+  - m_GUID: 1d1ac5643e48f524a873750a6e55e40d
+    m_Address: Player_Death
     m_ReadOnly: 0
     m_SerializedLabels:
     - Sound
@@ -51,32 +63,20 @@ MonoBehaviour:
     m_SerializedLabels:
     - Sound
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 86293ee5e7024b19a126d1624aff03da
-    m_Address: BGM_Fire
+  - m_GUID: 212f0e284af016445b42061b11dee93e
+    m_Address: Player_SkillHeal
     m_ReadOnly: 0
     m_SerializedLabels:
     - Sound
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 3e7da0914eb94fd8bd02632cb7b4f16a
-    m_Address: BGM_Gold
+  - m_GUID: 22060aa2a7f47cd46b4f2172cf9d86a9
+    m_Address: Gold_SwingMelee
     m_ReadOnly: 0
     m_SerializedLabels:
     - Sound
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 7ec6d887a59e437f828059e428cdac47
-    m_Address: BGM_Styx
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Sound
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 72e10dc0b10e09cb5b952e6ac6036b64
-    m_Address: BGM_Ending1
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Sound
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 9fe9b21e6f7d41f9820eea4c3bc014f5
-    m_Address: BGM_Ending2
+  - m_GUID: 278dadab2fd4164409e54e878575763f
+    m_Address: Gold_Draw
     m_ReadOnly: 0
     m_SerializedLabels:
     - Sound
@@ -87,8 +87,284 @@ MonoBehaviour:
     m_SerializedLabels:
     - Sound
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3a7ac58fd6743804488feb23cb9a357c
+    m_Address: Player_SkillAttackSpeed
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3b86c073012f9e140bd6300ff81c7f2d
+    m_Address: FinalDeath_Beep
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3e7da0914eb94fd8bd02632cb7b4f16a
+    m_Address: BGM_Gold
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 47d01ba50c14f8b4189076e12d01b2f9
+    m_Address: Player_AttackHeavy
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4dd9498fe9552364eb3043e82f916627
+    m_Address: Fire_Roar
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4f30a031109b6e84287176e8d2bb7b11
+    m_Address: Player_SkillBarrier
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4f655a04e62e863439bd4837eaafabbe
+    m_Address: Gold_HitLight
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 515b1ac85e4df1b40b76d27ca81f14ee
+    m_Address: Gold_SwingSword
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 527ce3e0107f6864fba53a9ded5dd663
+    m_Address: Water_Wade
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 58cc354736f1b03419f7b764a50d06f7
+    m_Address: Soil_Death
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5c7c68f5266f7ce44b89c60e7f030e82
+    m_Address: Sword_Clash
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5d75f82a66954b1458505fd5dc97dd65
+    m_Address: Player_SkillAttackUp
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6380490bb4074ec47964a82ba429b667
+    m_Address: Fire_Column
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 68a069fabed7ba14da3d045cb12a579c
+    m_Address: Gold_Dash
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 69bde60345881694a9e7fa51f73bae5c
+    m_Address: Fire_LavaLand
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6b832ae7c76088d4e97e1f7668afa1f9
+    m_Address: Gold_SwingClub
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6dd6b79888d32cd499b165c2cb955a27
+    m_Address: Fire_RushHit
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 70025cd56493ce7488ed7c377e51b41e
+    m_Address: Fire_LavaSizzle
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 72e10dc0b10e09cb5b952e6ac6036b64
+    m_Address: BGM_Ending1
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 77fd68bed477e0b4fab1f2574e3a8512
+    m_Address: Intro_Beep
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7ec6d887a59e437f828059e428cdac47
+    m_Address: BGM_Styx
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 86293ee5e7024b19a126d1624aff03da
+    m_Address: BGM_Fire
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 8acfa85a8c24ffc989e28484a25d645d
     m_Address: BGM_Ending4
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8b04faa6e43e2c042b127dd65ec59e7f
+    m_Address: Gold_HitHeavy
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8fe2939c3043d8b4796143a0f24cd28a
+    m_Address: Player_Footstep
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 98cb2fb4012e25e408098deaf6a155ff
+    m_Address: Soil_Footstep
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9fe9b21e6f7d41f9820eea4c3bc014f5
+    m_Address: BGM_Ending2
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a485170d6d7f13d438b4da209f0ff4b5
+    m_Address: ItemObtain
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a9eb1714483c8934dac0ed5c73c48d2d
+    m_Address: Water_Tornado
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ade95e5c994c8d9409b864ac33c26356
+    m_Address: Player_Jump
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b07c631118e7d8c49be9b23fbfc8e4a8
+    m_Address: Parry_Success
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b4dbc502813b4651863cdba96828f442
+    m_Address: BGM_Soil
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b6079b1f95e9485b9eb49cb8dd9526bf
+    m_Address: BGM_Lobby
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b852211165235904eb2ed1e3de9c0bca
+    m_Address: Water_Splash
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bc3cca16ac45400448050c3351f3496f
+    m_Address: Player_Dash
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bc8826d1f29c5a943940208611d6464f
+    m_Address: Fire_RushHit2
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c44141aa08383904ea33a678f2ce5051
+    m_Address: Water_Roar
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cad406075d81091468dbf11fe06f7c57
+    m_Address: Soil_Smash
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d1c0a97ddcbb13b409db4f3d9a0c8d62
+    m_Address: Water_Rising
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dc22b18ad11eafc42afec48f99781730
+    m_Address: Player_Land
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e0e15e7a345f06941a9d99d7aac2a5b3
+    m_Address: Gold_Roar
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ea0af13ca53ab004c833d0bfb1205107
+    m_Address: UI_Select
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ee3919569ae9b624ebe69a98aa76c0f0
+    m_Address: UI_SceneTransition
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f150f65c4e5d1e34099ba616491e5f91
+    m_Address: Gold_ScreenSlash
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f33f189e959c6fc40adabb439705c6a3
+    m_Address: Water_Skill
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f50d262e52808d946985479975c26229
+    m_Address: Water_IceBullet
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f7ce36b4763a89d4c83031d9549c2aed
+    m_Address: UI_Portal
     m_ReadOnly: 0
     m_SerializedLabels:
     - Sound

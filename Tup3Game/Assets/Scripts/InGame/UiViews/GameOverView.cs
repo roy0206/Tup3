@@ -32,15 +32,22 @@ public class GameOverView : MonoBehaviour
     public event Action TitleRequested;
 
     private bool built;
+    private Button continueButton;
+    private Button titleButton;
+    private UiFocusKeeper focus;
+    private GameObject outsideSelection;
 
     public void Show()
     {
         EnsureBuilt();
         gameObject.SetActive(true);
+        outsideSelection = UiFocus.Focus(transform, focus);
     }
 
     public void Hide()
     {
+        UiFocus.Blur(transform, outsideSelection);
+        outsideSelection = null;
         gameObject.SetActive(false);
     }
 
@@ -48,6 +55,8 @@ public class GameOverView : MonoBehaviour
     {
         if (built) return;
         built = true;
+
+        UiFocus.EnsureEventSystem();
 
         if (fontAsset == null) fontAsset = UiViewBuilder.FindFallbackFont(transform);
 
@@ -58,13 +67,16 @@ public class GameOverView : MonoBehaviour
 
         UiViewBuilder.BuildLabel(panel, "Title", titleText, fontAsset, titleFontSize, titleColor);
 
-        Button continueButton = UiViewBuilder.BuildButton(
+        continueButton = UiViewBuilder.BuildButton(
             panel, "ContinueButton", continueLabel, fontAsset, buttonFontSize, buttonColor, textColor, buttonSize);
         continueButton.onClick.AddListener(() => ContinueRequested?.Invoke());
 
-        Button titleButton = UiViewBuilder.BuildButton(
+        titleButton = UiViewBuilder.BuildButton(
             panel, "TitleButton", titleSceneLabel, fontAsset, buttonFontSize, buttonColor, textColor, buttonSize);
         titleButton.onClick.AddListener(() => TitleRequested?.Invoke());
+
+        UiFocus.LinkVertical(true, continueButton, titleButton);
+        focus = UiFocus.AttachKeeper(gameObject, sortingOrder, continueButton, titleButton);
     }
 }
 
@@ -83,4 +95,12 @@ public class GameOverView : MonoBehaviour
  *   패배 UI 가 위에 남아 버튼을 계속 누를 수 있다. 씬 전환 시 PauseManager 가 일시정지를 자동 해제한다.
  * - DOTween.PauseAll() 과 함께 쓰이므로 이 뷰는 트윈/애니메이터를 쓰지 않는다(즉시 표시/숨김).
  * - 폰트를 비워 두면 씬 안의 기존 TMP 텍스트 폰트 → TMP 기본 폰트 순으로 폴백한다.
+ *
+ * ── 키보드 조작 (2026-08-28 유저 확정) ───────────────────────────────────────
+ *   Show 때 UiFocus.Focus 가 "마지막 지점에서 다시"(첫 항목)를 선택하므로 곧바로 ↑/↓ + Enter 로
+ *   고를 수 있다. 두 항목은 UiFocus.LinkVertical 로 Explicit 순환 연결한다.
+ *   위 파일 노트대로 이 UI 가 떠 있는 동안에도 ESC 로 일시정지를 열 수 있는데(패배 UI 950 >
+ *   일시정지 900 이라 패배 UI 가 계속 위에 보인다), 이때 일시정지 메뉴가 선택을 가져가고
+ *   PauseMenuView.Hide 의 UiFocus.Blur 가 여기 있던 항목으로 선택을 되돌려 준다.
+ *   그래서 ESC → ESC 를 오가도 Enter 가 엉뚱한 버튼을 누르지 않는다.
  */

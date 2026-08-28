@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
 public class PauseManager : Singleton<PauseManager>
@@ -193,7 +192,7 @@ public class PauseManager : Singleton<PauseManager>
 
     void EnsureViews()
     {
-        EnsureEventSystem();
+        UiFocus.EnsureEventSystem();
 
         if (menuView == null)
         {
@@ -224,14 +223,6 @@ public class PauseManager : Singleton<PauseManager>
             optionsView.CloseRequested += OnOptionsCloseRequested;
             optionsView.Hide();
         }
-    }
-
-    static void EnsureEventSystem()
-    {
-        if (EventSystem.current != null) return;
-        if (FindAnyObjectByType<EventSystem>(FindObjectsInactive.Include) != null) return;
-
-        new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
     }
 
     void FreezeWorld()
@@ -326,6 +317,15 @@ public class PauseManager : Singleton<PauseManager>
  *      일시정지 중 옵션이 열려 있으면 ESC 는 "옵션 닫기(메뉴로 복귀)"로 동작한다.
  *    - 일시정지 차단 중(IsPauseBlocked) : 무시. 단 이미 정지 상태라면 ESC 로 해제는 계속 되게 두어
  *      차단 플래그가 잘못 남아도 플레이어가 갇히지 않는다.
+ *
+ *    [ESC 이중 처리 검토 — 2026-08-28 키보드 UI 작업]
+ *    EventSystem 쪽에도 Cancel(구 모듈은 InputManager 의 Cancel 축 = escape,
+ *    신 모듈은 Keyboard 의 escape 키에 붙은 "Cancel" usage) 이 흐르지만, uGUI Button/Slider 는
+ *    ICancelHandler 를 구현하지 않으므로 아무 일도 하지 않는다. 즉 일시정지 메뉴·옵션 패널·
+ *    패배 UI 에서 ESC 는 여기 HandleEscape 한 곳에서만 처리된다(이중 처리 없음).
+ *    유일한 예외가 ConfirmDialogView 다 — 그 모달은 ESC 로 닫혀야 자연스러워서 버튼에
+ *    UiCancelRelay 를 붙였고, 대신 떠 있는 동안 BlockPause() 를 걸어 HandleEscape 가
+ *    위 규칙대로 먼저 return 하게 만든다. 그래서 그 경우에도 ESC 한 번에 두 단계가 닫히지 않는다.
  *
  * 3-1) 일시정지 차단 (BlockPause / UnblockPause / IsPauseBlocked)
  *    "이 구간에서는 멈출 수 없다"를 표현하는 카운터. 중첩을 고려해 bool 이 아니라 참조 카운트다.

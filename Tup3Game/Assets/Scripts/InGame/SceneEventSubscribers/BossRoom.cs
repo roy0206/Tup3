@@ -43,7 +43,7 @@ public class BossRoom : MonoBehaviour, ISceneEventListener
     [SerializeField] private string introDialogueFile;
     [SerializeField] private string victoryDialogueFile;
     [SerializeField] private string victoryStartId;
-    [SerializeField] private string defeatDialogueFile = "S13_BATTLE_LOSE";
+    [SerializeField] private string defeatDialogueFile = "";
 
     [Header("지급 판정 행 id (비우면 _skill / _coin 접미사로 자동 판정)")]
     [SerializeField] private string skillGrantEntryId;
@@ -95,6 +95,13 @@ public class BossRoom : MonoBehaviour, ISceneEventListener
     private void Awake()
     {
         SceneController.Instance.RegisterListener(this);
+    }
+
+    private void Start()
+    {
+        ResolveReferences();
+        SetBossActive(false);
+        SetPlayerCombatEnabled(false);
     }
 
     public void OnSceneLoadComplete(string sceneName)
@@ -583,6 +590,17 @@ public class BossRoom : MonoBehaviour, ISceneEventListener
 
 /* [파일 노트]
  *
+ * ── 씬 진입 직후 선제 잠금 (2026-08-28) ───────────────────────────────────────
+ *   Start() 에서 미리 보스와 플레이어 공격을 꺼 둔다. Prepare 상태가 하는 일과 같지만 시점이 더 이르다.
+ *   이유: SceneController.Start 는 코루틴이라 `yield return null` + 세이브 비동기 로드가 끝난 뒤에야
+ *   NotifyLoadComplete 를 부른다. 그 사이 여러 프레임 동안 보스 Update 가 그대로 돌아
+ *   대사가 뜨기도 전에 패턴이 나가는 문제가 있었다(보스 Update 게이트는
+ *   PauseManager.IsPaused || DialogueManager.IsDialogueActive 인데 이 구간은 둘 다 false).
+ *   Awake 가 아니라 Start 인 것이 중요하다 — Unity 는 모든 Awake 를 끝낸 뒤 Start 를 부르고
+ *   Start 는 첫 Update 보다 먼저 실행되므로, 보스 초기화가 끝난 뒤 안전하게 끄면서도
+ *   패턴이 한 프레임도 돌지 않는다. (보스 클래스에는 Start 가 없어 지연되는 초기화도 없다.)
+ *   OnSceneLoadComplete 는 직접 Play 로 씬을 열어도 반드시 오므로 보스가 영영 꺼진 채 남지 않는다.
+ *
  * ── 상태 머신 흐름 ────────────────────────────────────────────────────────────
  *
  *   None
@@ -603,7 +621,12 @@ public class BossRoom : MonoBehaviour, ISceneEventListener
  *                  · 승리 → victoryDialogueFile 을 victoryStartId 행부터 재생.
  *                    그 행이 "받아들인다 / 거절한다" 선택지 행이고, 선택 결과로 _skill 또는 _coin 행에 도달한다.
  *                    도달 감지는 DialogueManager.OnEntryShown 으로 하고 거기서 실제 지급이 일어난다.
- *                  · 패배 → defeatDialogueFile(S13) 재생. 코인은 건드리지 않는다.
+ *                  · 패배 → 대사 없음. defeatDialogueFile 은 기본값이 빈 문자열이라 PlayDialogue 가
+ *                    곧바로 반환하고, dialogueRunning 이 false 인 채로 다음 프레임에 GameOver 로 넘어간다.
+ *                    (2026-08-28 유저 확인) 기획서 "#전투 패배시" 항목이 "메시지 없이 바로 시작"이라
+ *                    패배 대사는 애초에 기획에 없었다. 구 사양의 S13_BATTLE_LOSE 재생을 제거했고
+ *                    4개 보스 씬에 직렬화돼 있던 값도 함께 비웠다. CSV 파일 자체는 남겨 두었지만
+ *                    이제 어디서도 재생되지 않는다. 되살리려면 이 필드에 파일명을 넣으면 된다.
  *   Clear        : clearedBosses 에 이 보스 플래그를 기록하고 즉시 SaveAsync.
  *                  플레이어 조작을 돌려주고, 이후 퇴장은 기존 BossExit 상호작용에 맡긴다.
  *

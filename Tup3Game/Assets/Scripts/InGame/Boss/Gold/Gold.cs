@@ -94,6 +94,15 @@ public class Gold : BossBase
     protected override string CurrentHitSoundName =>
         IsGroggy ? groggyHitSoundName : base.CurrentHitSoundName;
 
+    [Header("반격 가능 표시 (aura)")]
+    [SerializeField] private Transform counterAura;
+    [SerializeField] private string counterAuraObjectName = "aura";
+    [SerializeField] private Vector2 counterAuraScaleRange = new Vector2(1f, 1.1f);
+    [SerializeField] private Vector2 counterAuraPulseDuration = new Vector2(0.25f, 0.6f);
+
+    private Tween counterAuraTween;
+    private bool counterAuraShown;
+
     private BoxCollider2D bodyCollider;
     private ComboAttack playerCombo;
     private Playermovement playerMovement;
@@ -153,7 +162,7 @@ public class Gold : BossBase
             .End()
             .Build();
 
-        curTimes = new List<float> { 0f, 0f, 0f, 0f, pattern4Cooldown };
+        curTimes = new List<float> { 0f, 0f, 10f, 60, pattern4Cooldown };
         if (animator == null) animator = GetComponent<Animator>();
         if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
         transform.localRotation = Quaternion.identity;
@@ -186,6 +195,7 @@ public class Gold : BossBase
         }
         isCounterAttackReady = false;
         groggyTime -= Time.deltaTime;
+        UpdateCounterAura();
         UpdatePlayerAttackDetection();
         patternElapsed = isPatternSetup ? patternElapsed + Time.deltaTime : 0f;
         animator.SetBool("IsDead", IsDead);
@@ -198,6 +208,56 @@ public class Gold : BossBase
     {
         CancelPattern4();
         HidePattern1Effect();
+        SetCounterAuraShown(false);
+    }
+
+    private void ResolveCounterAura()
+    {
+        if (counterAura != null) return;
+        if (string.IsNullOrWhiteSpace(counterAuraObjectName)) return;
+
+        foreach (Transform child in GetComponentsInChildren<Transform>(true))
+        {
+            if (child == transform) continue;
+            if (child.name != counterAuraObjectName) continue;
+
+            counterAura = child;
+            return;
+        }
+    }
+
+    private void UpdateCounterAura()
+    {
+        SetCounterAuraShown(!IsDead && !IsGroggy);
+    }
+
+    private void SetCounterAuraShown(bool show)
+    {
+        if (counterAura == null) return;
+        if (counterAuraShown == show) return;
+
+        counterAuraShown = show;
+
+        counterAuraTween?.Kill();
+        counterAuraTween = null;
+        counterAura.localScale = Vector3.one * counterAuraScaleRange.x;
+        counterAura.gameObject.SetActive(show);
+
+        if (show) PlayCounterAuraPulse();
+    }
+
+    private void PlayCounterAuraPulse()
+    {
+        if (counterAura == null) return;
+
+        float target = UnityEngine.Random.Range(counterAuraScaleRange.x, counterAuraScaleRange.y);
+        float duration = Mathf.Max(0.01f, UnityEngine.Random.Range(counterAuraPulseDuration.x, counterAuraPulseDuration.y));
+
+        counterAuraTween = counterAura
+            .DOScale(Vector3.one * target, duration)
+            .SetEase(Ease.InOutSine)
+            .SetTarget(this)
+            .OnComplete(PlayCounterAuraPulse);
     }
 
     private void ShowPattern1Effect()
