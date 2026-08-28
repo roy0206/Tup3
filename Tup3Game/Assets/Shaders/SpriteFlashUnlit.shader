@@ -56,18 +56,13 @@ Shader "Tup3/2D/Sprite Flash Unlit"
             // NOTE: Do not ifdef the properties here as SRP batcher can not handle different layouts.
             CBUFFER_START(UnityPerMaterial)
                 half4 _Color;
-                half4 _FlashColor;
-                half _FlashAmount;
             CBUFFER_END
 
-            // Tints the shaded RGB towards _FlashColor while keeping the sprite's own alpha,
-            // so only the silhouette lights up.
-            half4 ApplySpriteFlash(half4 shaded)
-            {
-                half amount = saturate(_FlashAmount * _FlashColor.a);
-                shaded.rgb = lerp(shaded.rgb, _FlashColor.rgb, amount);
-                return shaded;
-            }
+            // Driven per-renderer through a MaterialPropertyBlock, so these must stay OUTSIDE
+            // UnityPerMaterial. The SRP Batcher binds that buffer per material, which leaves a
+            // MaterialPropertyBlock override unbound.
+            half4 _FlashColor;
+            half _FlashAmount;
 
             Varyings UnlitVertex(Attributes input)
             {
@@ -80,9 +75,14 @@ Shader "Tup3/2D/Sprite Flash Unlit"
                 return o;
             }
 
+            // Tints the shaded RGB towards _FlashColor while keeping the sprite's own alpha,
+            // so only the silhouette lights up.
             half4 UnlitFragment(Varyings input) : SV_Target
             {
-                return ApplySpriteFlash(CommonUnlitFragment(input, input.color));
+                half4 shaded = CommonUnlitFragment(input, input.color);
+                half amount = saturate(_FlashAmount * _FlashColor.a);
+                shaded.rgb = lerp(shaded.rgb, _FlashColor.rgb, amount);
+                return shaded;
             }
             ENDHLSL
         }

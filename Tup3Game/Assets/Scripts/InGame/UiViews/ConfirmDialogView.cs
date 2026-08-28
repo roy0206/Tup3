@@ -34,6 +34,9 @@ public class ConfirmDialogView : MonoBehaviour
     [SerializeField] private float spacing = 20f;
     [SerializeField] private int sortingOrder = 980;
 
+    [Header("조작")]
+    [SerializeField] private bool cancelKeyCloses = true;
+
     public event Action Confirmed;
     public event Action Canceled;
 
@@ -41,6 +44,11 @@ public class ConfirmDialogView : MonoBehaviour
     private TextMeshProUGUI messageLabel;
     private TextMeshProUGUI confirmLabel;
     private TextMeshProUGUI cancelLabel;
+    private Button confirmButton;
+    private Button cancelButton;
+    private UiFocusKeeper focus;
+    private GameObject outsideSelection;
+    private bool pauseBlocked;
     private bool built;
 
     public void SetContent(string title, string message, string confirm, string cancel)
@@ -58,11 +66,36 @@ public class ConfirmDialogView : MonoBehaviour
         EnsureBuilt();
         ApplyContent();
         gameObject.SetActive(true);
+
+        outsideSelection = UiFocus.Focus(transform, focus);
+        BlockPause();
     }
 
     public void Hide()
     {
+        ReleasePause();
+        UiFocus.Blur(transform, outsideSelection);
+        outsideSelection = null;
         gameObject.SetActive(false);
+    }
+
+    private void OnDisable()
+    {
+        ReleasePause();
+    }
+
+    private void BlockPause()
+    {
+        if (!cancelKeyCloses || pauseBlocked) return;
+        pauseBlocked = true;
+        PauseManager.BlockPause();
+    }
+
+    private void ReleasePause()
+    {
+        if (!pauseBlocked) return;
+        pauseBlocked = false;
+        PauseManager.UnblockPause();
     }
 
     private void ApplyContent()
@@ -79,6 +112,8 @@ public class ConfirmDialogView : MonoBehaviour
     {
         if (built) return;
         built = true;
+
+        UiFocus.EnsureEventSystem();
 
         if (fontAsset == null) fontAsset = UiViewBuilder.FindFallbackFont(transform);
 
@@ -98,15 +133,24 @@ public class ConfirmDialogView : MonoBehaviour
         messageLayout.minWidth = messageWidth;
         messageLayout.minHeight = messageMinHeight;
 
-        Button confirmButton = UiViewBuilder.BuildButton(
+        confirmButton = UiViewBuilder.BuildButton(
             panel, "ConfirmButton", confirmText, fontAsset, buttonFontSize, buttonColor, confirmTextColor, buttonSize);
         confirmButton.onClick.AddListener(() => Confirmed?.Invoke());
         confirmLabel = confirmButton.GetComponentInChildren<TextMeshProUGUI>(true);
 
-        Button cancelButton = UiViewBuilder.BuildButton(
+        cancelButton = UiViewBuilder.BuildButton(
             panel, "CancelButton", cancelText, fontAsset, buttonFontSize, buttonColor, textColor, buttonSize);
         cancelButton.onClick.AddListener(() => Canceled?.Invoke());
         cancelLabel = cancelButton.GetComponentInChildren<TextMeshProUGUI>(true);
+
+        UiFocus.LinkVertical(true, confirmButton, cancelButton);
+        focus = UiFocus.AttachKeeper(gameObject, sortingOrder, cancelButton, confirmButton);
+
+        if (cancelKeyCloses)
+        {
+            confirmButton.gameObject.AddComponent<UiCancelRelay>().Setup(() => Canceled?.Invoke());
+            cancelButton.gameObject.AddComponent<UiCancelRelay>().Setup(() => Canceled?.Invoke());
+        }
     }
 }
 
@@ -141,4 +185,28 @@ public class ConfirmDialogView : MonoBehaviour
  *   폴백을 쓴다(BossRoom 의 GameOverView 처리와 동일). 씬 배치본이어도 EnsureBuilt 는 그대로
  *   돌아 같은 구조를 만들고, 구독은 호출자가 인스턴스 출처와 무관하게 붙인다.
  *   폰트를 비워 두면 씬 안의 기존 TMP 텍스트 폰트 → TMP 기본 폰트 순으로 폴백한다.
+ *
+ * ── 키보드 조작 (2026-08-28 유저 확정) ───────────────────────────────────────
+ *   [기본 선택 = 취소]
+ *   Show 때 UiFocus.Focus 가 "취소"를 먼저 선택한다. 다른 뷰는 첫 항목을 고르지만 이 모달만
+ *   두 번째 항목을 고르는 이유는, 확인 쪽이 되돌릴 수 없는 선택이기 때문이다(유일한 호출자인
+ *   Ending 의 "돌아가기"는 엔딩 업적을 포기하고 씬을 떠난다). 크레딧 빨리감기로 Enter 를
+ *   누르고 있다가 모달이 뜨는 순간 확정돼 버리는 사고를 막는다.
+ *   레이아웃 순서는 그대로 확인(위) → 취소(아래)이고, UiFocus.LinkVertical 로 Explicit 순환 연결한다.
+ *   엔딩 씬처럼 뒤쪽에 복귀 버튼 2개가 살아 있는 화면이라 Automatic 이면 방향키가 Dim 을 뚫고
+ *   새어 나가므로 Explicit 가 필수다.
+ *   Hide 때 UiFocus.Blur 가 모달을 열기 직전의 선택(엔딩의 "마지막 체크포인트로 돌아가기")으로
+ *   되돌리므로, 취소하고 나면 커서가 원래 자리에 그대로 있다.
+ *
+ *   [취소 키 = ESC — PauseManager 와의 중복 방지]
+ *   cancelKeyCloses(기본 켜짐)이면 두 버튼에 UiCancelRelay 를 붙여 ESC 로 Canceled 를 발화한다.
+ *   그런데 PauseManager.Update 는 KeyCode.Escape 를 무조건 읽어 HandleEscape 로 보내므로,
+ *   그대로 두면 ESC 한 번에 "모달이 닫히고 + 일시정지 메뉴가 열리는" 이중 처리가 난다.
+ *   그래서 이 모달은 떠 있는 동안 PauseManager.BlockPause() 를 걸어 둔다 —
+ *   HandleEscape 는 "IsPauseBlocked && !IsPaused" 에서 곧바로 return 하므로 ESC 는
+ *   오직 이 모달만 닫는다. Hide 와 OnDisable 양쪽에서 pauseBlocked 플래그로 정확히 한 번만
+ *   UnblockPause 하고, 씬이 바뀌면 PauseManager 가 카운터를 0 으로 되돌리므로 새지 않는다.
+ *   부수 효과로 "확인창이 떠 있는 동안에는 일시정지할 수 없다"가 되는데, 모달이 결정을
+ *   기다리는 구간이라 의도한 동작이다. 이 동작이 싫으면 cancelKeyCloses 를 끄면 되고,
+ *   그러면 ESC 는 예전처럼 일시정지 토글로만 동작한다(모달은 마우스/Enter 로만 닫힌다).
  */

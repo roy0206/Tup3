@@ -35,8 +35,11 @@ public class OptionsPanelView : MonoBehaviour
     private bool built;
     private Slider bgmSlider;
     private Slider sfxSlider;
+    private Button closeButton;
     private TextMeshProUGUI bgmValueLabel;
     private TextMeshProUGUI sfxValueLabel;
+    private UiFocusKeeper focus;
+    private GameObject outsideSelection;
 
     public void Show(float bgmValue, float sfxValue)
     {
@@ -47,10 +50,13 @@ public class OptionsPanelView : MonoBehaviour
         RefreshValueLabels();
 
         gameObject.SetActive(true);
+        outsideSelection = UiFocus.Focus(transform, focus);
     }
 
     public void Hide()
     {
+        UiFocus.Blur(transform, outsideSelection);
+        outsideSelection = null;
         gameObject.SetActive(false);
     }
 
@@ -58,6 +64,8 @@ public class OptionsPanelView : MonoBehaviour
     {
         if (built) return;
         built = true;
+
+        UiFocus.EnsureEventSystem();
 
         if (fontAsset == null) fontAsset = UiViewBuilder.FindFallbackFont(transform);
 
@@ -82,9 +90,12 @@ public class OptionsPanelView : MonoBehaviour
             SfxChanged?.Invoke(value);
         });
 
-        Button closeButton = UiViewBuilder.BuildButton(
+        closeButton = UiViewBuilder.BuildButton(
             panel, "CloseButton", "뒤로", fontAsset, buttonFontSize, buttonColor, textColor, buttonSize);
         closeButton.onClick.AddListener(() => CloseRequested?.Invoke());
+
+        UiFocus.LinkVertical(true, bgmSlider, sfxSlider, closeButton);
+        focus = UiFocus.AttachKeeper(gameObject, sortingOrder, bgmSlider, sfxSlider, closeButton);
     }
 
     private (Slider, TextMeshProUGUI) BuildVolumeRow(Transform parent, string name, string labelText)
@@ -113,6 +124,8 @@ public class OptionsPanelView : MonoBehaviour
         var valueElement = valueLabel.gameObject.AddComponent<LayoutElement>();
         valueElement.preferredWidth = 80f;
 
+        slider.gameObject.AddComponent<UiSelectionTint>().Setup(textColor, fillColor, label, valueLabel);
+
         return (slider, valueLabel);
     }
 
@@ -134,5 +147,26 @@ public class OptionsPanelView : MonoBehaviour
  *   재사용한다(분기는 PauseManager 담당). 트윈/애니메이터는 쓰지 않는다(DOTween.PauseAll 과 공존).
  * - UI 교체 방법은 PauseMenuView 와 동일: 같은 API 를 가진 이 컴포넌트를 씬에 직접 배치하면
  *   PauseManager 가 그것을 우선 사용한다.
- * - 조작은 마우스 기준(EventSystem 은 PauseManager 가 보장). 키보드 내비게이션은 추후 확장.
+ *
+ * ── 키보드 조작 (2026-08-28 유저 확정) ───────────────────────────────────────
+ *   Show 때 UiFocus.Focus 가 배경음 슬라이더(지난번 위치가 있으면 그쪽)를 선택한다.
+ *   방향키는 UiFocus.LinkVertical 로 배경음 ↔ 효과음 ↔ 뒤로 를 Explicit 순환 연결한다.
+ *   Automatic 을 쓰지 않는 이유가 여기서 특히 중요하다 — Start(타이틀) 씬에서 ESC 로 이 패널만
+ *   열면 뒤쪽 타이틀 메뉴 버튼 4개가 그대로 살아 있어서, Automatic 이면 ↓ 를 누르다 Dim 을 뚫고
+ *   타이틀 메뉴로 넘어가 버린다.
+ *
+ *   [슬라이더 좌우/상하]
+ *   uGUI Slider 는 OnMove 에서 "좌/우 이동인데 그 방향의 이웃(FindSelectableOnLeft/Right)이
+ *   없으면 값을 조절"한다. LinkVertical 이 selectOnLeft/Right 를 null 로 끊어 두므로
+ *   ← / → = 값 10%(stepSize = 범위의 0.1) 조절, ↑ / ↓ = 항목 이동이 그대로 성립한다.
+ *   마우스 드래그는 Slider 자신의 드래그 처리라 아무 영향이 없다.
+ *
+ *   [선택 표시]
+ *   슬라이더는 ColorTint 의 targetGraphic 이 핸들 하나뿐인데, 핸들은 골드색 채움 막대 위에
+ *   올라앉아 있어 색을 바꿔도 눈에 띄지 않는다. 그래서 슬라이더 오브젝트에 UiSelectionTint 를
+ *   붙여 같은 행의 이름표("배경음"/"효과음")와 값 표시("70%")를 fillColor(골드)로 함께 물들인다.
+ *   행 전체가 켜지므로 "뒤로" 버튼의 배경 밝아짐과 강도가 비슷하다.
+ *
+ *   ESC 는 예전대로 PauseManager.HandleEscape 만 처리한다(패널을 닫고 메뉴로 복귀 / 타이틀에서는 토글).
+ *   이 뷰는 Cancel 이벤트를 받지 않으므로 ESC 한 번에 두 단계가 닫히는 일이 없다.
  */

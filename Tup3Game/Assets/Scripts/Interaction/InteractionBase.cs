@@ -31,7 +31,7 @@ public abstract class InteractionBase : MonoBehaviour
 
     private float hold = 0;
     
-    private void Start()
+    protected virtual void Start()
     {
         InteractionManager.Current.Register(this);
         view = FindAnyObjectByType<InteractionView>();

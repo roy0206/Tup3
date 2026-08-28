@@ -48,6 +48,7 @@ public class Ending : MonoBehaviour, ISceneEventListener
     [SerializeField] private Color fallbackTextColor = new Color(0.9f, 0.9f, 0.9f, 1f);
     [SerializeField] private int fallbackSortingOrder = 920;
 
+    private UiFocusKeeper choiceFocus;
     private bool dialogueRunning;
     private bool subscribed;
     private bool confirmSubscribed;
@@ -227,7 +228,16 @@ public class Ending : MonoBehaviour, ISceneEventListener
         }
 
         if (returnButton == null && checkpointButton == null)
+        {
             Debug.LogError("[Ending] 복귀 버튼을 만들지 못했습니다 — 엔딩에서 빠져나갈 수단이 없습니다");
+            return;
+        }
+
+        UiFocus.EnsureEventSystem();
+        UiViewBuilder.ApplySelectionTint(checkpointButton);
+        UiViewBuilder.ApplySelectionTint(returnButton);
+        UiFocus.LinkVertical(true, checkpointButton, returnButton);
+        choiceFocus = UiFocus.AttachKeeper(gameObject, fallbackSortingOrder, checkpointButton, returnButton);
     }
 
     private void EnsureConfirmDialog()
@@ -297,8 +307,12 @@ public class Ending : MonoBehaviour, ISceneEventListener
 
     private void SetChoicesVisible(bool visible)
     {
+        if (!visible) UiFocus.Clear(choiceFocus);
+
         if (checkpointButton != null) checkpointButton.gameObject.SetActive(visible);
         if (returnButton != null) returnButton.gameObject.SetActive(visible);
+
+        if (visible) UiFocus.Select(choiceFocus);
     }
 
     private void RequestCheckpointReturn()
@@ -437,6 +451,24 @@ public class Ending : MonoBehaviour, ISceneEventListener
  * ── 크레딧 수정 방법 ─────────────────────────────────────────────────────────
  *   개별 구간 : 각 엔딩 씬 GameManager 의 이 컴포넌트 인스펙터 creditsContent(TextArea).
  *   공통 구간 : Assets/Resources/Credits/CommonCredits.txt 한 파일만 수정(전 엔딩 공유).
+ *
+ * ── 키보드 조작 (2026-08-28 유저 확정) ───────────────────────────────────────
+ *   복귀 선택지 2개는 UiFocus 로 키보드 조작을 붙인다.
+ *     - UiViewBuilder.ApplySelectionTint : 씬(EndingSceneBuilder)이 만든 ReturnButton 은
+ *       Image.color 가 (0,0,0,0.75) 검정이고 ColorBlock 은 기본값(normal=흰색)이라, ColorTint 가
+ *       검정에 흰색을 곱하는 꼴이 되어 선택/호버 상태가 화면에서 전혀 구분되지 않았다.
+ *       이 함수가 색을 정규화해 선택 시 배경이 확실히 밝아지게 만든다. 복제본(CheckpointButton)도
+ *       같이 통과시키므로 두 버튼의 강조가 일치한다.
+ *     - UiFocus.LinkVertical : 위(체크포인트) ↔ 아래(시작 화면)를 Explicit 순환 연결.
+ *       Automatic 이면 확인창이 떠 있을 때 방향키가 Dim 을 뚫고 여기로 새어 나온다.
+ *     - UiFocus.AttachKeeper : 파수꾼을 이 오브젝트(GameManager)에 붙인다. 버튼 2개가 서로 다른
+ *       부모(씬 캔버스 / 코드 생성 패널)에 있을 수 있어 공통 루트를 쓸 수 없기 때문이다.
+ *       크레딧이 흐르는 동안에는 버튼이 비활성이라 Preferred 가 null 이고, 파수꾼은 그런 자신을
+ *       최상위 판정에서 스스로 제외하므로 다른 UI 를 방해하지 않는다.
+ *   기본 선택은 위쪽 "마지막 체크포인트로 돌아가기"다. 첫 항목이기도 하고, 이쪽은 곧바로 씬을
+ *   떠나지 않고 확인창을 한 번 더 띄우므로(= 되돌릴 수 있음) 잘못 눌러도 안전하다.
+ *   반대편 "시작 화면으로"는 업적 해금 + ClearPlayData 라 되돌릴 수 없어 기본 선택으로 두지 않는다.
+ *   확인창이 열리면 ConfirmDialogView 가 선택을 가져갔다가 닫힐 때 여기로 되돌려 준다.
  *
  * ── null 안전 ────────────────────────────────────────────────────────────────
  *   DM 이 없으면 대사만, CreditsView 는 즉석 생성이라 항상 동작, 버튼이 없어도 예외 없이
