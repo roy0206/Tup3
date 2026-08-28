@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Serialization;
 
 [RequireComponent(typeof(Animator))]
 public class Water_eye : MonoBehaviour
@@ -28,8 +29,9 @@ public class Water_eye : MonoBehaviour
     [Header("렌더링 순서")]
     [SerializeField] private int minimumSortingOrder = 5;
 
-    [Header("보스에게 입히는 피해량")]
-    public float Damge_to_boss = 10f;
+    [Header("눈 파괴 시 보스에게 입히는 피해량")]
+    [SerializeField, FormerlySerializedAs("Damge_to_boss")]
+    private float damageToBoss = 10f;
     private BossBase bossRef;
     private bool canReceiveDamage = true;
     private Color originalColor = Color.white;
@@ -111,17 +113,14 @@ public class Water_eye : MonoBehaviour
     {
         if (IsDead || !canReceiveDamage || bossRef == null || amount <= 0f) return;
 
-        float realDamage = Mathf.Min(hp, amount);
-        
-        hp -= realDamage;
-        
-        bossRef.DoDamage(realDamage);
+        hp -= Mathf.Min(hp, amount);
 
         FlashOnHit();
 
         if (hp <= 0f)
         {
             IsDead = true;
+            bossRef.DoDamage(damageToBoss);
             Die();
         }
     }
@@ -227,6 +226,7 @@ public class Water_eye : MonoBehaviour
         lifeTime = Mathf.Max(0f, lifeTime);
         scale = Mathf.Max(0.01f, scale);
         hitFlashDuration = Mathf.Max(0f, hitFlashDuration);
+        damageToBoss = Mathf.Max(0f, damageToBoss);
         minimumSortingOrder = Mathf.Max(1, minimumSortingOrder);
     }
 }

@@ -35,6 +35,7 @@ public class Skills : MonoBehaviour, ISceneEventListener
     public float skill_2_groundCheckDistance = 50f;
     public GameObject skill_2_groundPrefab;
     public float skill_2_spawnDelay = 0.5f;
+    [Min(0f)] public float skill_2_overlapPushClearance = 0.05f;
     public Transform skill_2_aimMarker;
 
     [Header("3번 스킬설정 (공격속도)")]
@@ -111,15 +112,16 @@ public class Skills : MonoBehaviour, ISceneEventListener
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
-        SceneController.Instance.RegisterListener(this);
-
         movement = GetComponent<Playermovement>();
         attack = GetComponent<ComboAttack>();
         health = GetComponent<PlayerHealth>();
+        PrepareSkill2AimMarker();
 
         attackUpEffect = BuildBackgroundEffect("SkillEffect_AttackUp", attackUpEffectSprites);
         healEffect = BuildBackgroundEffect("SkillEffect_Heal", healEffectSprites);
         attackSpeedEffect = BuildBackgroundEffect("SkillEffect_AttackSpeed", attackSpeedEffectSprites);
+
+        SceneController.Instance.RegisterListener(this);
     }
 
     private SpriteSequencePlayer BuildBackgroundEffect(string objectName, Sprite[] frames)
@@ -233,7 +235,7 @@ public class Skills : MonoBehaviour, ISceneEventListener
     private IEnumerator Do_skill_1()
     {
         canUseSkill_1 = false;
-        OnSkillsActive[0].Invoke(skill_1_duration, skill_1_cool);
+        OnSkillsActive[0]?.Invoke(skill_1_duration, skill_1_cool);
 
         AudioManager.Instance.PlaySound(SoundSkillAttackUp, skillSoundVolume);
         PlayBackgroundEffect(attackUpEffect);
@@ -261,10 +263,14 @@ public class Skills : MonoBehaviour, ISceneEventListener
     private IEnumerator Do_changed_skill_2()
     {
         canUseSkill_2 = false;
+<<<<<<< HEAD
         OnSkillsActive[1].Invoke(skill_2_duration, skill_2_cool);
 
         AudioManager.Instance.PlaySound(SoundSkillBarrier, skillSoundVolume);
 
+=======
+        OnSkillsActive[1]?.Invoke(skill_2_duration, skill_2_cool);
+>>>>>>> origin/main
         float originalSpeed = movement.moveSpeed;
         float originalGravity = movement.fallGravityMultiplier;
 
@@ -301,9 +307,7 @@ public class Skills : MonoBehaviour, ISceneEventListener
         skill_2_aimOffsetX = 0f;
 
         movement.StopHorizontalMovement();
-
-        if (skill_2_aimMarker != null)
-            skill_2_aimMarker.gameObject.SetActive(true);
+        UpdateAimSkill2();
     }
 
     private void UpdateAimSkill2()
@@ -341,10 +345,32 @@ public class Skills : MonoBehaviour, ISceneEventListener
             skill_2_hasValidAimPoint = false;
         }
 
-        if (skill_2_aimMarker != null && skill_2_hasValidAimPoint)
+        if (skill_2_aimMarker != null)
         {
-            skill_2_aimMarker.position = skill_2_currentAimPoint;
+            if (skill_2_hasValidAimPoint)
+                skill_2_aimMarker.position = skill_2_currentAimPoint;
+
+            if (skill_2_aimMarker.gameObject.activeSelf != skill_2_hasValidAimPoint)
+                skill_2_aimMarker.gameObject.SetActive(skill_2_hasValidAimPoint);
         }
+    }
+
+    private void PrepareSkill2AimMarker()
+    {
+        if (skill_2_aimMarker == null)
+            return;
+
+        GameObject markerObject = skill_2_aimMarker.gameObject;
+
+        // 프리팹 에셋을 직접 연결한 경우 씬에 존재하지 않아 렌더링되지 않으므로 복제해서 사용한다.
+        if (!markerObject.scene.IsValid())
+        {
+            markerObject = Instantiate(markerObject, transform);
+            markerObject.name = skill_2_aimMarker.name;
+            skill_2_aimMarker = markerObject.transform;
+        }
+
+        markerObject.SetActive(false);
     }
 
     private void StopAimingAndSpawnSkill2()
@@ -369,6 +395,7 @@ public class Skills : MonoBehaviour, ISceneEventListener
         if (skill_2_groundPrefab != null)
         {
             GameObject spawnedGround = Instantiate(skill_2_groundPrefab, spawnPoint, Quaternion.identity);
+<<<<<<< HEAD
 
             SkillGroundMarker marker = spawnedGround.AddComponent<SkillGroundMarker>();
             marker.ApplyBarrierVisual(
@@ -378,6 +405,14 @@ public class Skills : MonoBehaviour, ISceneEventListener
                 barrierEffectScale,
                 barrierEffectOrderOffset,
                 hideBarrierOriginalSprite);
+=======
+            spawnedGround.SetActive(true);
+
+            if (!spawnedGround.TryGetComponent<SkillGroundMarker>(out _))
+                spawnedGround.AddComponent<SkillGroundMarker>();
+
+            ResolvePlayerOverlap(spawnedGround);
+>>>>>>> origin/main
 
             yield return new WaitForSeconds(skill_2_duration);
             if (spawnedGround != null)
@@ -387,11 +422,53 @@ public class Skills : MonoBehaviour, ISceneEventListener
         }
     }
 
+    private void ResolvePlayerOverlap(GameObject spawnedGround)
+    {
+        if (movement == null || spawnedGround == null)
+            return;
+
+        Collider2D playerCollider = movement.GetComponent<Collider2D>();
+        if (playerCollider == null)
+            return;
+
+        Physics2D.SyncTransforms();
+
+        Bounds playerBounds = playerCollider.bounds;
+        float highestOverlappingSurface = float.NegativeInfinity;
+
+        foreach (Collider2D groundCollider in spawnedGround.GetComponentsInChildren<Collider2D>(true))
+        {
+            if (groundCollider == null || !groundCollider.enabled)
+                continue;
+
+            Bounds groundBounds = groundCollider.bounds;
+            if (!groundBounds.Intersects(playerBounds))
+                continue;
+
+            highestOverlappingSurface = Mathf.Max(
+                highestOverlappingSurface,
+                groundBounds.max.y
+            );
+        }
+
+        if (float.IsNegativeInfinity(highestOverlappingSurface))
+            return;
+
+        float clearance = Mathf.Max(skill_2_overlapPushClearance, 0.01f);
+        float pushDistance = highestOverlappingSurface + clearance - playerBounds.min.y;
+        if (pushDistance <= 0f)
+            return;
+
+        movement.transform.position += Vector3.up * pushDistance;
+        movement.ResetVerticalVelocity();
+        Physics2D.SyncTransforms();
+    }
+
     private IEnumerator Do_skill_3()
     {
         canUseSkill_3 = false;
         IsSkill3Active = true;
-        OnSkillsActive[2].Invoke(skill_3_duration, skill_3_cool);
+        OnSkillsActive[2]?.Invoke(skill_3_duration, skill_3_cool);
 
         AudioManager.Instance.PlaySound(SoundSkillAttackSpeed, skillSoundVolume);
         PlayBackgroundEffect(attackSpeedEffect);
@@ -418,6 +495,7 @@ public class Skills : MonoBehaviour, ISceneEventListener
     private IEnumerator Do_skill_4()
     {
         canUseSkill_4 = false;
+<<<<<<< HEAD
         OnSkillsActive[3].Invoke(skill_4_duration, skill_4_cool);
 
         AudioManager.Instance.PlaySound(SoundSkillHeal, skillSoundVolume);
@@ -429,6 +507,10 @@ public class Skills : MonoBehaviour, ISceneEventListener
         float healPerTick = skill_4_healAmount / (skill_4_duration / tickInterval);
 
         while (elapsed < skill_4_duration)
+=======
+        OnSkillsActive[3]?.Invoke(skill_4_duration, skill_4_cool);
+        try
+>>>>>>> origin/main
         {
             elapsed += Time.deltaTime;
 

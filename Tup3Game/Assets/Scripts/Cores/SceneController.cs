@@ -9,7 +9,7 @@ public class SceneController : Singleton<SceneController>
 
     [Header("씬 설정 목록")]
     [Tooltip("프로젝트에서 사용하는 모든 SceneSO 를 등록하세요.")]
-    [SerializeField] private List<SceneSO> sceneConfigs;
+    [SerializeField] private List<SceneSO> sceneConfigs = new();
 
     [Header("전환 사운드")]
     [SerializeField, Range(0f, 1f)] private float transitionVolume = 0.9f;
@@ -47,6 +47,9 @@ public class SceneController : Singleton<SceneController>
     private void BuildConfigMap()
     {
         _configMap = new Dictionary<string, SceneSO>();
+
+        if (sceneConfigs == null)
+            return;
 
         foreach (var config in sceneConfigs)
         {
