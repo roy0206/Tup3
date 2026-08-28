@@ -263,14 +263,10 @@ public class Skills : MonoBehaviour, ISceneEventListener
     private IEnumerator Do_changed_skill_2()
     {
         canUseSkill_2 = false;
-<<<<<<< HEAD
-        OnSkillsActive[1].Invoke(skill_2_duration, skill_2_cool);
+        OnSkillsActive[1]?.Invoke(skill_2_duration, skill_2_cool);
 
         AudioManager.Instance.PlaySound(SoundSkillBarrier, skillSoundVolume);
 
-=======
-        OnSkillsActive[1]?.Invoke(skill_2_duration, skill_2_cool);
->>>>>>> origin/main
         float originalSpeed = movement.moveSpeed;
         float originalGravity = movement.fallGravityMultiplier;
 
@@ -395,9 +391,11 @@ public class Skills : MonoBehaviour, ISceneEventListener
         if (skill_2_groundPrefab != null)
         {
             GameObject spawnedGround = Instantiate(skill_2_groundPrefab, spawnPoint, Quaternion.identity);
-<<<<<<< HEAD
+            spawnedGround.SetActive(true);
 
-            SkillGroundMarker marker = spawnedGround.AddComponent<SkillGroundMarker>();
+            if (!spawnedGround.TryGetComponent(out SkillGroundMarker marker))
+                marker = spawnedGround.AddComponent<SkillGroundMarker>();
+
             marker.ApplyBarrierVisual(
                 barrierEffectSprites,
                 barrierEffectFrameRate,
@@ -405,14 +403,8 @@ public class Skills : MonoBehaviour, ISceneEventListener
                 barrierEffectScale,
                 barrierEffectOrderOffset,
                 hideBarrierOriginalSprite);
-=======
-            spawnedGround.SetActive(true);
-
-            if (!spawnedGround.TryGetComponent<SkillGroundMarker>(out _))
-                spawnedGround.AddComponent<SkillGroundMarker>();
 
             ResolvePlayerOverlap(spawnedGround);
->>>>>>> origin/main
 
             yield return new WaitForSeconds(skill_2_duration);
             if (spawnedGround != null)
@@ -495,8 +487,7 @@ public class Skills : MonoBehaviour, ISceneEventListener
     private IEnumerator Do_skill_4()
     {
         canUseSkill_4 = false;
-<<<<<<< HEAD
-        OnSkillsActive[3].Invoke(skill_4_duration, skill_4_cool);
+        OnSkillsActive[3]?.Invoke(skill_4_duration, skill_4_cool);
 
         AudioManager.Instance.PlaySound(SoundSkillHeal, skillSoundVolume);
         PlayBackgroundEffect(healEffect);
@@ -507,10 +498,6 @@ public class Skills : MonoBehaviour, ISceneEventListener
         float healPerTick = skill_4_healAmount / (skill_4_duration / tickInterval);
 
         while (elapsed < skill_4_duration)
-=======
-        OnSkillsActive[3]?.Invoke(skill_4_duration, skill_4_cool);
-        try
->>>>>>> origin/main
         {
             elapsed += Time.deltaTime;
 
