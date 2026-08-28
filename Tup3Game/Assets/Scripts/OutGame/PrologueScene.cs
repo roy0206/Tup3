@@ -164,9 +164,12 @@ public class PrologueScene : MonoBehaviour, ISceneEventListener
         GameObject iconObject = new GameObject("Fill");
         iconObject.transform.SetParent(root.transform, false);
 
+        Sprite sprite = skipGaugeSprite != null ? skipGaugeSprite : FindInteractionSprite();
+        if (sprite == null) sprite = CreateSolidSprite();
+
         skipGaugeImage = iconObject.AddComponent<Image>();
         skipGaugeImage.raycastTarget = false;
-        skipGaugeImage.sprite = skipGaugeSprite != null ? skipGaugeSprite : FindInteractionSprite();
+        skipGaugeImage.sprite = sprite;
         skipGaugeImage.type = Image.Type.Filled;
         skipGaugeImage.fillMethod = Image.FillMethod.Radial360;
         skipGaugeImage.fillOrigin = 2;
@@ -179,6 +182,17 @@ public class PrologueScene : MonoBehaviour, ISceneEventListener
         rect.anchoredPosition = skipGaugeAnchoredPosition;
 
         ApplySkipGauge(0f, false);
+    }
+
+    private static Sprite CreateSolidSprite()
+    {
+        Texture2D texture = new Texture2D(4, 4, TextureFormat.RGBA32, false);
+        Color[] pixels = new Color[16];
+        for (int i = 0; i < pixels.Length; i++) pixels[i] = Color.white;
+        texture.SetPixels(pixels);
+        texture.Apply();
+
+        return Sprite.Create(texture, new Rect(0f, 0f, 4f, 4f), new Vector2(0.5f, 0.5f));
     }
 
     private Sprite FindInteractionSprite()
