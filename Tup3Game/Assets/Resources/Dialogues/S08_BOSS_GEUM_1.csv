@@ -8,5 +8,6 @@ geum1_06,금보스,"자, 어서 하던걸 마저 하라구.",,,"도입 대사의
 geum1_win,주인공,(그의 힘을 받아들일 것인가),,힘을 받아들인다:geum1_win_geuk/거절한다:geum1_win_saeng,"승리 확정 후 BossRoom 이 이 행부터 재생한다(victoryStartId=geum1_win). 패배했을 때는 S13_BATTLE_LOSE 를 재생한다."
 geum1_win_geuk,금보스,…,geum1_skill,,"극(剋) 승리 경로 — 보스의 힘을 받아들인다."
 geum1_skill,시스템,금 스킬을 획득하였습니다,,,"BossRoom 이 이 행 도달을 감지해 실제로 스킬을 지급하고 세이브한다."
-geum1_win_saeng,금보스,(작성중) 생(生)으로 승리 시 대사,geum1_coin,,"생(生) 승리 경로 — 스킬을 거절한다."
+geum1_win_saeng,금보스,거절이라. 죽음을 손에 쥐지는 않겠다는 건가.,geum1_win_saeng_02,,"생(生) 승리 경로 — 스킬을 거절한다."
+geum1_win_saeng_02,금보스,좋아. 그럼 너는 아직 죽지 않은 채로 남는군.,geum1_coin,,
 geum1_coin,시스템,의지 코인 5개를 얻었다,,,"BossRoom 이 이 행 도달을 감지해 의지 코인 5개를 지급하고 세이브한다."

@@ -59,6 +59,26 @@ public class Playermovement : MonoBehaviour
     private bool legacyWaterState;
     private readonly HashSet<int> activeWaterSources = new HashSet<int>();
 
+    [Header("사운드")]
+    [SerializeField] private float footstepInterval = 0.34f;
+    [SerializeField] private float footstepMinSpeed = 0.5f;
+    [SerializeField] private float heavyLandFallSpeed = 22f;
+    [SerializeField, Range(0f, 1f)] private float footstepVolume = 0.55f;
+    [SerializeField, Range(0f, 1f)] private float jumpVolume = 0.8f;
+    [SerializeField, Range(0f, 1f)] private float landVolume = 0.8f;
+    [SerializeField, Range(0f, 1f)] private float landHeavyVolume = 1f;
+    [SerializeField, Range(0f, 1f)] private float dashVolume = 0.9f;
+
+    private const string SoundFootstep = "Player_Footstep";
+    private const string SoundJump = "Player_Jump";
+    private const string SoundLand = "Player_Land";
+    private const string SoundLandHeavy = "Player_LandHeavy";
+    private const string SoundDash = "Player_Dash";
+
+    private float footstepTimer;
+    private bool wasGrounded;
+    private float pendingImpactSpeed;
+
     private BoxCollider2D col;
     private Vector2 velocity;
     private Vector2 externalVelocity;
@@ -105,11 +125,14 @@ public class Playermovement : MonoBehaviour
         if (animator == null) animator = GetComponent<Animator>();
         if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
         legacyWaterState = isInWater;
+        wasGrounded = true;
     }
 
     void Update()
     {
         if (PauseManager.IsPaused || DialogueManager.IsDialogueActive) return;
+
+        HandleLandingSound();
 
         float horizontalInput = Input.GetAxisRaw("Horizontal");
         
@@ -229,6 +252,8 @@ public class Playermovement : MonoBehaviour
                     coyoteTimer = 0f;
                     if (animator != null)
                         animator.SetTrigger("JumpTrigger");
+
+                    AudioManager.Instance.PlaySound(SoundJump, jumpVolume);
                 }
                 if (Input.GetKeyUp(KeyCode.X) && velocity.y > 0f)
                 {
@@ -269,16 +294,54 @@ public class Playermovement : MonoBehaviour
                 }
             }
         }
+        HandleFootstepSound();
+
         if (!isDashing)
         {
             Vector2 finalVelocity = velocity;
 
             finalVelocity.x += stormVelocity.x;
 
+            pendingImpactSpeed = velocity.y;
+
             Move(finalVelocity * Time.deltaTime);
 
             stormVelocity = Vector2.zero;
         }
+    }
+
+    private void HandleLandingSound()
+    {
+        bool groundedNow = collisions.below;
+
+        if (groundedNow && !wasGrounded && !isInWater)
+        {
+            float impact = -pendingImpactSpeed;
+            bool heavy = impact >= heavyLandFallSpeed;
+
+            AudioManager.Instance.PlaySound(
+                heavy ? SoundLandHeavy : SoundLand,
+                heavy ? landHeavyVolume : landVolume);
+
+            footstepTimer = 0f;
+        }
+
+        wasGrounded = groundedNow;
+    }
+
+    private void HandleFootstepSound()
+    {
+        if (isDashing || isInWater || !collisions.below || Mathf.Abs(velocity.x) < footstepMinSpeed)
+        {
+            footstepTimer = 0f;
+            return;
+        }
+
+        footstepTimer -= Time.deltaTime;
+        if (footstepTimer > 0f) return;
+
+        footstepTimer = Mathf.Max(0.05f, footstepInterval);
+        AudioManager.Instance.PlaySound(SoundFootstep, footstepVolume);
     }
 
     public void Move(Vector2 moveAmount)
@@ -425,6 +488,8 @@ public class Playermovement : MonoBehaviour
     {
         canDash = false;
         isDashing = true;
+
+        AudioManager.Instance.PlaySound(SoundDash, dashVolume);
 
         if (dashEffectController != null)
         {
@@ -575,6 +640,9 @@ public class Playermovement : MonoBehaviour
         waterMaxFallSpeed = Mathf.Max(0f, waterMaxFallSpeed);
         waterFastDescendSpeed = Mathf.Max(0f, waterFastDescendSpeed);
         waterGravityMultiplier = Mathf.Max(0f, waterGravityMultiplier);
+        footstepInterval = Mathf.Max(0.05f, footstepInterval);
+        footstepMinSpeed = Mathf.Max(0f, footstepMinSpeed);
+        heavyLandFallSpeed = Mathf.Max(0.1f, heavyLandFallSpeed);
     }
 
     public bool IsDashing() => isDashing;
@@ -591,4 +659,21 @@ public class Playermovement : MonoBehaviour
  * 일시정지 대응 : Update 첫 줄에서 PauseManager.IsPaused 를 검사해 입력/중력/이동을 전부 멈추고,
  * DoDash 코루틴도 루프 안에서 일시정지 동안 프레임을 흘려보내 대시 이동/타이머가 진행되지 않게 했다.
  * 대시 쿨다운(WaitForSeconds)은 일시정지 중에도 실시간으로 흐른다(플레이어에게 불리하지 않아 허용).
+ *
+ * 효과음 배선
+ *  - Player_Footstep : HandleFootstepSound() — 접지 + 대시/수중이 아님 + |velocity.x| >= footstepMinSpeed 인
+ *    동안 footstepInterval 마다 1회. 조건이 깨지면 타이머를 0으로 리셋해 재출발 시 첫 발소리가 즉시 난다.
+ *  - Player_Jump : 지상/코요테 점프 입력이 실제로 성립한 지점(velocity.y = jumpForce 직후).
+ *    수중 플랩(HandleWaterMovement)은 점프가 아니라 헤엄이라 소리를 넣지 않았다.
+ *  - Player_Land / Player_LandHeavy : 이 스크립트는 Rigidbody2D 없이 Move() → VerticalCollisions() 로
+ *    collisions.below 를 갱신하고, 착지하는 순간 velocity.y 가 0 으로 덮어써진다. 그래서 충돌 판정이
+ *    끝난 뒤에는 낙하 속도를 알 수 없다. 매 프레임 Move() 직전 velocity.y 를 pendingImpactSpeed 에
+ *    보관해 두고, 다음 프레임 Update 첫 줄의 HandleLandingSound() 에서 공중→지상 전이
+ *    (!wasGrounded && collisions.below)를 감지해 그 값으로 강/약 착지를 가른다.
+ *    임계값은 heavyLandFallSpeed(기본 22, 낙하 속력 절대값 기준). 수중에서는 착지음을 내지 않는다.
+ *    wasGrounded 는 Awake 에서 true 로 시작해 씬 진입 첫 프레임에 헛 착지음이 나지 않게 한다.
+ *  - Player_Dash : DoDash 코루틴 진입부(쿨다운 통과가 확정된 지점).
+ *  볼륨/간격/임계값은 전부 [SerializeField] 이며 AudioManager 는 Singleton + DontDestroyOnLoad 라
+ *  InteractionBase 와 동일하게 널 가드 없이 AudioManager.Instance 를 직접 호출한다
+ *  (클립 미로드/미존재 시 AudioManager 가 경고 로그만 남기고 -1 을 돌려준다).
  */

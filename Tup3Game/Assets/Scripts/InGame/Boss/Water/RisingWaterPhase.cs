@@ -27,6 +27,14 @@ public class RisingWaterPhase : MonoBehaviour
     [SerializeField] private int minimumPlatformSortingOrder = 1;
     [SerializeField] private int playerOrderAbovePlatforms = 1;
 
+    [Header("사운드")]
+    [SerializeField] private float risingVolume = 1f;
+    [SerializeField] private float splashVolume = 0.7f;
+    [SerializeField] private float splashMinInterval = 0.4f;
+
+    private const string RisingSound = "Water_Rising";
+    private const string SplashSound = "Water_Splash";
+
     private Playermovement player;
     private Collider2D playerCollider;
     private Tween riseTween;
@@ -88,6 +96,7 @@ public class RisingWaterPhase : MonoBehaviour
 
         hasStarted = true;
         HasReachedTarget = false;
+        BossSound.Play(RisingSound, risingVolume);
 
         float riseStartY = GetRiseStartY();
         float riseEndY = GetRiseEndY();
@@ -294,6 +303,9 @@ public class RisingWaterPhase : MonoBehaviour
 
         playerIsSwimming = value;
 
+        if (value && hasStarted)
+            BossSound.PlayThrottled(SplashSound, splashVolume, splashMinInterval);
+
         if (player != null)
             player.SetInWater(this, value);
     }
@@ -336,3 +348,18 @@ public class RisingWaterPhase : MonoBehaviour
         playerOrderAbovePlatforms = Mathf.Max(0, playerOrderAbovePlatforms);
     }
 }
+
+/* [파일 노트]
+ * 사운드
+ *   Water_Rising : BeginRise() 가 실제로 수위 상승을 시작하는 지점에서 1회.
+ *                  BeginRise 는 hasStarted 가 이미 true 면 맨 위에서 즉시 return 하므로
+ *                  중복 호출로 두 번 울리지 않는다.
+ *   Water_Splash : 플레이어가 수면 아래로 들어가 수영 상태로 바뀌는 순간(SetPlayerSwimming(true)).
+ *                  "물소리(범용)" 를 여기에 쓴 근거 : 수보스 스크립트 안에서 플레이어와 물이 직접
+ *                  부딪히는 사건이 이곳 하나뿐이고, 나머지 물 관련 사건(분출·고드름·토네이도·수위)은
+ *                  전용 이름이 이미 배정돼 있다.
+ *                  물에서 나오는 전환에는 붙이지 않았다 — 정리 경로(StopAndHide/OnDisable/OnDestroy)가
+ *                  전부 SetPlayerSwimming(false) 를 부르므로 보스 사망·씬 종료 때 엉뚱하게 울린다.
+ *                  splashMinInterval(기본 0.4초)은 수면 근처에서 오르내릴 때의 연타를 막는다
+ *                  (enterDepth/exitDepth 히스테리시스가 이미 있지만 파도 위에서 반복될 수 있다).
+ */

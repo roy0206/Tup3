@@ -32,6 +32,10 @@ public class Water_Sprout : MonoBehaviour
     [SerializeField] private float pathWidth = 0.2f; // SetTargetWidth로 덮어씀
     [SerializeField] private float pathFadeDuration = 0.4f;
     [SerializeField] private int minimumSortingOrder = 10;
+    [SerializeField] private bool showPathPreview = true;
+    [SerializeField] private bool drawHitboxGizmo = true;
+    private bool sortingOrderOverridden;
+    private int sortingOrderOverride;
     private const float spriteNativeHeight = 5.6f; // waterspout_2 스프라이트 실제 높이(유닛), 피벗은 좌하단
 
 
@@ -40,6 +44,12 @@ public class Water_Sprout : MonoBehaviour
     private float targetScaleY;  // SetTargetLength에서 계산된 최종 scale.y 캐싱
     private float targetPosX;    // SetTargetLength에서 계산된 최종 localPosition.x 캐싱
 
+
+    [Header("사운드")]
+    [SerializeField] private float sproutVolume = 0.8f;
+    [SerializeField] private float sproutMinInterval = 0.12f;
+
+    private const string SproutSound = "Water_Sprout";
 
     private float delayElapsed;
     private float growTimer;
@@ -85,6 +95,7 @@ public class Water_Sprout : MonoBehaviour
             {
                 state = SproutState.Growing;
                 growTimer = 0f;
+                BossSound.PlayThrottled(SproutSound, sproutVolume, sproutMinInterval);
                 if (watersproutAnimator != null)
                     watersproutAnimator.SetBool("On", true);
             }
@@ -177,19 +188,28 @@ public class Water_Sprout : MonoBehaviour
 
     private void ShowPathPreview()
     {
-        if (pathSprite == null) return;
-        pathSprite.gameObject.SetActive(true);
+        if (pathSprite != null)
+        {
+            if (showPathPreview)
+            {
+                pathSprite.gameObject.SetActive(true);
 
-        // x: 진행방향(로컬), y: 가로 폭 -> baseOffsetY로 세로(콜라이더 기준) 위치도 맞춰줌
-        pathSprite.transform.localPosition = new Vector3(0f, baseOffsetY, 0f);
-        pathSprite.transform.localRotation = Quaternion.identity;
-        pathSprite.transform.localScale = new Vector3(pathLength, pathWidth, 1f);
+                // x: 진행방향(로컬), y: 가로 폭 -> baseOffsetY로 세로(콜라이더 기준) 위치도 맞춰줌
+                pathSprite.transform.localPosition = new Vector3(0f, baseOffsetY, 0f);
+                pathSprite.transform.localRotation = Quaternion.identity;
+                pathSprite.transform.localScale = new Vector3(pathLength, pathWidth, 1f);
 
-        Color c = pathSprite.color;
-        c.a = 0.6f;
-        pathSprite.color = c;
+                Color c = pathSprite.color;
+                c.a = 0.6f;
+                pathSprite.color = c;
 
-        StartCoroutine(FadePathSprite());
+                StartCoroutine(FadePathSprite());
+            }
+            else
+            {
+                pathSprite.gameObject.SetActive(false);
+            }
+        }
 
         if (pathCollider != null)
         {
@@ -236,6 +256,12 @@ public class Water_Sprout : MonoBehaviour
         targetSize.y = pathWidth;
     }
 
+    public void Configure(float warnDelay, float damageOverride)
+    {
+        startDelay = Mathf.Max(0f, warnDelay);
+        damage = Mathf.Max(0f, damageOverride);
+    }
+
     public void SetTargetLength(float length)
     {
         pathLength = Mathf.Max(0.01f, length);
@@ -250,16 +276,38 @@ public class Water_Sprout : MonoBehaviour
         }
     }
 
+    public void SetSortingOrder(int order)
+    {
+        sortingOrderOverridden = true;
+        sortingOrderOverride = order;
+        ApplySortingOrder();
+    }
+
+    public void SetPathPreviewVisible(bool visible)
+    {
+        showPathPreview = visible;
+        if (!visible && pathSprite != null) pathSprite.gameObject.SetActive(false);
+    }
+
+    public void SetHitboxGizmoVisible(bool visible)
+    {
+        drawHitboxGizmo = visible;
+    }
+
     private void ApplySortingOrder()
     {
         if (Watersprout_render != null)
         {
             foreach (SpriteRenderer renderer in Watersprout_render.GetComponentsInChildren<SpriteRenderer>(true))
-                renderer.sortingOrder = Mathf.Max(renderer.sortingOrder, minimumSortingOrder);
+                renderer.sortingOrder = sortingOrderOverridden
+                    ? sortingOrderOverride
+                    : Mathf.Max(renderer.sortingOrder, minimumSortingOrder);
         }
 
         if (pathSprite != null)
-            pathSprite.sortingOrder = Mathf.Max(pathSprite.sortingOrder, minimumSortingOrder + 1);
+            pathSprite.sortingOrder = sortingOrderOverridden
+                ? sortingOrderOverride
+                : Mathf.Max(pathSprite.sortingOrder, minimumSortingOrder + 1);
     }
 
     private void OnValidate()
@@ -274,6 +322,7 @@ public class Water_Sprout : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        if (!drawHitboxGizmo) return;
         if (pathCollider == null) return;
 
         Matrix4x4 oldMatrix = Gizmos.matrix;
@@ -296,3 +345,32 @@ public class Water_Sprout : MonoBehaviour
         Gizmos.matrix = oldMatrix;
     }
 }
+
+/* [파일 노트]
+ * Configure(warnDelay, damage) : 외부 소환자(최종보스 물기둥 패턴)가 전조 시간(startDelay)과
+ * 데미지를 프리팹 값 대신 지정할 때 쓴다. 수보스 경로(Water_Sprout_Zone)는 호출하지 않으므로
+ * 기존 동작은 프리팹 직렬화 값 그대로다. 수명이 끝나면 Destroy(gameObject) 로 스스로 사라지므로
+ * PoolManager 로 꺼냈더라도 반납 없이 파괴된다(풀은 매번 새로 Instantiate).
+ *
+ * 호출자 주입 3종 (전부 최종보스 전용, 수보스 경로는 호출하지 않아 프리팹 직렬화 값 그대로 동작)
+ *   - SetSortingOrder(order) : sortingOrderOverridden 이 서면 ApplySortingOrder 가
+ *     "Max(기존, minimumSortingOrder)" 대신 지정값을 그대로 쓴다. Awake 의 ApplySortingOrder 가
+ *     이미 돈 뒤에 호출되므로 세터가 즉시 재적용한다.
+ *   - SetPathPreviewVisible(false) : "하늘색 사각형" = pathSprite(Water_Pump 프리팹의 Warning_sprite,
+ *     색 0.25/0.92/0.89 하늘색)를 끈다. ShowPathPreview 는 이 플래그와 무관하게 콜라이더 초기화와
+ *     Watersprout_render 스케일 리셋을 계속 수행하므로 성장 로직·데미지 판정은 그대로다.
+ *   - SetHitboxGizmoVisible(false) : OnDrawGizmos 의 시안색 DrawCube(=pathCollider 시각화)를 끈다.
+ *     에디터 전용 그림이라 게임 로직에는 영향이 없다.
+ * 세 값 모두 인스턴스 필드이고 Water_Sprout 는 수명이 끝나면 Destroy 되어 매번 새로 Instantiate
+ * 되므로, 재사용으로 값이 새는 경로가 없다(별도 OnEnable 리셋이 불필요한 이유).
+ *
+ * 사운드 Water_Sprout : 전조(startDelay)가 끝나고 Waiting → Growing 으로 넘어가는 프레임,
+ * 즉 애니메이터 "On" 을 켜는 실제 분출 순간에 재생한다(Launch 시점이 아니다 — 그러면 전조 중에
+ * 소리가 먼저 나 버린다).
+ * 이 파일은 수보스(Water_Sprout_Zone)와 최종보스(수 물기둥 패턴)가 공유하는데, 두 경로 모두
+ * 같은 "물기둥 분출" 사건이고 배정된 소리도 Water_Sprout 하나뿐이라 호출자 주입(Configure/
+ * SetTargetWidth 같은 세터) 없이 공용으로 두었다.
+ * sproutMinInterval(기본 0.12초) 스로틀이 필요한 이유 : 수보스는 3개를 같은 프레임에 한꺼번에
+ * 소환하므로 전조 시간도 같아 세 기둥이 정확히 동시에 분출한다(스로틀이 없으면 소리가 3중으로 겹친다).
+ * 최종보스는 0.25초 간격으로 5개를 차례로 뿌리므로 스로틀 간격보다 넓어 기둥마다 따로 울린다.
+ */

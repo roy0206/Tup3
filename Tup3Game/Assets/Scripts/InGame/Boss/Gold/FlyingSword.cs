@@ -13,6 +13,12 @@ public class FlyingSword : MonoBehaviour
     [SerializeField] private float reflectedLifeTime = 4f;
     [SerializeField] private float bossHitRadius = 1f;
 
+    [Header("사운드")]
+    [SerializeField] private float clashVolume = 1f;
+    [SerializeField] private float clashMinInterval = 0.08f;
+
+    private const string ClashSound = "Sword_Clash";
+
     private PlayerKnockBack player;
     private Collider2D playerCollider;
     private Gold boss;
@@ -148,6 +154,7 @@ public class FlyingSword : MonoBehaviour
         if (hitbox != null) hitbox.enabled = false;
         if (bc != null) bc.enabled = true;
         AimAtBoss();
+        BossSound.PlayThrottled(ClashSound, clashVolume, clashMinInterval);
         Debug.Log("<color=#00FFFF>[금 보스] 날아드는 검 쳐내기 성공! 검이 보스에게 되돌아간다</color>");
     }
 
@@ -241,4 +248,12 @@ public class FlyingSword : MonoBehaviour
  * 반사 유도/명중 통지는 BossTransform / NotifyBossHit 헬퍼가 두 보스를 공통 처리한다.
  * FinalBoss 쪽 NotifyReflectedSwordHit 은 enableGroggy 가 꺼져 있으면 카운트만 하고 보상이 없다
  * (패링 = 해당 검 무효화만). 둘 다 없는 씬이면 반사된 검은 즉시 반납된다.
+ *
+ * 사운드 Sword_Clash : Reflect() — 플레이어의 검이 날아오는 검을 쳐내는 바로 그 순간.
+ * "검과 검이 부딪치는" 사건에 가장 정확히 대응하는 지점이라 여기를 골랐다.
+ * 금보스 Parried() / 최종보스 OnParrySuccess() 의 Parry_Success 와 겹치지 않는다는 점도 근거다 —
+ * 어검 쳐내기는 그 두 메서드를 거치지 않는다(금보스는 5회 누적돼야 Parried 로 가고, 최종보스는
+ * enableGroggy 가 꺼져 있어 아예 가지 않는다). 즉 한 번의 쳐내기에 두 소리가 겹치는 경우가 없다.
+ * clashMinInterval(기본 0.08초) : 검 5자루가 몰려 있을 때 한 번의 휘두르기가 여러 자루를 동시에
+ * 쳐내면 같은 프레임에 Reflect 가 여러 번 일어날 수 있어 겹침을 막는다.
  */

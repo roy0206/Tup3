@@ -55,6 +55,13 @@ public class DialogueManager : DomainSingleton<DialogueManager>
     private List<Choice> currentChoices;
     private int selectedIndex;
 
+    [Header("선택지 사운드")]
+    [SerializeField, Range(0f, 1f)] private float selectVolume = 0.8f;
+
+    private const string SoundSelect = "UI_Select";
+
+    private int fallbackHighlightIndex = -1;
+
     private State state = State.Inactive;
     private TextMeshProUGUI activeText;
     private DialogueEntry[] entries;
@@ -459,6 +466,7 @@ public class DialogueManager : DomainSingleton<DialogueManager>
         currentChoices = choices;
         selectedIndex = 0;
         state = State.Choosing;
+        fallbackHighlightIndex = -1;
 
         if (choiceView != null)
         {
@@ -494,6 +502,11 @@ public class DialogueManager : DomainSingleton<DialogueManager>
             choiceView.SetHighlight(selectedIndex);
             return;
         }
+
+        if (fallbackHighlightIndex >= 0 && fallbackHighlightIndex != selectedIndex)
+            AudioManager.Instance.PlaySound(SoundSelect, selectVolume);
+
+        fallbackHighlightIndex = selectedIndex;
 
         for (int i = 0; i < Mathf.Min(currentChoices.Count, choiceTexts.Length);i++)
         {
@@ -589,4 +602,10 @@ public class DialogueManager : DomainSingleton<DialogueManager>
  *    - Update : PauseManager.IsPaused 동안 V/화살표 입력을 무시한다(대사 진행·선택 확정 차단).
  *    - TypeLine : 일시정지 동안 글자 출력을 멈췄다가 해제 시 이어서 타이핑한다.
  *    - AutoAdvanceRoutine : 대기 시간이 끝나도 일시정지 중이면 해제될 때까지 Advance 를 보류한다.
+ *
+ * 6) 선택지 효과음 (UI_Select) — ChoicePanel 폴백 경로 전용
+ *    UpdateChoiceHighlight 의 폴백 분기(choiceView == null)에서 fallbackHighlightIndex 와 비교해
+ *    선택 커서가 실제로 옮겨간 경우에만 재생한다. ShowChoices 에서 -1 로 초기화하므로
+ *    선택지가 처음 뜨는 순간에는 울리지 않는다.
+ *    DialogueChoiceView 가 있는 씬에서는 이 분기를 타지 않고 뷰 쪽 ApplyHighlight 가 같은 소리를 낸다.
  */

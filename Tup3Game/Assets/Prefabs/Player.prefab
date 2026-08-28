@@ -5140,10 +5140,10 @@ MonoBehaviour:
   skill_4_duration: 5
   skill_4_HealEffect: {fileID: 6764349960059873119}
   isSkillEquiped: 00000000
-  skill_1_key: 97
-  skill_2_key: 115
+  skill_1_key: 102
+  skill_2_key: 97
   skill_3_key: 100
-  skill_4_key: 102
+  skill_4_key: 115
 --- !u!114 &483271029826859299
 MonoBehaviour:
   m_ObjectHideFlags: 0

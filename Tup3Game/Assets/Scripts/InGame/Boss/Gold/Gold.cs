@@ -69,6 +69,31 @@ public class Gold : BossBase
     [SerializeField] private string pattern4SlashPoolKey = "Pattern4Slash";
     [SerializeField] private float pattern4SlashLifeTime = 0.8f;
 
+    [Header("사운드")]
+    [SerializeField] private string groggyHitSoundName = GroggyHitSound;
+    [SerializeField] private string blockedHitSoundName = BlockedHitSound;
+    [SerializeField] private float roarSoundVolume = 1f;
+    [SerializeField] private float swingSoundVolume = 1f;
+    [SerializeField] private float parrySoundVolume = 1f;
+    [SerializeField] private float blockedHitVolume = 0.8f;
+
+    private const string RoarSound = "Gold_Roar";
+    private const string SwingMeleeSound = "Gold_SwingMelee";
+    private const string SwingSwordSound = "Gold_SwingSword";
+    private const string ScreenSlashSound = "Gold_ScreenSlash";
+    private const string DrawSound = "Gold_Draw";
+    private const string LightHitSound = "Gold_HitLight";
+    private const string GroggyHitSound = "Gold_HitHeavy";
+    private const string BlockedHitSound = "Block_Blunt";
+    private const string ParrySuccessSound = "Parry_Success";
+
+    private bool hasPlayedIntroRoar;
+
+    protected override string DefaultHitSoundName => LightHitSound;
+
+    protected override string CurrentHitSoundName =>
+        IsGroggy ? groggyHitSoundName : base.CurrentHitSoundName;
+
     private BoxCollider2D bodyCollider;
     private ComboAttack playerCombo;
     private Playermovement playerMovement;
@@ -149,6 +174,12 @@ public class Gold : BossBase
     {
         if (PauseManager.IsPaused || DialogueManager.IsDialogueActive) return;
 
+        if (!hasPlayedIntroRoar && !IsDead)
+        {
+            hasPlayedIntroRoar = true;
+            BossSound.Play(RoarSound, roarSoundVolume);
+        }
+
         for (int i = 0; i < curTimes.Count; i++)
         {
             curTimes[i] -= Time.deltaTime;
@@ -172,6 +203,7 @@ public class Gold : BossBase
     private void ShowPattern1Effect()
     {
         isPattern1EffectShown = true;
+        BossSound.Play(SwingMeleeSound, swingSoundVolume);
         if (pattern1SlashEffect == null) return;
         pattern1SlashEffect.SetActive(false);
         pattern1SlashEffect.SetActive(true);
@@ -225,6 +257,7 @@ public class Gold : BossBase
         if (curTimes != null) curTimes[0] = 0f;
         ResetPatternTriggers();
         groggyTime = groggyDuration;
+        BossSound.Play(ParrySuccessSound, parrySoundVolume);
         Debug.Log($"<color=#00FF88>[금 보스] 패턴{patternIndex} 쳐내기 성공! {groggyDuration}초간 그로기</color>");
     }
 
@@ -287,6 +320,7 @@ public class Gold : BossBase
             animator.SetBool("IsMoving", false);
             animator.SetBool("IsIdle", false);
             animator.SetTrigger("CounterAttack");
+            BossSound.Play(SwingMeleeSound, swingSoundVolume);
             DOVirtual.DelayedCall(0.2f,
                 () => player.GetComponent<PlayerKnockBack>().TakeHit(transform.position, 0.5f, 20));
         }
@@ -365,16 +399,24 @@ public class Gold : BossBase
         if (player == null) return;
         if (HorizontalDistance > pattern1HitRange) return;
 
-        if (player.TryGetComponent(out PlayerKnockBack knockBack))
+        DamagePlayer(pattern1Damage, pattern1KnockBackForce);
+    }
+
+    private void DamagePlayer(float damage, float knockBackForce)
+    {
+        if (player == null) return;
+
+        PlayerKnockBack knockBack = player.GetComponent<PlayerKnockBack>();
+        if (knockBack == null) knockBack = player.GetComponentInChildren<PlayerKnockBack>(true);
+        if (knockBack == null) knockBack = player.GetComponentInParent<PlayerKnockBack>();
+
+        if (knockBack == null)
         {
-            knockBack.TakeHit(transform.position, pattern1KnockBackForce, Mathf.RoundToInt(pattern1Damage));
+            Debug.LogError($"[금 보스] '{player.name}' 에서 PlayerKnockBack 을 찾지 못했습니다. 넉백·무적 점멸이 적용되지 않아 피해를 건너뜁니다.", this);
             return;
         }
 
-        if (player.TryGetComponent(out PlayerHealth playerHealth))
-        {
-            playerHealth.TakeDamage(pattern1Damage);
-        }
+        knockBack.TakeHit(transform.position, knockBackForce, Mathf.RoundToInt(damage));
     }
 
     private TaskStatus Pattern2()
@@ -399,16 +441,12 @@ public class Gold : BossBase
             {
                 if (IsDead || GroggyTime > 0) return;
 
+                BossSound.Play(SwingMeleeSound, swingSoundVolume);
+
                 PoolManager.Instance.Get(
                     "SwordTrap",
-                    new Vector3(transform.position.x + 1, -3f, 0f),
+                    new Vector3(transform.position.x, -1.8f, 0f),
                     Quaternion.identity).transform.rotation = Quaternion.Euler(0f, 180, 0f);
-
-
-                PoolManager.Instance.Get(
-                    "SwordTrap",
-                    new Vector3(transform.position.x + -1, -3f, 0f),
-                    Quaternion.identity).transform.rotation = Quaternion.Euler(0f, 0, 0f);
             });
         }
 
@@ -446,6 +484,8 @@ public class Gold : BossBase
             DOVirtual.DelayedCall(1f, () =>
             {
                 if (IsDead || GroggyTime > 0) return;
+
+                BossSound.Play(SwingSwordSound, swingSoundVolume);
 
                 for (int i = 0; i < 5; i++)
                 {
@@ -489,6 +529,7 @@ public class Gold : BossBase
             animator.SetBool("IsMoving", false);
             animator.SetBool("IsIdle", false);
             animator.SetTrigger("Pattern4");
+            BossSound.Play(DrawSound, swingSoundVolume);
             if (player != null) Face(Mathf.Sign(player.transform.position.x - transform.position.x));
 
             BuildPattern4Sequence(flashTime, slashTime, endTime);
@@ -573,6 +614,7 @@ public class Gold : BossBase
         if (pattern4FlashEffect != null) pattern4FlashEffect.SetActive(false);
         if (isPattern4Parried) return;
 
+        BossSound.Play(ScreenSlashSound, swingSoundVolume);
         SpawnPattern4Slash();
         Debug.Log("<color=red>[금 보스] 발도 참격 명중 판정</color>");
         ApplyPattern4Damage();
@@ -593,16 +635,7 @@ public class Gold : BossBase
     {
         if (player == null) return;
 
-        if (player.TryGetComponent(out PlayerKnockBack knockBack))
-        {
-            knockBack.TakeHit(transform.position, pattern4KnockBackForce, Mathf.RoundToInt(pattern4Damage));
-            return;
-        }
-
-        if (player.TryGetComponent(out PlayerHealth playerHealth))
-        {
-            playerHealth.TakeDamage(pattern4Damage);
-        }
+        DamagePlayer(pattern4Damage, pattern4KnockBackForce);
     }
 
     private void CancelPattern4()
@@ -739,6 +772,8 @@ public class Gold : BossBase
             return base.DoDamage(damage);
         }
 
+        BossSound.PlayThrottled(blockedHitSoundName, blockedHitVolume, HitSoundMinInterval);
+
         if (isCounterAttackReady || !isCounterAttacking)
         {
             isCounterAttacking = true;
@@ -759,6 +794,12 @@ public class Gold : BossBase
  * 보스에게 DoDamage 를 호출하는 외부 코드는 Attackhitbox 하나뿐이라 이 게이트만으로 전부 막힌다.
  * 되돌아온 검(FlyingSword)의 보스 명중도 DoDamage 가 아니라 NotifyReflectedSwordHit() 로만
  * 통지되므로 체력에는 영향이 없다.
+ *
+ * 플레이어 피해는 전부 DamagePlayer(damage, knockBackForce) 한 곳을 거친다 —
+ * PlayerKnockBack.TakeHit 이 데미지·콤보 취소·넉백·0.5초 무적 점멸을 모두 처리하는 정식 경로다.
+ * 예전에는 PlayerKnockBack 을 못 찾으면 PlayerHealth.TakeDamage 로 조용히 떨어졌는데,
+ * 그 경로는 넉백과 무적 점멸을 통째로 건너뛰어 버그를 숨겼다. 지금은 루트→자식→부모 순으로
+ * 참조를 찾고 그래도 없으면 에러 로그를 남기고 피해를 주지 않는다(조용한 실패 금지).
  *
  * ─────────────────────────────────────────────────────────────
  * 그로기 진입 = 쳐내기 성공
@@ -851,4 +892,32 @@ public class Gold : BossBase
  * Update 첫 줄의 PauseManager.IsPaused 게이트로 BT/쿨타임/그로기 타이머/중력이 전부 멈춘다.
  * 패턴4 연출 시퀀스와 패턴2/3 의 소환 DelayedCall 은 PauseManager 의 DOTween.PauseAll 로 함께 멈추고,
  * 카운터·패턴 데미지는 PlayerKnockBack.TakeHit 쪽 게이트가 차단한다.
+ *
+ * ─────────────────────────────────────────────────────────────
+ * 사운드
+ * ─────────────────────────────────────────────────────────────
+ * 피격음이 세 갈래인 이유는 금보스의 피해 규칙이 세 갈래이기 때문이다(DoDamage 참조).
+ *   1) 그로기 중 실제 피해 → Gold_HitHeavy
+ *      base.DoDamage 로 넘어가는 유일한 경로다. BossBase 가 CurrentHitSoundName 으로 이름을 묻고,
+ *      금보스는 IsGroggy 일 때 groggyHitSoundName 을 돌려준다. 즉 BossBase 의 재생 코드는 그대로 쓰고
+ *      "어떤 이름을 쓸지"만 갈아끼운다(재생 지점을 늘리지 않아 이중 재생이 없다).
+ *   2) 비그로기 피격(데미지 0, 카운터만 예약) → Block_Blunt
+ *      이 경로는 base.DoDamage 를 부르지 않으므로 BossBase 의 피격음이 울리지 않는다.
+ *      그래서 그 return false 직전에 직접 재생한다. 간격 제한은 BossBase 의 HitSoundMinInterval 을
+ *      공유해 플레이어 3단 콤보로 연타할 때 막힘음이 뭉치지 않게 한다.
+ *   3) hitSoundName(기본 Gold_HitLight) : 위 두 갈래에 걸리지 않는 일반 피격용 값이다.
+ *      현재 규칙상 금보스에서는 실제로 도달하지 않지만(그로기가 유일한 피해 구간),
+ *      최종보스와 같은 기본값을 유지해 두면 규칙이 완화될 때 그대로 동작한다.
+ * 공격음
+ *   Gold_Roar        : 전투가 실제로 시작되는 첫 프레임(Update 의 일시정지·대사 게이트를 처음 통과할 때) 1회.
+ *                      금보스 애니메이터에 포효 상태가 따로 없어 등장 시점에 붙였다.
+ *   Gold_SwingMelee  : 패턴1 검기가 켜지는 순간(ShowPattern1Effect = 실제 베는 프레임),
+ *                      패턴2 검 함정을 뽑아내는 순간(1초 DelayedCall), 카운터 반격 시작.
+ *   Gold_SwingSword  : 패턴3 어검 5자루를 뿌리는 순간(1초 DelayedCall) 1회 — 검마다가 아니라 투척 1회 기준.
+ *   Gold_Draw        : 패턴4 진입(기마자세 발도 준비) — 발도 전조.
+ *   Gold_ScreenSlash : 패턴4 참격이 확정되는 순간(ResolvePattern4Slash, 쳐내기에 실패했을 때만).
+ *                      쳐내기에 성공하면 isPattern4Parried 로 여기 도달하기 전에 return 하므로 울리지 않는다.
+ *   Parry_Success    : Parried() — 패턴1/2/4 쳐내기와 패턴3 어검 5회 반사 모두 이 한 곳을 지난다.
+ *   Sword_Clash      : 금보스가 아니라 FlyingSword.Reflect() 에 있다(검과 검이 부딪히는 순간).
+ *   Gold_SwingClub   : 유저 보류 — 어디에서도 호출하지 않는다.
  */

@@ -35,6 +35,11 @@ public class ComboAttack : MonoBehaviour
     [Header("돌진 가속 곡선")]
     public AnimationCurve dashSpeedCurve = AnimationCurve.EaseInOut(0f, 2f, 1f, 0.3f);
 
+    [Header("사운드")]
+    [SerializeField, Range(0f, 1f)] private float attackHeavyVolume = 1f;
+
+    private const string SoundAttackHeavy = "Player_AttackHeavy";
+
     private bool isAttacking = false;
     private bool isLunging = false;
     private bool comboQueued = false;
@@ -152,6 +157,9 @@ public class ComboAttack : MonoBehaviour
                             cancelRequested = false;
                             yield break;
                         }
+
+                        AudioManager.Instance.PlaySound(SoundAttackHeavy, attackHeavyVolume);
+
                         yield return StartCoroutine(DashForward(attack3Distance, duration, facingDirection));
                         if (cancelRequested)
                             yield break;
@@ -324,4 +332,9 @@ public class ComboAttack : MonoBehaviour
  * 일시정지 대응 : Update(입력)와 DashForward(전진 이동)는 PauseManager.IsPaused 동안 정지하고,
  * 콤보 입력 대기 타이머도 일시정지 중에는 흐르지 않는다. WaitForSeconds 기반 대기(콤보 딜레이 등)는
  * 실시간으로 흐르지만 이동/판정이 모두 멈춰 있어 체감 영향이 없다.
+ *
+ * 효과음 배선
+ *  - Player_AttackHeavy : comboStep == 3(막타)의 취소 검사 통과 직후, 3단 돌진(DashForward)이 시작되는
+ *    지점에서 1회. 1·2타는 전용 효과음 파일이 없어 아무것도 재생하지 않는다.
+ *    막타가 취소(cancelRequested)되면 소리도 나지 않는다.
  */

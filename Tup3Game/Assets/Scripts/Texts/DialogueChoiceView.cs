@@ -32,6 +32,11 @@ public class DialogueChoiceView : MonoBehaviour
     [SerializeField] private float highlightDuration = 0.12f;
     [SerializeField] private float fadeDuration = 0.15f;
 
+    [Header("사운드")]
+    [SerializeField, Range(0f, 1f)] private float selectVolume = 0.8f;
+
+    private const string SoundSelect = "UI_Select";
+
     private class Option
     {
         public GameObject root;
@@ -120,6 +125,9 @@ public class DialogueChoiceView : MonoBehaviour
     private void ApplyHighlight(int index, bool instant)
     {
         if (highlightIndex == index && !instant) return;
+
+        if (!instant) AudioManager.Instance.PlaySound(SoundSelect, selectVolume);
+
         highlightIndex = index;
 
         for (int i = 0; i < visibleCount; i++)
@@ -332,4 +340,11 @@ public class DialogueChoiceView : MonoBehaviour
  *
  * 6) HideInstant()
  *    페이드 없이 즉시 끈다. DialogueManager 가 대화를 통째로 종료(EndDialogue)할 때 쓴다.
+ *
+ * 7) 효과음 (UI_Select)
+ *    ApplyHighlight 에서 선택 커서가 실제로 다른 항목으로 옮겨갈 때만 1회 재생한다.
+ *    Show() 가 부르는 최초 하이라이트는 instant: true 로 들어오므로 선택지 등장 시에는 소리가 나지 않고,
+ *    유저가 방향키로 선택을 바꾼 경우(DialogueManager → SetHighlight → instant: false)에만 울린다.
+ *    이 뷰가 씬에 없을 때 타는 기존 ChoicePanel 폴백 경로는 DialogueManager.UpdateChoiceHighlight
+ *    쪽에 같은 소리를 별도로 붙여 두었다(양쪽이 동시에 울리는 일은 없다 — 폴백은 choiceView == null 일 때만).
  */

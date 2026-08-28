@@ -27,8 +27,14 @@ public class Ice_Bullet : MonoBehaviour
     [SerializeField] private int minimumPathSortingOrder = 6;
 
     [Header("생성 연출 (고드름 자라나는 효과)")]
-    [SerializeField] private Transform iceVisual; 
+    [SerializeField] private Transform iceVisual;
     [SerializeField] private AnimationCurve growCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+
+    [Header("사운드")]
+    [SerializeField] private float iceBulletVolume = 0.8f;
+    [SerializeField] private float iceBulletMinInterval = 0.12f;
+
+    private const string IceBulletSound = "Water_IceBullet";
 
     private Vector2 direction = Vector2.right;
     private float elapsed;
@@ -99,6 +105,7 @@ public class Ice_Bullet : MonoBehaviour
             if (delayElapsed >= startDelay)
             {
                 isLaunching = true; // 정지 끝, 이제부터 가속 시작
+                BossSound.PlayThrottled(IceBulletSound, iceBulletVolume, iceBulletMinInterval);
                 if (iceVisual != null)
                     iceVisual.localScale = Vector3.one;
             }
@@ -296,3 +303,11 @@ public class Ice_Bullet : MonoBehaviour
         Gizmos.DrawWireCube(transform.position, freezeProbeSize);
     }
 }
+
+/* [파일 노트]
+ * 사운드 Water_IceBullet : 전조(startDelay, 고드름이 자라는 구간)가 끝나고 isLaunching 이 서는
+ * 프레임 — 즉 고드름이 실제로 발사되는 순간 — 에 재생한다. Launch() 시점이 아닌 이유는
+ * Launch 가 "예고 시작"이고 그때 소리를 내면 발사 타이밍과 어긋나기 때문이다.
+ * iceBulletMinInterval(기본 0.12초) 스로틀 : IceBulletSpawnZone 이 3발을 같은 프레임에 소환하고
+ * 전조 시간도 동일해 세 발이 정확히 동시에 발사되므로, 스로틀이 없으면 소리가 3중으로 겹친다.
+ */

@@ -32,6 +32,15 @@ public class PrologueScene : MonoBehaviour, ISceneEventListener
     [SerializeField] internal float playerRadiusEnd = 9f;
     [SerializeField] internal int monologueLineCount = 36;
 
+    [Header("도입 비프음")]
+    [SerializeField, Range(0f, 1f)] internal float introBeepVolume = 0.7f;
+    [SerializeField] internal int introBeepRepeat = 3;
+    [SerializeField] internal int introBeepLineCount = 3;
+
+    internal const string SoundIntroBeep = "Intro_Beep";
+
+    private int introBeepId = -1;
+
     [Header("씬 이동 / 스킵")]
     [SerializeField] internal string nextSceneName = "Lobby";
     [SerializeField] internal KeyCode[] skipKeys = { KeyCode.Escape, KeyCode.Space, KeyCode.Return };
@@ -64,6 +73,7 @@ public class PrologueScene : MonoBehaviour, ISceneEventListener
     public void OnSceneExit(string sceneName)
     {
         SceneController.Instance.UnregisterListener(this);
+        StopIntroBeep();
         KillTracked();
     }
 
@@ -126,6 +136,21 @@ public class PrologueScene : MonoBehaviour, ISceneEventListener
 
         Debug.Log("[Prologue] 스킵 입력 — 프롤로그를 건너뜁니다.");
         stateMachine.ChangeState(new PrologueOutro(true));
+    }
+
+    internal void PlayIntroBeep()
+    {
+        StopIntroBeep();
+        introBeepId = AudioManager.Instance.PlaySound(
+            SoundIntroBeep, introBeepVolume, Mathf.Max(1, introBeepRepeat));
+    }
+
+    internal void StopIntroBeep()
+    {
+        if (introBeepId < 0) return;
+
+        AudioManager.Instance.StopSound(introBeepId);
+        introBeepId = -1;
     }
 
     internal void Track(Tween tween)
@@ -257,6 +282,8 @@ internal class PrologueMonologue : State<PrologueScene>
         dialogue.OnDialogueEnd += onDialogueEnd;
         dialogue.OnLineShown += onLineShown;
 
+        entity.PlayIntroBeep();
+
         dialogue.SetAutoAdvance(true, entity.autoAdvanceDelay);
         dialogue.StartDialogueFromCsv(entity.dialogueFileName);
     }
@@ -287,11 +314,14 @@ internal class PrologueMonologue : State<PrologueScene>
         onDialogueEnd = null;
         onLineShown = null;
 
+        entity.StopIntroBeep();
         entity.KillTracked();
     }
 
     private void UpdateLightTargets(PrologueScene entity, int lineNumber)
     {
+        if (lineNumber > entity.introBeepLineCount) entity.StopIntroBeep();
+
         int span = Mathf.Max(1, entity.monologueLineCount - 1);
         float t = Mathf.Clamp01((lineNumber - 1) / (float)span);
 
@@ -331,6 +361,7 @@ internal class PrologueOutro : State<PrologueScene>
     public override void Enter(PrologueScene entity)
     {
         entity.HideSkipHint();
+        entity.StopIntroBeep();
 
         var dialogue = DialogueManager.Current;
         if (dialogue != null)
@@ -417,4 +448,16 @@ internal class PrologueOutro : State<PrologueScene>
  *
  * 6) 입력
  *    프로젝트 전반이 legacy Input 을 쓰고 있어 여기서도 Input.GetKeyDown 을 그대로 쓴다.
+ *
+ * 7) 도입 비프음 (Intro_Beep)
+ *    "이승에서 죽음을 맞는 순간, 뚜뚜뚜 하는 하트비트 비프음과 함께 첫 대사가 흐른다"는 기획 의도대로
+ *    PrologueMonologue.Enter 에서 StartDialogueFromCsv 직전에 PlayIntroBeep() 으로 시작한다.
+ *    (조명이 켜지는 PrologueAwakening 이 아니라 대사 시작 시점에 맞물린다.)
+ *    AudioManager.PlaySound 의 repeatTime(introBeepRepeat, 기본 3)으로 "뚜-뚜-뚜" 세 번을 만들고,
+ *    반환된 채널 id 를 들고 있다가 StopIntroBeep() 으로 중단한다. 중단 시점은 세 곳이다.
+ *      - OnLineShown 이 introBeepLineCount(기본 3) 줄을 넘어갈 때 (도입 3줄이 지나가면 정지)
+ *      - PrologueMonologue.Exit / PrologueOutro.Enter (독백 종료·스킵)
+ *      - PrologueScene.OnSceneExit (씬 이탈)
+ *    AudioManager 는 DontDestroyOnLoad 라 씬을 떠나도 채널이 남을 수 있어 명시적 정지가 필요하다.
+ *    파일이 짧아 3회로 부족하거나 길이가 맞지 않으면 introBeepRepeat / introBeepLineCount 로 조절한다.
  */

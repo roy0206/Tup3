@@ -12,7 +12,7 @@ public class Soil : BossBase
     private List<float> curTimes;
     [SerializeField] List<Transform> hitboxTransforms = new List<Transform>();
     private GameObject player;
-    private SpriteRenderer spriteRenderer;
+    [SerializeField] private Transform visualRoot;
     private bool isFacingRight;
 
     [Header("이동")]
@@ -30,6 +30,19 @@ public class Soil : BossBase
     [SerializeField] private float pattern1Cooltime;
     [SerializeField] private float pattern2Cooltime;
     [SerializeField] private float pattern3Cooltime;
+
+    [Header("사운드")]
+    [SerializeField] private float smashSoundVolume = 1f;
+    [SerializeField] private float footstepSoundVolume = 0.6f;
+    [SerializeField] private float footstepMinInterval = 0.4f;
+
+    private const string SmashSound = "Soil_Smash";
+    private const string FootstepSound = "Soil_Footstep";
+    private const string DeathSound = "Soil_Death";
+
+    private float footstepTimer;
+
+    protected override string DefaultDeathSoundName => DeathSound;
 
     new void Awake()
     {
@@ -66,11 +79,23 @@ public class Soil : BossBase
         player = GameObject.FindGameObjectWithTag("Player");
         bodyCollider = boxColliders.Count > 0 ? boxColliders[0] : GetComponent<BoxCollider2D>();
 
-        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        if (visualRoot == null) visualRoot = transform.Find("Body");
         if (Mathf.Approximately(transform.rotation.eulerAngles.y, 180f))
         {
             transform.rotation = Quaternion.identity;
             SetFacing(true);
+        }
+
+        SnapToGround();
+        if (!snappedToGround) StartCoroutine(SnapToGroundWhenReady());
+    }
+
+    private IEnumerator SnapToGroundWhenReady()
+    {
+        for (int i = 0; i < 30 && !snappedToGround; i++)
+        {
+            yield return null;
+            SnapToGround();
         }
     }
 
@@ -126,6 +151,7 @@ public class Soil : BossBase
             DOVirtual.DelayedCall(0.6f, () =>
             {
                 hitboxTransforms[1].gameObject.SetActive(true);
+                BossSound.Play(SmashSound, smashSoundVolume);
             } );
             DOVirtual.DelayedCall(0.7f, () =>
             {
@@ -224,7 +250,17 @@ public class Soil : BossBase
         float dir = Mathf.Sign(player.transform.position.x - transform.position.x);
         Face(dir);
         transform.Translate(Vector3.right * (dir * moveSpeed * Time.deltaTime), Space.World);
+        PlayFootstep();
         return TaskStatus.Success;
+    }
+
+    private void PlayFootstep()
+    {
+        footstepTimer -= Time.deltaTime;
+        if (footstepTimer > 0f) return;
+
+        footstepTimer = Mathf.Max(0.05f, footstepMinInterval);
+        BossSound.Play(FootstepSound, footstepSoundVolume);
     }
 
     private TaskStatus Stay()
@@ -242,10 +278,10 @@ public class Soil : BossBase
 
     private void SetFacing(bool facingRight)
     {
-        if (spriteRenderer != null) spriteRenderer.flipX = facingRight;
         if (facingRight == isFacingRight) return;
 
         isFacingRight = facingRight;
+        if (visualRoot != null) MirrorChild(visualRoot);
         foreach (var hitbox in hitboxTransforms)
             MirrorChild(hitbox);
     }
@@ -263,20 +299,113 @@ public class Soil : BossBase
         t.localScale = scale;
     }
 
+    [SerializeField] private float fallRescueDepth = 12f;
+    private Vector3 lastGroundedPosition;
+    private bool hasGroundedPosition;
+    private bool snappedToGround;
+
+    private Bounds GroundProbeBounds()
+    {
+        if (bodyCollider != null)
+        {
+            Vector3 s = transform.lossyScale;
+            Vector2 center = (Vector2)transform.position
+                + new Vector2(bodyCollider.offset.x * s.x, bodyCollider.offset.y * s.y);
+            Vector2 size = new Vector2(
+                Mathf.Abs(bodyCollider.size.x * s.x),
+                Mathf.Abs(bodyCollider.size.y * s.y));
+            return new Bounds(center, size);
+        }
+
+        return new Bounds(transform.position, Vector3.one);
+    }
+
+    private bool IsOwnCollider(Collider2D col)
+    {
+        return col != null && col.transform.IsChildOf(transform);
+    }
+
+    private RaycastHit2D GroundCast(Vector2 origin, Vector2 size, float distance)
+    {
+        foreach (var hit in Physics2D.BoxCastAll(origin, size, 0f, Vector2.down, distance, groundMask))
+        {
+            if (!IsOwnCollider(hit.collider)) return hit;
+        }
+        return default;
+    }
+
+    private Collider2D GroundOverlap(Vector2 center, Vector2 size)
+    {
+        foreach (var col in Physics2D.OverlapBoxAll(center, size, 0f, groundMask))
+        {
+            if (!IsOwnCollider(col)) return col;
+        }
+        return null;
+    }
+
+    private void SnapToGround()
+    {
+        Bounds probe = GroundProbeBounds();
+        Vector2 castOrigin = new Vector2(probe.center.x, probe.center.y + 30f);
+        RaycastHit2D hit = GroundCast(castOrigin, probe.size, 120f);
+        if (hit.collider == null) return;
+
+        float delta = (castOrigin.y - hit.distance) - probe.center.y;
+        if (Mathf.Abs(delta) > 0.001f)
+            transform.Translate(Vector3.up * delta, Space.World);
+
+        verticalVelocity = 0f;
+        snappedToGround = true;
+        RememberGrounded();
+    }
+
+    private void RememberGrounded()
+    {
+        lastGroundedPosition = transform.position;
+        hasGroundedPosition = true;
+    }
+
     private void ApplyGravity()
     {
-        Bounds bounds = bodyCollider.bounds;
-        bool grounded = Physics2D.BoxCast(bounds.center, bounds.size, 0f,
-            Vector2.down, groundCheckDistance, groundMask).collider != null;
-
-        if (grounded && verticalVelocity <= 0f)
+        if (!snappedToGround)
         {
+            SnapToGround();
+            if (snappedToGround) return;
+        }
+
+        Bounds bounds = GroundProbeBounds();
+
+        Collider2D overlapped = GroundOverlap(bounds.center, bounds.size * 0.98f);
+        if (overlapped != null)
+        {
+            float push = overlapped.bounds.max.y - bounds.min.y;
+            if (push > 0f) transform.Translate(Vector3.up * push, Space.World);
             verticalVelocity = 0f;
+            RememberGrounded();
+            return;
+        }
+
+        float fallThisFrame = verticalVelocity < 0f ? -verticalVelocity * Time.deltaTime : 0f;
+        float castDistance = Mathf.Max(groundCheckDistance, fallThisFrame);
+        RaycastHit2D hit = GroundCast(bounds.center, bounds.size, castDistance);
+
+        if (hit.collider != null && verticalVelocity <= 0f)
+        {
+            if (hit.distance > groundCheckDistance)
+                transform.Translate(Vector3.down * (hit.distance - groundCheckDistance * 0.5f), Space.World);
+            verticalVelocity = 0f;
+            RememberGrounded();
             return;
         }
 
         verticalVelocity += gravity * Time.deltaTime;
         transform.Translate(Vector3.up * (verticalVelocity * Time.deltaTime), Space.World);
+
+        if (hasGroundedPosition && transform.position.y < lastGroundedPosition.y - fallRescueDepth)
+        {
+            transform.position = lastGroundedPosition;
+            verticalVelocity = 0f;
+        }
     }
 
 }
@@ -286,10 +415,29 @@ public class Soil : BossBase
  * 패턴의 지연 히트박스(DOVirtual.DelayedCall)와 이동 트윈은 PauseManager 의 DOTween.PauseAll 로 멈추고,
  * SoilDrop 소환 코루틴은 루프마다 WaitWhilePaused 로 일시정지 동안 추가 소환을 하지 않는다.
  *
- * 좌우반전은 Gold 보스와 같은 spriteRenderer.flipX 방식이다 — 예전의 루트 Y축 180도 회전은
- * 자식 체력바 캔버스까지 카메라 반대편으로 뒤집어 안 보이게 만들었다. flipX 는 자식을 안 뒤집으므로
- * 방향이 바뀔 때 SetFacing 이 hitboxTransforms 전체의 localPosition.x / localScale.x 를 미러링한다.
+ * 접지/중력 (FinalBoss 와 동일한 방식): Awake 에서 SnapToGround 로 지면 표면에 1회 스냅 —
+ * BossRoom 이 도입 대사 동안 이 컴포넌트를 꺼둬도(Update 정지) 보스가 공중에 떠 있지 않게 한다.
+ * ApplyGravity 는 낙하속도 비례 캐스트 + 착지 스냅 + 파묻힘 밀어올림으로 터널링을 막고,
+ * 마지막 접지 위치를 기억해 fallRescueDepth 이상 낙하(콜라이더 없는 구멍)하면 복귀한다.
+ * 접지 검사 박스는 bodyCollider 의 size/offset 을 스케일 반영해 직접 계산한다(비활성에도 유효).
+ *
+ * 좌우반전: 토보스는 본 리깅 캐릭터(Body 하위 다중 SpriteRenderer)라 flipX 로는 그래픽이 안
+ * 뒤집힌다 — SetFacing 이 리그 루트(visualRoot, 기본 "Body" 자식, x=0 피봇)와 hitboxTransforms 의
+ * localPosition.x / localScale.x 를 함께 미러링한다. 예전의 루트 Y축 180도 회전은 자식 체력바
+ * 캔버스까지 카메라 반대편으로 뒤집어 안 보이게 만들었기 때문에 쓰지 않는다.
  * 기본(스프라이트 원본)은 왼쪽 보기 = isFacingRight false 이고, 씬에 Y=180 으로 저장돼 있던 경우를
  * 위해 Awake 에서 회전을 identity 로 되돌리고 facing 상태로 변환한다. 패턴1의 전진 히트박스와
  * SoilDrop 낙하 방향도 회전 대신 isFacingRight 를 본다.
+ *
+ * 사운드
+ *   Soil_Smash  : 패턴1(내려치기). 패턴 시작이 아니라 기존 0.6초 DelayedCall — 즉 첫 히트박스가
+ *                 켜지는(= 팔이 땅에 닿는) 순간 — 안에서 1회 재생해 모션과 타격음을 맞춘다.
+ *                 패턴1을 고른 근거 : 이 패턴이 내리치며 전방으로 전진하는 히트박스(파동)를 뿜는
+ *                 동작이고, 최종보스의 "토 파동"이 같은 애니(SoilPattern1)와 같은 타임라인
+ *                 (근접 0.6~0.9 / 파동 0.7)을 그대로 이식한 것이라 둘이 같은 소리를 공유한다.
+ *   Soil_Death  : DefaultDeathSoundName 으로 BossBase 에 넘긴다(체력 0 시점 1회).
+ *   Soil_Footstep : Move 태스크가 성공한 프레임마다 footstepMinInterval(기본 0.4초) 간격으로 재생.
+ *                 Move 는 매 프레임 호출되므로 간격 제한이 없으면 초당 수십 번 울린다.
+ *                 타이머는 이동한 프레임에만 줄어들어 멈춰 있는 동안에는 발소리가 나지 않는다.
+ *   Soil_RockFall : 낙석 본체(SoilDrop.cs)가 스스로 재생한다.
  */

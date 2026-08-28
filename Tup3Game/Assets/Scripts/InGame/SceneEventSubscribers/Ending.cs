@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,15 +19,41 @@ public class Ending : MonoBehaviour, ISceneEventListener
     [SerializeField] private DialogueManager DM;
     [SerializeField] private Button returnButton;
     [SerializeField] private CreditsView creditsView;
+    [SerializeField] private Button checkpointButton;
+    [SerializeField] private ConfirmDialogView confirmDialog;
 
     [Header("옵션")]
     [SerializeField] private string returnScene = "Start";
     [SerializeField] private bool allowManualAdvance = true;
+    [SerializeField] private string checkpointScene = "Lobby";
+
+    [Header("복귀 선택지 문구")]
+    [SerializeField] private string checkpointButtonLabel = "마지막 체크포인트로 돌아가기";
+    [SerializeField] private string returnButtonLabel = "시작 화면으로";
+    [SerializeField] private string checkpointConfirmTitle = "정말 돌아갈까요?";
+    [SerializeField, TextArea(3, 8)]
+    private string checkpointConfirmMessage =
+        "마지막 체크포인트로 돌아가면 이 엔딩의 업적이 클리어되지 않습니다.\n" +
+        "엔딩 업적은 '시작 화면으로'를 선택했을 때만 인정됩니다.";
+    [SerializeField] private string checkpointConfirmYes = "돌아가기";
+    [SerializeField] private string checkpointConfirmNo = "취소";
+
+    [Header("복귀 선택지 배치 (버튼을 코드로 만들 때만 사용)")]
+    [SerializeField] private float checkpointButtonWidth = 560f;
+    [SerializeField] private float checkpointButtonGap = 16f;
+    [SerializeField] private Vector2 fallbackButtonSize = new Vector2(560f, 68f);
+    [SerializeField] private float fallbackButtonFontSize = 30f;
+    [SerializeField] private Color fallbackPanelColor = new Color(0f, 0f, 0f, 0f);
+    [SerializeField] private Color fallbackButtonColor = new Color(0f, 0f, 0f, 0.75f);
+    [SerializeField] private Color fallbackTextColor = new Color(0.9f, 0.9f, 0.9f, 1f);
+    [SerializeField] private int fallbackSortingOrder = 920;
 
     private bool dialogueRunning;
     private bool subscribed;
+    private bool confirmSubscribed;
     private bool creditsStarted;
     private bool achievementsUnlocked;
+    private bool leaving;
 
     private void Awake()
     {
@@ -39,11 +66,8 @@ public class Ending : MonoBehaviour, ISceneEventListener
         WarnOnEndingMismatch();
         Subscribe();
 
-        if (returnButton != null)
-        {
-            returnButton.onClick.AddListener(ReturnToStart);
-            returnButton.gameObject.SetActive(false);
-        }
+        BuildReturnChoices();
+        SetChoicesVisible(false);
 
         PlayEndingDialogue();
 
@@ -53,9 +77,6 @@ public class Ending : MonoBehaviour, ISceneEventListener
     public void OnSceneExit(string sceneName)
     {
         Unsubscribe();
-        UnlockAchievements();
-        UserDataManager.Instance.ClearPlayData();
-        UserDataManager.Instance.SaveAsync();
         SceneController.Instance.UnregisterListener(this);
     }
 
@@ -67,8 +88,25 @@ public class Ending : MonoBehaviour, ISceneEventListener
     private void ResolveReferences()
     {
         if (DM == null) DM = DialogueManager.Current;
-        if (returnButton == null) returnButton = FindAnyObjectByType<Button>(FindObjectsInactive.Include);
         if (creditsView == null) creditsView = FindAnyObjectByType<CreditsView>(FindObjectsInactive.Include);
+        if (confirmDialog == null) confirmDialog = FindAnyObjectByType<ConfirmDialogView>(FindObjectsInactive.Include);
+        if (returnButton == null) returnButton = FindSceneReturnButton();
+    }
+
+    private Button FindSceneReturnButton()
+    {
+        var buttons = FindObjectsByType<Button>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            Button button = buttons[i];
+            if (button == null || button == checkpointButton) continue;
+            if (confirmDialog != null && button.transform.IsChildOf(confirmDialog.transform)) continue;
+            if (button.transform.IsChildOf(transform)) continue;
+            return button;
+        }
+
+        return null;
     }
 
     private void WarnOnEndingMismatch()
@@ -94,9 +132,18 @@ public class Ending : MonoBehaviour, ISceneEventListener
 
     private void Unsubscribe()
     {
-        if (!subscribed || DM == null) return;
-        subscribed = false;
-        DM.OnDialogueEnd -= HandleDialogueEnd;
+        if (subscribed && DM != null)
+        {
+            subscribed = false;
+            DM.OnDialogueEnd -= HandleDialogueEnd;
+        }
+
+        if (confirmSubscribed && confirmDialog != null)
+        {
+            confirmSubscribed = false;
+            confirmDialog.Confirmed -= HandleCheckpointConfirmed;
+            confirmDialog.Canceled -= HandleCheckpointCanceled;
+        }
     }
 
     private void PlayEndingDialogue()
@@ -148,8 +195,139 @@ public class Ending : MonoBehaviour, ISceneEventListener
 
     private void FinishEnding()
     {
-        UnlockAchievements();
-        if (returnButton != null) returnButton.gameObject.SetActive(true);
+        SetChoicesVisible(true);
+    }
+
+    private void BuildReturnChoices()
+    {
+        EnsureConfirmDialog();
+
+        if (returnButton != null)
+        {
+            if (checkpointButton == null) checkpointButton = CloneCheckpointButton();
+        }
+        else
+        {
+            BuildFallbackChoices();
+        }
+
+        ApplyButtonLabel(checkpointButton, checkpointButtonLabel);
+        ApplyButtonLabel(returnButton, returnButtonLabel);
+
+        if (checkpointButton != null)
+        {
+            checkpointButton.onClick.RemoveListener(RequestCheckpointReturn);
+            checkpointButton.onClick.AddListener(RequestCheckpointReturn);
+        }
+
+        if (returnButton != null)
+        {
+            returnButton.onClick.RemoveListener(ReturnToStart);
+            returnButton.onClick.AddListener(ReturnToStart);
+        }
+
+        if (returnButton == null && checkpointButton == null)
+            Debug.LogError("[Ending] 복귀 버튼을 만들지 못했습니다 — 엔딩에서 빠져나갈 수단이 없습니다");
+    }
+
+    private void EnsureConfirmDialog()
+    {
+        if (confirmDialog == null)
+        {
+            var go = new GameObject("ConfirmDialogView");
+            go.transform.SetParent(transform, false);
+            confirmDialog = go.AddComponent<ConfirmDialogView>();
+        }
+
+        confirmDialog.SetContent(
+            checkpointConfirmTitle, checkpointConfirmMessage, checkpointConfirmYes, checkpointConfirmNo);
+        confirmDialog.Hide();
+
+        if (confirmSubscribed) return;
+        confirmSubscribed = true;
+        confirmDialog.Confirmed += HandleCheckpointConfirmed;
+        confirmDialog.Canceled += HandleCheckpointCanceled;
+    }
+
+    private Button CloneCheckpointButton()
+    {
+        var sourceRect = (RectTransform)returnButton.transform;
+
+        GameObject clone = Instantiate(returnButton.gameObject, sourceRect.parent);
+        clone.name = "CheckpointButton";
+
+        var button = clone.GetComponent<Button>();
+        if (button == null) return null;
+        button.onClick = new Button.ButtonClickedEvent();
+
+        var rect = (RectTransform)clone.transform;
+        float height = sourceRect.rect.height;
+        rect.sizeDelta = new Vector2(Mathf.Max(sourceRect.sizeDelta.x, checkpointButtonWidth), rect.sizeDelta.y);
+        rect.anchoredPosition = sourceRect.anchoredPosition + new Vector2(0f, height + checkpointButtonGap);
+
+        return button;
+    }
+
+    private void BuildFallbackChoices()
+    {
+        var go = new GameObject("EndingReturnChoices");
+        go.transform.SetParent(transform, false);
+
+        TMP_FontAsset font = UiViewBuilder.FindFallbackFont(transform);
+        UiViewBuilder.SetupOverlayCanvas(go, fallbackSortingOrder);
+
+        RectTransform panel = UiViewBuilder.BuildCenterPanel(go.transform, fallbackPanelColor, checkpointButtonGap);
+
+        checkpointButton = UiViewBuilder.BuildButton(
+            panel, "CheckpointButton", checkpointButtonLabel, font, fallbackButtonFontSize,
+            fallbackButtonColor, fallbackTextColor, fallbackButtonSize);
+
+        returnButton = UiViewBuilder.BuildButton(
+            panel, "ReturnButton", returnButtonLabel, font, fallbackButtonFontSize,
+            fallbackButtonColor, fallbackTextColor, fallbackButtonSize);
+    }
+
+    private void ApplyButtonLabel(Button button, string label)
+    {
+        if (button == null || string.IsNullOrWhiteSpace(label)) return;
+
+        var text = button.GetComponentInChildren<TextMeshProUGUI>(true);
+        if (text != null) text.text = label;
+    }
+
+    private void SetChoicesVisible(bool visible)
+    {
+        if (checkpointButton != null) checkpointButton.gameObject.SetActive(visible);
+        if (returnButton != null) returnButton.gameObject.SetActive(visible);
+    }
+
+    private void RequestCheckpointReturn()
+    {
+        if (leaving) return;
+
+        if (confirmDialog == null)
+        {
+            Debug.LogError("[Ending] 확인창이 없어 체크포인트 복귀를 진행할 수 없습니다");
+            return;
+        }
+
+        confirmDialog.Show();
+    }
+
+    private void HandleCheckpointCanceled()
+    {
+        if (confirmDialog != null) confirmDialog.Hide();
+    }
+
+    private void HandleCheckpointConfirmed()
+    {
+        if (leaving) return;
+        leaving = true;
+
+        if (confirmDialog != null) confirmDialog.Hide();
+
+        Debug.Log($"[Ending] 체크포인트 복귀 — '{achievementId}' 업적은 해금하지 않고 세이브도 유지합니다");
+        SceneController.Instance.LoadScene(checkpointScene);
     }
 
     private void UnlockAchievements()
@@ -170,6 +348,16 @@ public class Ending : MonoBehaviour, ISceneEventListener
 
     private void ReturnToStart()
     {
+        if (leaving) return;
+        leaving = true;
+
+        if (confirmDialog != null) confirmDialog.Hide();
+
+        UnlockAchievements();
+
+        UserDataManager.Instance.ClearPlayData();
+        UserDataManager.Instance.SaveAsync();
+
         SceneController.Instance.LoadScene(returnScene);
     }
 }
@@ -185,16 +373,58 @@ public class Ending : MonoBehaviour, ISceneEventListener
  *
  * ── 흐름 ─────────────────────────────────────────────────────────────────────
  *   OnSceneLoadComplete
- *     → 참조 수집(DM/버튼/CreditsView 자동 탐색) → endingId 일치 검사(경고만)
- *     → 복귀 버튼 숨김 → 대사 재생(DialogueManager null 안전 — 없으면 대사만 건너뜀)
+ *     → 참조 수집(DM/버튼/CreditsView/ConfirmDialogView 자동 탐색) → endingId 일치 검사(경고만)
+ *     → 복귀 선택지 2개 구성 후 숨김 → 대사 재생(DialogueManager null 안전 — 없으면 대사만 건너뜀)
  *   대사 종료(OnDialogueEnd) 또는 대사 시작 실패
  *     → StartCredits : CreditsView(없으면 즉석 생성)로 크레딧 스크롤 재생.
  *       [개별 콘텐츠(creditsContent)] → [공통 출처(Resources/Credits/CommonCredits.txt)] 순.
  *       V/클릭 홀드로 가속(사실상 스킵)은 CreditsView 가 처리한다.
  *   크레딧 종료(콜백 FinishEnding)
- *     → 업적 해금("Clear" + achievementId) + SaveAsync → 복귀 버튼 표시(누르면 returnScene)
+ *     → 복귀 선택지 2개를 표시하기만 한다. 여기서는 업적도 세이브도 건드리지 않는다.
  *   OnSceneExit
- *     → 업적 해금 보장(멱등) → ClearPlayData → SaveAsync (기존 동작 그대로)
+ *     → 구독 해제 + 리스너 등록 해제만. (세이브 갱신은 SceneController 가 전환 시 수행한다)
+ *
+ * ── 복귀 분기 (2026-08-28 유저 확정 — 사양 변경) ─────────────────────────────
+ *   예전에는 "크레딧이 끝나면 무조건" 업적 해금 + ClearPlayData 였고 OnSceneExit 에도 같은 처리를
+ *   멱등하게 한 번 더 걸어 두었다. 이제는 플레이어의 선택에 따라 갈린다 —
+ *   업적 해금은 더 이상 "엔딩 도달"이 아니라 "엔딩을 받아들이고 회차를 끝낸다"는 선언이다.
+ *
+ *   [A] "마지막 체크포인트로 돌아가기" (checkpointButton)
+ *       → 곧바로 이동하지 않고 ConfirmDialogView 로 경고 모달을 띄운다
+ *         (이 엔딩의 업적이 클리어되지 않는다는 안내 — 문구 4종 전부 인스펙터 노출).
+ *       → "취소" : 모달만 닫고 엔딩 화면(선택지 2개)으로 돌아온다.
+ *       → "돌아가기" : 업적을 해금하지 않고, ClearPlayData 도 호출하지 않은 채
+ *         checkpointScene(기본 "Lobby")을 로드한다. 세이브가 그대로 남으므로 회차가 이어진다.
+ *   [B] "시작 화면으로" (returnButton — 기존 필드를 그대로 재사용)
+ *       → UnlockAchievements("Clear" + achievementId) → SaveAsync → ClearPlayData → SaveAsync
+ *         → returnScene(기본 "Start") 로드.
+ *
+ *   실행 순서의 근거 : UserData 는 Achievements / Settings / Play 세 덩어리를 가진 한 객체이고
+ *   ClearPlayData() 는 Data.Play 만 새 PlayData 로 교체할 뿐 Achievements 는 손대지 않는다
+ *   (UserDataManager.ClearPlayData / UserData.cs 파일 노트 참조). 그래도 "해금 → 저장 → 삭제 → 저장"
+ *   순서를 지키는 이유는, LocalSaveBackend.SaveAsync 가 File.WriteAllText 로 동기 기록 후
+ *   완료된 Task 를 반환하기 때문에 첫 SaveAsync 시점에 업적이 이미 디스크에 확정되기 때문이다.
+ *   이후 어떤 단계가 실패하거나 씬 전환이 끼어들어도 업적은 유실되지 않는다.
+ *   업적까지 지워 버리는 UserDataManager.ResetAsync 는 이 경로에서 절대 쓰지 않는다.
+ *   leaving 플래그로 두 버튼의 중복 입력을 막는다(SceneController.IsTransitioning 과 이중 방어).
+ *
+ * ── 체크포인트의 정의 ────────────────────────────────────────────────────────
+ *   이 프로젝트에는 별도 체크포인트 시스템이 없다. PlayData.position 을 읽고 쓰는 곳은 Lobby.cs
+ *   뿐이며(로비를 떠날 때의 로비 좌표를 저장), 좌표·체력·스킬 복원은 Lobby.OnSceneLoadComplete 가
+ *   전담한다. 따라서 "마지막 체크포인트 = 로비 씬"이고, BossRoom 의 패배 복귀(defeatReturnScene)와
+ *   같은 규약이다. 씬 이름은 checkpointScene 으로 인스펙터에서 바꿀 수 있다.
+ *
+ * ── 버튼 확보 방식 ───────────────────────────────────────────────────────────
+ *   씬(EndingSceneBuilder)은 Canvas 밑에 ReturnButton 하나만 만들어 두므로, 두 번째 버튼은
+ *   런타임에 그 버튼을 Instantiate 로 복제해 만든다 — 폰트·색·앵커가 그대로 따라오므로 씬에서
+ *   버튼을 꾸며 두면 두 버튼의 모양이 자동으로 일치한다. 복제본은 원본 위(높이 + gap)에 놓고
+ *   긴 라벨이 들어가도록 폭만 checkpointButtonWidth 이상으로 넓히며, onClick 은 새 이벤트로
+ *   갈아끼워 원본의 연결을 물려받지 않는다. 씬에 checkpointButton 을 직접 배치해 두면 복제는
+ *   생략되고 그것을 쓴다.
+ *   returnButton 조차 없는 씬에서는 UiViewBuilder 로 버튼 2개짜리 패널을 통째로 코드 생성한다
+ *   (fallback* 인스펙터 값으로 스타일 조정). 두 버튼 모두 실패했을 때만 에러 로그를 남긴다.
+ *   ConfirmDialogView 는 씬 배치본이 있으면 그것을, 없으면 이 오브젝트의 자식으로 생성한다
+ *   (BossRoom 의 GameOverView 처리와 동일한 폴백).
  *
  * ── 씬별 기본 매핑 (EndingSceneBuilder 가 배선) ──────────────────────────────
  *   Ending1 = S11_ENDING_1 / end1_01  (패배·배드)
@@ -210,5 +440,5 @@ public class Ending : MonoBehaviour, ISceneEventListener
  *
  * ── null 안전 ────────────────────────────────────────────────────────────────
  *   DM 이 없으면 대사만, CreditsView 는 즉석 생성이라 항상 동작, 버튼이 없어도 예외 없이
- *   진행된다(복귀 수단만 없어짐). 크레딧 이중 시작은 creditsStarted 플래그로 방지.
+ *   진행된다. 크레딧 이중 시작은 creditsStarted 플래그로 방지.
  */
