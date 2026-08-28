@@ -4,6 +4,7 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.UI;
 
 public class PrologueScene : MonoBehaviour, ISceneEventListener
 {
@@ -43,7 +44,19 @@ public class PrologueScene : MonoBehaviour, ISceneEventListener
 
     [Header("씬 이동 / 스킵")]
     [SerializeField] internal string nextSceneName = "Lobby";
-    [SerializeField] internal KeyCode[] skipKeys = { KeyCode.Escape, KeyCode.Space, KeyCode.Return };
+    [SerializeField] internal KeyCode skipKey = KeyCode.V;
+    [SerializeField] internal float skipHoldDuration = 2f;
+
+    [Header("스킵 게이지 (상호작용 UI 와 동일)")]
+    [SerializeField] internal Sprite skipGaugeSprite;
+    [SerializeField] internal Vector2 skipGaugeAnchoredPosition = new Vector2(-110f, 96f);
+    [SerializeField] internal Vector2 skipGaugeSize = new Vector2(72f, 72f);
+    [SerializeField] internal int skipGaugeSortingOrder = 810;
+    [SerializeField] internal Color skipGaugeIdleColor = new Color(1f, 1f, 1f, 0.35f);
+    [SerializeField] internal Color skipGaugeHoldColor = Color.white;
+
+    private Image skipGaugeImage;
+    private float skipHold;
 
     internal StateMachine<PrologueScene> stateMachine;
     internal bool dialogueFinished;
@@ -120,13 +133,69 @@ public class PrologueScene : MonoBehaviour, ISceneEventListener
 
     private bool IsSkipPressed()
     {
-        if (skipKeys == null) return false;
+        EnsureSkipGauge();
 
-        for (int i = 0; i < skipKeys.Length; i++)
+        float duration = Mathf.Max(0.01f, skipHoldDuration);
+
+        if (Input.GetKey(skipKey))
         {
-            if (Input.GetKeyDown(skipKeys[i])) return true;
+            skipHold += Time.deltaTime;
+            ApplySkipGauge(skipHold / duration, true);
+            return skipHold >= duration;
         }
+
+        if (skipHold > 0f)
+        {
+            skipHold = 0f;
+            ApplySkipGauge(0f, false);
+        }
+
         return false;
+    }
+
+    private void EnsureSkipGauge()
+    {
+        if (skipGaugeImage != null) return;
+
+        GameObject root = new GameObject("PrologueSkipGauge");
+        root.transform.SetParent(transform, false);
+        UiViewBuilder.SetupOverlayCanvas(root, skipGaugeSortingOrder);
+
+        GameObject iconObject = new GameObject("Fill");
+        iconObject.transform.SetParent(root.transform, false);
+
+        skipGaugeImage = iconObject.AddComponent<Image>();
+        skipGaugeImage.raycastTarget = false;
+        skipGaugeImage.sprite = skipGaugeSprite != null ? skipGaugeSprite : FindInteractionSprite();
+        skipGaugeImage.type = Image.Type.Filled;
+        skipGaugeImage.fillMethod = Image.FillMethod.Radial360;
+        skipGaugeImage.fillOrigin = 2;
+
+        RectTransform rect = skipGaugeImage.rectTransform;
+        rect.anchorMin = Vector2.one;
+        rect.anchorMax = Vector2.one;
+        rect.pivot = new Vector2(1f, 1f);
+        rect.sizeDelta = skipGaugeSize;
+        rect.anchoredPosition = skipGaugeAnchoredPosition;
+
+        ApplySkipGauge(0f, false);
+    }
+
+    private Sprite FindInteractionSprite()
+    {
+        InteractionView view = FindAnyObjectByType<InteractionView>(FindObjectsInactive.Include);
+        if (view == null) return null;
+
+        Image image = view.GetComponent<Image>();
+        return image != null ? image.sprite : null;
+    }
+
+    private void ApplySkipGauge(float ratio, bool holding)
+    {
+        if (skipGaugeImage == null) return;
+
+        skipGaugeImage.fillAmount = Mathf.Clamp01(ratio);
+        skipGaugeImage.color = holding ? skipGaugeHoldColor : skipGaugeIdleColor;
     }
 
     internal void RequestSkip()
@@ -175,6 +244,9 @@ public class PrologueScene : MonoBehaviour, ISceneEventListener
         skipHintTween?.Kill();
         skipHintTween = null;
         if (skipHintText != null) skipHintText.alpha = 0f;
+
+        skipHold = 0f;
+        if (skipGaugeImage != null) skipGaugeImage.gameObject.SetActive(false);
     }
 
     internal void GoToNextScene()
@@ -460,4 +532,14 @@ internal class PrologueOutro : State<PrologueScene>
  *      - PrologueScene.OnSceneExit (씬 이탈)
  *    AudioManager 는 DontDestroyOnLoad 라 씬을 떠나도 채널이 남을 수 있어 명시적 정지가 필요하다.
  *    파일이 짧아 3회로 부족하거나 길이가 맞지 않으면 introBeepRepeat / introBeepLineCount 로 조절한다.
- */
+  *
+ * ── 스킵을 V 홀드 2초로 변경 (2026-08-29 유저 요청) ──────────────────────────
+ * 예전에는 skipKeys(Esc/Space/Enter) 중 하나를 누르면 즉시 스킵됐다. 이제 skipKey(V)를
+ * skipHoldDuration(2초) 동안 누르고 있어야 넘어간다 — 보스방 상호작용과 같은 규약이다.
+ * 게이지도 상호작용 UI 와 같은 방식이다: 같은 스프라이트(PlayerUI 의 InteractionIcon 이 쓰는
+ * key_v_loading)를 Image.Type.Filled + Radial360 + fillOrigin 2 로 채운다.
+ * 프롤로그 씬에는 PlayerUI(InteractionView)가 없으므로 씬을 고치지 않고 코드로 생성한다.
+ * 스프라이트는 skipGaugeSprite 로 직접 지정할 수 있고, 비어 있으면 씬의 InteractionView 에서
+ * 가져오며, 그것도 없으면 스프라이트 없이 색 사각형으로 그려진다(동작에는 지장 없음).
+ * 키를 떼면 게이지가 0 으로 돌아간다(InteractionBase.OnHoldUP 과 같은 동작).
+*/

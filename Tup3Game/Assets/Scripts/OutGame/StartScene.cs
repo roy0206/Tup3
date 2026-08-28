@@ -6,32 +6,57 @@ using UnityEngine.Rendering;
 
 public class StartScene : MonoBehaviour
 {
+    [Header("첫 진입 페이드")]
+    [SerializeField] private float bootFadeDuration = 0.6f;
+    [SerializeField] private int bootStableFrames = 3;
+    [SerializeField] private float bootFrameTimeThreshold = 0.08f;
+    [SerializeField] private float bootMaxWait = 8f;
+
+    internal float BootFadeDuration => Mathf.Max(0f, bootFadeDuration);
+    internal int BootStableFrames => Mathf.Max(1, bootStableFrames);
+    internal float BootFrameTimeThreshold => Mathf.Max(0.001f, bootFrameTimeThreshold);
+    internal float BootMaxWait => Mathf.Max(0.1f, bootMaxWait);
+
     internal StateMachine<StartScene> stateMachine;
+
     private void Awake()
     {
+        ScreenFader.Instance.SetInstant(1f);
+
         stateMachine = new StateMachine<StartScene>();
         stateMachine.Setup(this, new Booting());
-        
     }
 
     void Update()
     {
+        if (stateMachine == null) return;
         stateMachine.Execute();
     }
 }
 
 internal class Booting : State<StartScene>
 {
-    private float timer = 1;
+    private int stableFrames;
+    private float elapsed;
+
     public override void Enter(StartScene entity)
     {
-
+        stableFrames = 0;
+        elapsed = 0f;
     }
 
     public override void Execute(StartScene entity)
     {
-        timer -= Time.deltaTime;
-        if(timer <= 0) entity.stateMachine.ChangeState(new IntroCutscene() );
+        float delta = Time.unscaledDeltaTime;
+        elapsed += delta;
+
+        if (delta <= entity.BootFrameTimeThreshold) stableFrames++;
+        else stableFrames = 0;
+
+        if (stableFrames < entity.BootStableFrames && elapsed < entity.BootMaxWait) return;
+
+        ScreenFader.Instance.FadeIn(entity.BootFadeDuration);
+        entity.stateMachine.ChangeState(new IntroCutscene());
     }
 
     public override void Exit(StartScene entity)
@@ -48,9 +73,12 @@ internal class IntroCutscene : State<StartScene>
     private readonly List<Tween> delayedCalls = new List<Tween>();
     public override void Enter(StartScene entity)
     {
-        Camera.main.transform.DOMoveX(0, 20f).SetEase(Ease.Linear);
+        Camera cam = Camera.main;
+        if (cam != null) cam.transform.DOMoveX(0, 20f).SetEase(Ease.Linear);
+        else Debug.LogWarning("[StartScene] MainCamera 태그가 붙은 카메라가 없어 인트로 카메라 이동을 건너뜁니다.");
+
         fader = entity.GetComponent<SpriteRenderer>();
-        fader.DOFade(0, 1f);
+        if (fader != null) fader.DOFade(0, 1f);
         KeepSubtitlesOutOfPostProcessing();
         delayedCalls.Add(DOVirtual.DelayedCall(2, () =>
             DialogueManager.Current.StartDialogueFromCsv("S00_PROLOGUE")));
@@ -297,4 +325,20 @@ internal class Menu : State<StartScene>
  * 두 뷰 모두 Exit 에서 구독 해제 + Hide 한다. 배지는 Show 때마다 업적을 다시 읽으므로
  * 엔딩을 마치고 "시작 화면으로" 돌아오면(= Ending.cs 가 업적 해금 후 Start 씬 로드)
  * 곧바로 밝아진 배지가 보인다.
- */
+  *
+ * ── 시작 시 로딩 랙이 그대로 보이던 문제 (2026-08-29 유저 요청) ─────────────
+ * Booting 은 timer = 1 을 Time.deltaTime 으로 깎았는데, 첫 프레임의 deltaTime 은 로딩 시간만큼
+ * 커질 수 있어(수 초) 단 한 프레임에 타이머가 소진되고 곧바로 인트로로 넘어갔다.
+ * 결과적으로 검은 화면이 랙 구간을 덮어 주지 못하고 버벅임이 그대로 노출됐다.
+ *
+ * 이제 시간이 아니라 "프레임이 안정됐는가"로 판정한다 —
+ * unscaledDeltaTime 이 bootFrameTimeThreshold(0.08초) 이하인 프레임이 bootStableFrames(3회)
+ * 연속으로 나와야 넘어가고, 그때 ScreenFader 를 페이드인한다.
+ * 저사양에서 영원히 대기하지 않도록 bootMaxWait(8초) 상한을 둔다.
+ * 검은 화면은 Awake 에서 ScreenFader.SetInstant(1f) 로 즉시 덮는다 — ScreenFader 는 Overlay
+ * 캔버스(sortingOrder 5000)라 카메라 준비 여부와 무관하게 첫 프레임부터 화면을 가린다.
+ * IntroCutscene 이 쓰는 SpriteRenderer 페이더는 그대로 두었다(연출용, 역할이 다르다).
+ *
+ * Camera.main / SpriteRenderer null 가드도 함께 넣었다. 두 참조가 비면 IntroCutscene.Enter 에서
+ * NRE 가 나고 그것이 StartScene.Update 의 stateMachine.Execute() 로 튀어 나왔다(로그 121회).
+*/

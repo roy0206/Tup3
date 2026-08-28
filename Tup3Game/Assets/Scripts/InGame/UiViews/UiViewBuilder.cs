@@ -227,18 +227,44 @@ public static class UiViewBuilder
         selectable.colors = colors;
     }
 
+    private const char KoreanProbe = '가';
+
     public static TMP_FontAsset FindFallbackFont(Transform origin)
     {
         var texts = Object.FindObjectsByType<TextMeshProUGUI>(
             FindObjectsInactive.Include, FindObjectsSortMode.None);
 
+        TMP_FontAsset anyFont = null;
+
         for (int i = 0; i < texts.Length; i++)
         {
-            if (texts[i] != null && texts[i].font != null && !texts[i].transform.IsChildOf(origin))
-                return texts[i].font;
+            if (texts[i] == null || texts[i].font == null) continue;
+            if (texts[i].transform.IsChildOf(origin)) continue;
+
+            if (CanRenderKorean(texts[i].font)) return texts[i].font;
+            if (anyFont == null) anyFont = texts[i].font;
         }
 
-        return TMP_Settings.defaultFontAsset;
+        TMP_FontAsset defaultFont = TMP_Settings.defaultFontAsset;
+        if (CanRenderKorean(defaultFont)) return defaultFont;
+
+        return anyFont != null ? anyFont : defaultFont;
+    }
+
+    private static bool CanRenderKorean(TMP_FontAsset font)
+    {
+        if (font == null) return false;
+        if (font.HasCharacter(KoreanProbe)) return true;
+
+        var fallbacks = font.fallbackFontAssetTable;
+        if (fallbacks == null) return false;
+
+        for (int i = 0; i < fallbacks.Count; i++)
+        {
+            if (fallbacks[i] != null && fallbacks[i].HasCharacter(KoreanProbe)) return true;
+        }
+
+        return false;
     }
 }
 
@@ -271,4 +297,13 @@ public static class UiViewBuilder
  *   Image.color 를 흰색으로 접어 넣는 계산이라 두 번 호출해도 결과가 같다(멱등).
  *   씬에 미리 배치된 버튼(Ending 씬의 ReturnButton 등)에도 그대로 쓸 수 있다 —
  *   Ending.cs 가 복제한 버튼까지 포함해 이 함수를 통과시킨다.
- */
+  *
+ * ── 코드 생성 UI 한글 깨짐 (2026-08-29) ──────────────────────────────────────
+ * FindFallbackFont 는 씬에서 찾은 "첫 TMP 폰트"를 그대로 돌려줬다. 로비 씬에는 DialogueUI 가
+ * 없어 Pretendard 를 쓰는 텍스트가 하나도 없고, 그래서 한글 글리프가 없는 LiberationSans 가
+ * 잡혀 일시정지 메뉴만 글자가 깨졌다(다른 씬은 DialogueUI 덕에 우연히 멀쩡했다).
+ * 이제 HasCharacter('가') 로 한글 렌더 가능 여부를 실제로 확인해 그런 폰트를 우선 고른다.
+ * 폰트의 fallbackFontAssetTable 까지 훑으므로 "본체엔 한글이 없지만 폴백에 있는" 경우도 통과한다.
+ * 보강으로 TMP 기본 폰트(LiberationSans SDF)의 폴백 맨 앞에 PRETENDARD-REGULAR SDF 를 넣어 두었다 —
+ * 이 함수가 무엇을 고르든 최종적으로 한글이 그려진다.
+*/
