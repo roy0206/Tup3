@@ -28,10 +28,14 @@ public class StyxEnterence : InteractionBase, ISceneEventListener
 
     public void OnSceneLoadComplete(string sceneName)
     {
-        /*if (UserDataManager.Instance.Data.Play.clearedBosses.HasFlag(boss))
+        if ((int)UserDataManager.Instance.Data.Play.clearedBosses == 15)
         {
-            InteractionManager.Current.Unregister(this);
-        }*/
+            GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 1);
+        }
+        else
+        {
+            GetComponent<SpriteRenderer>().color = new Color(0.2f, 0.2f, 0.2f, 1);
+        }
     }
 
     public void OnSceneExit(string sceneName)

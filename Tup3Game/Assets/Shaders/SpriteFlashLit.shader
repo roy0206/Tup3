@@ -60,22 +60,16 @@ Shader "Tup3/2D/Sprite Flash Lit"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/2D/Include/Lit2DCommon.hlsl"
 
             // NOTE: Do not ifdef the properties here as SRP batcher can not handle different layouts.
-            // The layout below must stay byte-identical in every pass of this shader.
             CBUFFER_START(UnityPerMaterial)
                 half4 _Color;
-                half4 _FlashColor;
-                half _FlashAmount;
             CBUFFER_END
 
-            // Tints the already-shaded RGB towards _FlashColor while keeping the sprite's
-            // own alpha, so only the silhouette lights up. Applied after the 2D lighting so
-            // the flash reads the same in a dark room as in a bright one.
-            half4 ApplySpriteFlash(half4 shaded)
-            {
-                half amount = saturate(_FlashAmount * _FlashColor.a);
-                shaded.rgb = lerp(shaded.rgb, _FlashColor.rgb, amount);
-                return shaded;
-            }
+            // Driven per-renderer through a MaterialPropertyBlock, so these must stay OUTSIDE
+            // UnityPerMaterial. The SRP Batcher binds that buffer per material, which leaves a
+            // MaterialPropertyBlock override unbound and makes the 2D lit pass fail to compile
+            // with "invalid access of unbound variable".
+            half4 _FlashColor;
+            half _FlashAmount;
 
             Varyings LitVertex(Attributes input)
             {
@@ -89,9 +83,15 @@ Shader "Tup3/2D/Sprite Flash Lit"
                 return o;
             }
 
+            // Tints the already-shaded RGB towards _FlashColor while keeping the sprite's own
+            // alpha, so only the silhouette lights up. Applied after the 2D lighting so the
+            // flash reads the same in a dark room as in a bright one.
             half4 LitFragment(Varyings input) : SV_Target
             {
-                return ApplySpriteFlash(CommonLitFragment(input, input.color));
+                half4 shaded = CommonLitFragment(input, input.color);
+                half amount = saturate(_FlashAmount * _FlashColor.a);
+                shaded.rgb = lerp(shaded.rgb, _FlashColor.rgb, amount);
+                return shaded;
             }
             ENDHLSL
         }
@@ -126,12 +126,8 @@ Shader "Tup3/2D/Sprite Flash Lit"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/2D/Include/Normals2DCommon.hlsl"
 
             // NOTE: Do not ifdef the properties here as SRP batcher can not handle different layouts.
-            // _FlashColor / _FlashAmount are unused in this pass but must be declared to keep
-            // the UnityPerMaterial layout identical across passes.
             CBUFFER_START( UnityPerMaterial )
                 half4 _Color;
-                half4 _FlashColor;
-                half _FlashAmount;
             CBUFFER_END
 
             Varyings NormalsRenderingVertex(Attributes input)
@@ -185,16 +181,10 @@ Shader "Tup3/2D/Sprite Flash Lit"
             // NOTE: Do not ifdef the properties here as SRP batcher can not handle different layouts.
             CBUFFER_START(UnityPerMaterial)
                 half4 _Color;
-                half4 _FlashColor;
-                half _FlashAmount;
             CBUFFER_END
 
-            half4 ApplySpriteFlash(half4 shaded)
-            {
-                half amount = saturate(_FlashAmount * _FlashColor.a);
-                shaded.rgb = lerp(shaded.rgb, _FlashColor.rgb, amount);
-                return shaded;
-            }
+            half4 _FlashColor;
+            half _FlashAmount;
 
             Varyings UnlitVertex(Attributes input)
             {
@@ -209,7 +199,10 @@ Shader "Tup3/2D/Sprite Flash Lit"
 
             half4 UnlitFragment(Varyings input) : SV_Target
             {
-                return ApplySpriteFlash(CommonUnlitFragment(input, input.color));
+                half4 shaded = CommonUnlitFragment(input, input.color);
+                half amount = saturate(_FlashAmount * _FlashColor.a);
+                shaded.rgb = lerp(shaded.rgb, _FlashColor.rgb, amount);
+                return shaded;
             }
             ENDHLSL
         }

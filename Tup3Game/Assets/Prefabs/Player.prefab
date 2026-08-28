@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &9179601464333307082
 Transform:
   m_ObjectHideFlags: 0
@@ -4983,6 +4983,14 @@ MonoBehaviour:
   waterFastDescendSpeed: 8
   waterDescendKey: 274
   waterGravityMultiplier: 0.3
+  footstepInterval: 0.34
+  footstepMinSpeed: 0.5
+  heavyLandFallSpeed: 22
+  footstepVolume: 0.55
+  jumpVolume: 0.8
+  landVolume: 0.8
+  landHeavyVolume: 1
+  dashVolume: 0.9
 --- !u!61 &7619190873882549438
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -5100,6 +5108,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  attackHeavyVolume: 1
 --- !u!114 &7688133843110150903
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5115,11 +5124,9 @@ MonoBehaviour:
   skill_1_increase: 1.5
   skill_1_duration: 10
   skill_1_cool: 10
-  skill_1_auraEffect: {fileID: 6772987569774413600}
   skill_2_haste: 1.2
   skill_2_duration: 10
   skill_2_cool: 10
-  skill_2_auraEffect: {fileID: 6742015772090819945}
   skill_2_aimRange: 10
   skill_2_aimMoveSpeed: 8
   skill_2_minSpawnDistance: 2
@@ -5134,12 +5141,24 @@ MonoBehaviour:
   skill_3_attackSpeedMultiplier: 1.5
   skill_3_duration: 5
   skill_3_cool: 10
-  skill_3_auraEffect: {fileID: 2447727491210074026}
   skill_4_healAmount: 5
   skill_4_cool: 10
   skill_4_duration: 5
-  skill_4_HealEffect: {fileID: 6764349960059873119}
   isSkillEquiped: 00000000
+  barrierEffectSprites: []
+  healEffectSprites: []
+  attackSpeedEffectSprites: []
+  attackUpEffectSprites: []
+  backgroundEffectFrameRate: 12
+  backgroundEffectOffset: {x: 0, y: 0.2}
+  backgroundEffectScale: 1.4
+  backgroundEffectOrderOffset: 1
+  barrierEffectFrameRate: 10
+  barrierEffectOffset: {x: 0, y: 0}
+  barrierEffectScale: 1
+  barrierEffectOrderOffset: 0
+  hideBarrierOriginalSprite: 1
+  skillSoundVolume: 0.9
   skill_1_key: 102
   skill_2_key: 97
   skill_3_key: 100
@@ -5157,6 +5176,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
   maxHealth: 100
+  deathVolume: 1
 --- !u!114 &3234327923423046461
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5409,7 +5429,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7193566756489059895
 Transform:
   m_ObjectHideFlags: 0
@@ -10245,7 +10265,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5596616109277670273
 Transform:
   m_ObjectHideFlags: 0
@@ -15208,7 +15228,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7822705440478720344
 Transform:
   m_ObjectHideFlags: 0

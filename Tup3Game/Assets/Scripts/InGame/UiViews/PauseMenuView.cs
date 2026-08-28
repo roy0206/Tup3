@@ -29,15 +29,23 @@ public class PauseMenuView : MonoBehaviour
     public event Action QuitRequested;
 
     private bool built;
+    private Button resumeButton;
+    private Button optionsButton;
+    private Button quitButton;
+    private UiFocusKeeper focus;
+    private GameObject outsideSelection;
 
     public void Show()
     {
         EnsureBuilt();
         gameObject.SetActive(true);
+        outsideSelection = UiFocus.Focus(transform, focus);
     }
 
     public void Hide()
     {
+        UiFocus.Blur(transform, outsideSelection);
+        outsideSelection = null;
         gameObject.SetActive(false);
     }
 
@@ -45,6 +53,8 @@ public class PauseMenuView : MonoBehaviour
     {
         if (built) return;
         built = true;
+
+        UiFocus.EnsureEventSystem();
 
         if (fontAsset == null) fontAsset = UiViewBuilder.FindFallbackFont(transform);
 
@@ -55,17 +65,20 @@ public class PauseMenuView : MonoBehaviour
 
         UiViewBuilder.BuildLabel(panel, "Title", "일시정지", fontAsset, titleFontSize, titleColor);
 
-        Button resumeButton = UiViewBuilder.BuildButton(
+        resumeButton = UiViewBuilder.BuildButton(
             panel, "ResumeButton", "계속하기", fontAsset, buttonFontSize, buttonColor, textColor, buttonSize);
         resumeButton.onClick.AddListener(() => ResumeRequested?.Invoke());
 
-        Button optionsButton = UiViewBuilder.BuildButton(
+        optionsButton = UiViewBuilder.BuildButton(
             panel, "OptionsButton", "옵션", fontAsset, buttonFontSize, buttonColor, textColor, buttonSize);
         optionsButton.onClick.AddListener(() => OptionsRequested?.Invoke());
 
-        Button quitButton = UiViewBuilder.BuildButton(
+        quitButton = UiViewBuilder.BuildButton(
             panel, "QuitButton", "게임 종료", fontAsset, buttonFontSize, buttonColor, quitTextColor, buttonSize);
         quitButton.onClick.AddListener(() => QuitRequested?.Invoke());
+
+        UiFocus.LinkVertical(true, resumeButton, optionsButton, quitButton);
+        focus = UiFocus.AttachKeeper(gameObject, sortingOrder, resumeButton, optionsButton, quitButton);
     }
 }
 
@@ -84,4 +97,16 @@ public class PauseMenuView : MonoBehaviour
  * - 버튼 순서는 계속하기 → 옵션 → 게임 종료. 종료 버튼만 quitTextColor 로 구분한다(형태·크기는 동일).
  * - DOTween.PauseAll() 과 함께 쓰이므로 이 뷰는 트윈/애니메이터를 절대 쓰지 않는다(즉시 표시/숨김).
  * - 폰트를 비워 두면 씬 안의 기존 TMP 텍스트 폰트 → TMP 기본 폰트 순으로 폴백한다.
+ *
+ * ── 키보드 조작 (2026-08-28 유저 확정) ───────────────────────────────────────
+ *   Show 때 UiFocus.Focus 가 "지난번에 짚고 있던 항목(없으면 계속하기)"을 선택하므로
+ *   메뉴가 열리자마자 ↑/↓ + Enter 로 조작할 수 있다. 옵션 패널에 다녀오면 커서가 "옵션"에
+ *   그대로 남아 있는 이유가 이것이다(UiFocusKeeper 가 마지막 위치를 기억한다).
+ *   방향키 연결은 UiFocus.LinkVertical 로 계속하기 ↔ 옵션 ↔ 게임 종료 를 Explicit 순환 연결한다.
+ *   Automatic 을 쓰지 않는 이유 : 엔딩 씬처럼 아래쪽에 다른 버튼이 살아 있는 화면에서
+ *   방향키가 Dim 을 뚫고 새어 나가기 때문(UiFocus 파일 노트 참고).
+ *   Hide 때는 UiFocus.Blur 가 이 메뉴가 열리기 직전의 선택(예: 패배 UI 의 버튼)으로 되돌린다.
+ *   강조는 UiViewBuilder.BuildButton 의 ColorTint 가 담당한다 — 타이틀 메뉴와 달리 버튼이
+ *   눈에 보이는 일반 디자인이라 볼드를 강제하지 않고 기존 시각 언어를 그대로 둔다.
+ *   ESC 는 예전대로 PauseManager.HandleEscape 만 처리한다(이 뷰는 Cancel 을 받지 않는다).
  */

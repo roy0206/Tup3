@@ -50,6 +50,13 @@ public class FinalBossRoom : MonoBehaviour, ISceneEventListener
         SceneController.Instance.RegisterListener(this);
     }
 
+    private void Start()
+    {
+        ResolveReferences();
+        SetBossActive(false);
+        SetPlayerCombatEnabled(false);
+    }
+
     public void OnSceneLoadComplete(string sceneName)
     {
         ResolveReferences();

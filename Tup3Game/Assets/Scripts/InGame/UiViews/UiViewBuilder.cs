@@ -113,14 +113,7 @@ public static class UiViewBuilder
 
         var button = go.AddComponent<Button>();
         button.targetGraphic = image;
-
-        var colors = button.colors;
-        colors.normalColor = Color.white;
-        colors.highlightedColor = new Color(1.35f, 1.35f, 1.35f, 1f);
-        colors.pressedColor = new Color(0.7f, 0.7f, 0.7f, 1f);
-        colors.selectedColor = colors.highlightedColor;
-        colors.fadeDuration = 0.08f;
-        button.colors = colors;
+        ApplySelectionTint(button);
 
         var label = BuildLabel(go.transform, "Label", text, font, fontSize, textColor);
         var labelRect = (RectTransform)label.transform;
@@ -201,6 +194,39 @@ public static class UiViewBuilder
         return slider;
     }
 
+    public static void ApplySelectionTint(Selectable selectable)
+    {
+        ApplySelectionTint(selectable, Color.white, 0.16f, 0.36f, 0.54f);
+    }
+
+    public static void ApplySelectionTint(
+        Selectable selectable, Color accent, float highlighted, float selected, float pressed)
+    {
+        if (selectable == null) return;
+
+        selectable.transition = Selectable.Transition.ColorTint;
+
+        Graphic graphic = selectable.targetGraphic;
+        ColorBlock colors = selectable.colors;
+
+        Color baseColor = colors.normalColor;
+        if (graphic != null)
+        {
+            baseColor *= graphic.color;
+            graphic.color = Color.white;
+        }
+
+        colors.normalColor = baseColor;
+        colors.highlightedColor = Color.Lerp(baseColor, accent, highlighted);
+        colors.selectedColor = Color.Lerp(baseColor, accent, selected);
+        colors.pressedColor = Color.Lerp(baseColor, accent, pressed);
+        colors.disabledColor = new Color(baseColor.r, baseColor.g, baseColor.b, baseColor.a * 0.4f);
+        colors.colorMultiplier = 1f;
+        colors.fadeDuration = 0.08f;
+
+        selectable.colors = colors;
+    }
+
     public static TMP_FontAsset FindFallbackFont(Transform origin)
     {
         var texts = Object.FindObjectsByType<TextMeshProUGUI>(
@@ -226,5 +252,23 @@ public static class UiViewBuilder
  * - BuildCenterPanel   : 중앙 정렬 세로 레이아웃 패널(내용 크기에 맞춰 자동 확장).
  * - BuildButton        : Image + Button(ColorTint) + TMP 라벨. 트윈 없이 기본 틴트 전환만 쓴다.
  * - BuildSlider        : uGUI Slider 를 배경/채움/핸들 구조로 조립(0..1, 가로).
+ * - ApplySelectionTint : Selectable 의 ColorBlock 을 "선택이 눈에 보이도록" 다시 계산해 넣는다.
  * - FindFallbackFont   : 씬의 기존 TMP 텍스트 폰트를 물려받고, 없으면 TMP 기본 폰트.
+ *
+ * ── ApplySelectionTint — 검은 버튼에서 틴트가 보이지 않던 문제 (2026-08-28) ──
+ *   uGUI 의 ColorTint 는 targetGraphic 의 색에 ColorBlock 색을 "곱한다".
+ *   예전 BuildButton 은 Image.color = buttonColor(대개 (0,0,0,0.75) 검정)로 두고
+ *   normalColor = 흰색, highlighted/selected = (1.35,1.35,1.35) 로 잡았는데,
+ *   검정에 무엇을 곱해도 검정이라 강조 상태가 알파만 아주 조금 달라질 뿐 사실상 보이지 않았다.
+ *   마우스로만 쓸 때는 커서 위치가 곧 강조라 티가 안 났지만, 키보드 조작에서는
+ *   "지금 어느 항목에 있는지"가 전혀 읽히지 않아 치명적이다.
+ *   그래서 색을 다음처럼 뒤집는다.
+ *     - 원래 보이던 색(= normalColor × Image.color)을 계산해 normalColor 로 옮기고
+ *       Image.color 는 흰색으로 만든다. 평상시 겉모습은 그대로다.
+ *     - highlighted / selected / pressed 는 그 기준색에서 accent(기본 흰색) 쪽으로
+ *       0.16 / 0.36 / 0.54 만큼 보간한다. 검은 패널 위에서 선택 항목만 확실히 밝아지고,
+ *       마우스 호버(0.16)보다 키보드 선택(0.36)이 더 강해 둘이 섞여도 구분된다.
+ *   Image.color 를 흰색으로 접어 넣는 계산이라 두 번 호출해도 결과가 같다(멱등).
+ *   씬에 미리 배치된 버튼(Ending 씬의 ReturnButton 등)에도 그대로 쓸 수 있다 —
+ *   Ending.cs 가 복제한 버튼까지 포함해 이 함수를 통과시킨다.
  */

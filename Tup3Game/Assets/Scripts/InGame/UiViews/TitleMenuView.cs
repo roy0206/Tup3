@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -29,7 +30,7 @@ public class TitleMenuView : MonoBehaviour
     [SerializeField] private int sortingOrder = 800;
 
     [Header("조작")]
-    [SerializeField] private bool keyboardNavigation;
+    [SerializeField] private bool keyboardNavigation = true;
 
     [Header("계층 (미리 배치한 경우 자동 연결)")]
     [SerializeField] private RectTransform itemsRoot;
@@ -65,6 +66,8 @@ public class TitleMenuView : MonoBehaviour
 
         gameObject.SetActive(true);
 
+        ApplyNavigation();
+
         if (EventSystem.current == null) return;
 
         if (!keyboardNavigation)
@@ -75,6 +78,25 @@ public class TitleMenuView : MonoBehaviour
 
         Button first = newGameItem != null ? newGameItem : optionsItem;
         if (first != null) EventSystem.current.SetSelectedGameObject(first.gameObject);
+    }
+
+    private void ApplyNavigation()
+    {
+        if (!keyboardNavigation) return;
+
+        var chain = new List<Selectable>();
+        AddNavigable(chain, newGameItem);
+        AddNavigable(chain, continueItem);
+        AddNavigable(chain, optionsItem);
+        AddNavigable(chain, quitItem);
+
+        UiFocus.LinkVertical(true, chain.ToArray());
+    }
+
+    private static void AddNavigable(List<Selectable> chain, Button item)
+    {
+        if (item == null || !item.gameObject.activeSelf) return;
+        chain.Add(item);
     }
 
     public void Hide()
@@ -88,13 +110,17 @@ public class TitleMenuView : MonoBehaviour
         if (built) return;
         built = true;
 
-        EnsureEventSystem();
+        UiFocus.EnsureEventSystem();
 
         if (fontAsset == null) fontAsset = UiViewBuilder.FindFallbackFont(transform);
 
         UiViewBuilder.SetupOverlayCanvas(gameObject, sortingOrder);
 
-        if (AdoptPlacedHierarchy()) return;
+        if (AdoptPlacedHierarchy())
+        {
+            AttachFocusKeeper();
+            return;
+        }
 
         RectTransform column = BuildColumn();
 
@@ -102,6 +128,8 @@ public class TitleMenuView : MonoBehaviour
         continueItem = BuildItem(column, ContinueItemName, continueLabel, () => ContinueRequested?.Invoke());
         optionsItem = BuildItem(column, OptionsItemName, optionsLabel, () => OptionsRequested?.Invoke());
         quitItem = BuildItem(column, QuitItemName, quitLabel, () => QuitRequested?.Invoke());
+
+        AttachFocusKeeper();
     }
 
     private bool AdoptPlacedHierarchy()
@@ -224,12 +252,12 @@ public class TitleMenuView : MonoBehaviour
         EventSystem.current.SetSelectedGameObject(null);
     }
 
-    private static void EnsureEventSystem()
+    private void AttachFocusKeeper()
     {
-        if (EventSystem.current != null) return;
-        if (FindAnyObjectByType<EventSystem>(FindObjectsInactive.Include) != null) return;
+        if (!keyboardNavigation) return;
 
-        new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
+        UiFocus.AttachKeeper(
+            gameObject, sortingOrder, newGameItem, continueItem, optionsItem, quitItem);
     }
 }
 
@@ -251,19 +279,39 @@ public class TitleMenuView : MonoBehaviour
  * - 글씨는 흰색(textColor) 단색. 폰트를 비워 두면 씬의 기존 TMP 텍스트 폰트(한글 지원)를 물려받고,
  *   없으면 TMP 기본 폰트로 폴백한다(FindFallbackFont).
  *
- * [호버 볼드]
- * 항목마다 TitleMenuItemHighlighter 를 붙여 마우스 호버와 키보드 선택 모두에서 글씨를 볼드로 바꾼다.
- * 구현 근거는 TitleMenuItemHighlighter.cs 의 파일 노트를 볼 것. 이 뷰 쪽 전제는 두 가지다 —
- * Button.transition 을 None 으로 둘 것(강조는 전부 하이라이터 담당), 라벨의 raycastTarget 은 꺼 둘 것
- * (UiViewBuilder.BuildLabel 이 이미 꺼 준다. 라벨이 레이캐스트를 먹으면 항목 오브젝트로 오는
- * PointerEnter/Exit 이 글자 모양 경계에서 끊겨 볼드가 깜빡인다).
+ * [선택 볼드 — 키보드 조작 기준 (2026-08-28 유저 확정)]
+ * 항목마다 TitleMenuItemHighlighter 를 붙여 "선택된 항목만" 글씨를 볼드로 바꾼다.
+ * 마우스 호버 강조는 의도적으로 없앴다 — 이 메뉴의 의도된 조작은 키보드 방향키이고,
+ * 호버 강조가 함께 있으면 방향키로 짚고 있는 항목이 어느 것인지 흐려지기 때문이다.
+ * 마우스 클릭은 그대로 동작하며, 클릭하면 uGUI 가 그 버튼을 선택하므로 볼드가 자연히 따라온다.
+ * 이 뷰 쪽 전제는 Button.transition 을 None 으로 둘 것(강조는 전부 하이라이터 담당) 하나다.
+ * 구현 근거는 TitleMenuItemHighlighter.cs 의 파일 노트를 볼 것.
  *
  * [키보드 내비게이션 — keyboardNavigation]
- * 기본값은 꺼짐(마우스 전용). 이 게임의 다른 UI(OptionsPanelView 등)가 마우스 기준이라 맞춘 것이다.
- *   - 꺼짐 : Show 때 선택을 비우고 클릭할 때마다 다시 비운다. 그래서 아무것도 볼드가 아닌 상태로 시작하고,
- *     "옵션"을 눌러 옵션 패널이 열린 뒤에도 타이틀 항목이 선택된 채 남아 Enter 로 다시 눌리는 사고가 없다.
- *   - 켜짐 : Show 때 첫 항목을 선택하므로 방향키로 이동(볼드가 따라옴) + Enter 로 실행할 수 있다.
- *     Button 의 Navigation 은 기본값(Automatic)이라 세로 배치를 그대로 따라간다.
+ * 기본값 켜짐. Show 때 첫 항목을 선택하므로 방향키로 이동(볼드가 따라옴) + Enter 로 실행할 수 있다.
+ * 끄면 Show 때 선택을 비우고 클릭할 때마다 다시 비운다(마우스 전용 모드). 이 경우 볼드는
+ * 클릭 직후에만 잠깐 보이므로 사실상 강조가 없는 메뉴가 된다.
+ *
+ * [Navigation — Show 때마다 다시 잇는다 (2026-08-28)]
+ * 예전에는 기본값 Automatic 에 맡겼다. Automatic 은 비활성 항목("이어하기"가 숨겨진 경우)을
+ * 알아서 건너뛰지만, "씬 안의 모든 활성 Selectable" 중에서 방향으로 가장 가까운 것을 찾기 때문에
+ * Start 씬에 아직 남아 있는 예전 버튼(Canvas 밑의 "Button (Legacy)" 2개, Start.cs 가 연결한
+ * 것들 — 지워도 되는 잔재다)으로 방향키가 새어 나갈 수 있다. 그러면 화면에 볼드가 하나도 없는
+ * 상태로 커서만 어딘가로 사라진 것처럼 보이고, 그 상태에서 Enter 를 누르면 엉뚱한 동작이 난다.
+ * 그래서 Show 에서 ApplyNavigation 이 "그 순간 켜져 있는 항목만" 모아 UiFocus.LinkVertical 로
+ * Explicit 순환 연결한다. 매번 다시 이으므로 canContinue 가 바뀌어도 막다른 길이 생기지 않고,
+ * 좌/우는 끊겨 있으며, 마지막↔첫 항목이 순환한다.
+ * (다른 뷰들은 항목 구성이 고정이라 EnsureBuilt 에서 한 번만 연결한다.)
+ *
+ * [2026-08-28] 공용 헬퍼로 정리
+ * - 자체 EnsureEventSystem 을 UiFocus.EnsureEventSystem 으로 교체했다(구현은 동일 —
+ *   씬에 EventSystem 이 없을 때만 StandaloneInputModule 로 생성).
+ * - keyboardNavigation 이 켜져 있을 때만 UiFocusKeeper 를 붙인다. 두 입력 모듈 모두
+ *   "선택 불가능한 곳을 클릭하면 선택 해제"라, 배경(글씨 바깥의 검은 화면)을 한 번 클릭하면
+ *   볼드가 사라지고 방향키가 먹지 않게 되던 구멍을 막는다. 파수꾼은 선택이 비었을 때만
+ *   개입하므로 클릭 조작을 방해하지 않는다.
+ *   마우스 전용 모드(keyboardNavigation=false)에서는 붙이지 않는다 — 그 모드는 선택을
+ *   일부러 비우는데 파수꾼이 곧바로 되살려 버리기 때문이다.
  *
  * [겹침 순서]
  * sortingOrder 800 은 PauseMenuView(900) / OptionsPanelView(910) 보다 아래다. Start 씬에서 ESC 나
