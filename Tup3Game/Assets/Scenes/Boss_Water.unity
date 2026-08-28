@@ -2773,7 +2773,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Water
   boxColliders: []
-  maxHp: 22
+  maxHp: 200
   enableHitFlash: 1
   hitFlashColor: {r: 1, g: 1, b: 1, a: 1}
   hitFlashDuration: 0.12
@@ -2821,6 +2821,8 @@ MonoBehaviour:
   encroachmentHpRatio: 0.5
   roarSoundVolume: 1
   encroachmentWarningPrefab: {fileID: 5429567737852955018, guid: b7cea0486d6561f4097e2dd06d6e7106, type: 3}
+  encroachmentWarningMaterial: {fileID: 0}
+  encroachmentWarningColor: {r: 1, g: 1, b: 1, a: 1}
   encroachmentWarningPoint: {fileID: 1840672278}
   encroachmentTelegraphDuration: 5
   encroachmentSealCheckSize: {x: 2, y: 2}
