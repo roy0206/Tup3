@@ -179,11 +179,10 @@ public class Water_Sprout : MonoBehaviour
         if (hitMask.value != 0 && (hitMask.value & (1 << other.gameObject.layer)) == 0)
             return;
 
-        PlayerKnockBack playerKnockback = other.GetComponentInParent<PlayerKnockBack>();
-        if (playerKnockback != null)
-        {
-            playerKnockback.TakeHit(transform.position, 0f, Mathf.RoundToInt(damage));
-        }
+        if (!other.TryGetComponent(out PlayerKnockBack playerKnockback))
+            return;
+
+        playerKnockback.TakeHit(transform.position, 0f, Mathf.RoundToInt(damage));
     }
 
     private void ShowPathPreview()

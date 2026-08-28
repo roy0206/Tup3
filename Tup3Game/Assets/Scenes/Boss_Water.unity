@@ -723,7 +723,7 @@ Transform:
   m_GameObject: {fileID: 530767375}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -6.2911997, y: -0.6107302, z: 0}
+  m_LocalPosition: {x: -6.2911997, y: -1.66, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1152,7 +1152,7 @@ Transform:
   m_GameObject: {fileID: 633491338}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.7088003, y: -0.6107302, z: 0}
+  m_LocalPosition: {x: 3.7088003, y: -1.66, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1538,7 +1538,7 @@ Transform:
   m_GameObject: {fileID: 810401352}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 8.67, z: 0}
+  m_LocalPosition: {x: 0, y: 16.22, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2519,7 +2519,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -10.2912, y: -3.6107302, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 1}
+  m_LocalScale: {x: 2.25, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 998600065}
@@ -2717,12 +2717,15 @@ MonoBehaviour:
   victoryDelay: 2
   defeatDelay: 1.5
   saengWillCoinReward: 5
-  defeatWillCoinPenalty: 1
   geukWillCoinCost: 1
+  defeatCutscene: {fileID: 0}
+  defeatCutsceneTimeout: 20
+  gameOverView: {fileID: 0}
   allowManualAdvance: 1
   lockMovementDuringDialogue: 0
   restoreHealthOnDefeat: 1
   defeatReturnScene: Lobby
+  titleSceneName: Start
 --- !u!4 &1155819030
 Transform:
   m_ObjectHideFlags: 0
@@ -2771,6 +2774,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Water
   boxColliders: []
   maxHp: 200
+  enableHitFlash: 1
+  hitFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  hitFlashDuration: 0.12
+  hitSoundName: 
+  deathSoundName: 
+  hitSoundVolume: 1
+  hitSoundMinInterval: 0.08
+  deathSoundVolume: 1
   watersproutzone: {fileID: 2002017500}
   WaterSprout_SpawnCount: 3
   WaterSprout_DelayTime: 3
@@ -2783,10 +2794,10 @@ MonoBehaviour:
   iceBullet_CoolTime: 3
   eyePrefab: {fileID: 2211376033529449236, guid: 08135d686003638439d3d9766808f4fe, type: 3}
   Scale:
-  - 1
-  - 1
-  - 1.5
-  - 1
+  - 1.2
+  - 1.2
+  - 1.75
+  - 1.2
   eyeSpawnPoints:
   - {fileID: 2092540026}
   - {fileID: 1654437364}
@@ -2808,7 +2819,10 @@ MonoBehaviour:
   electricBallCoolTime: 20
   risingWaterPhase: {fileID: 1165065347}
   encroachmentHpRatio: 0.5
+  roarSoundVolume: 1
   encroachmentWarningPrefab: {fileID: 5429567737852955018, guid: b7cea0486d6561f4097e2dd06d6e7106, type: 3}
+  encroachmentWarningMaterial: {fileID: 0}
+  encroachmentWarningColor: {r: 1, g: 1, b: 1, a: 1}
   encroachmentWarningPoint: {fileID: 1840672278}
   encroachmentTelegraphDuration: 5
   encroachmentSealCheckSize: {x: 2, y: 2}
@@ -2856,6 +2870,9 @@ MonoBehaviour:
   exitDepth: 0.15
   minimumPlatformSortingOrder: 1
   playerOrderAbovePlatforms: 1
+  risingVolume: 1
+  splashVolume: 0.7
+  splashMinInterval: 0.4
 --- !u!114 &1165065348
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3231,12 +3248,15 @@ MonoBehaviour:
   victoryDelay: 2
   defeatDelay: 1.5
   saengWillCoinReward: 5
-  defeatWillCoinPenalty: 1
   geukWillCoinCost: 1
+  defeatCutscene: {fileID: 0}
+  defeatCutsceneTimeout: 20
+  gameOverView: {fileID: 0}
   allowManualAdvance: 1
   lockMovementDuringDialogue: 0
   restoreHealthOnDefeat: 1
   defeatReturnScene: Lobby
+  titleSceneName: Start
 --- !u!4 &1433291523
 Transform:
   m_ObjectHideFlags: 0
@@ -3430,7 +3450,7 @@ Transform:
   m_GameObject: {fileID: 1604545516}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4.2911997, y: -4.9107304, z: 0}
+  m_LocalPosition: {x: -4.2911997, y: -5.51, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3555,7 +3575,7 @@ Transform:
   m_GameObject: {fileID: 1714231072}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.7088003, y: -4.9107304, z: 0}
+  m_LocalPosition: {x: 1.7088003, y: -5.51, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3987,8 +4007,8 @@ Transform:
   m_GameObject: {fileID: 1790726243}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.02, y: -9.4, z: 0}
-  m_LocalScale: {x: 3, y: 5, z: 1}
+  m_LocalPosition: {x: -0.02, y: -20.3, z: 0}
+  m_LocalScale: {x: 3, y: 7, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1019036034}
@@ -4112,7 +4132,7 @@ Transform:
   m_GameObject: {fileID: 1840672277}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1, y: -6.55, z: 0}
+  m_LocalPosition: {x: -1, y: -7.3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4201,7 +4221,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 7.7088003, y: -3.6107302, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 1}
+  m_LocalScale: {x: 2.25, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 998600065}

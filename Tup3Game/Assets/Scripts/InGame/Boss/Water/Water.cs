@@ -70,6 +70,8 @@ public class Water : BossBase
 
     [Header("잠식 전조 및 파훼")]
     [SerializeField] private GameObject encroachmentWarningPrefab;
+    [SerializeField] private Material encroachmentWarningMaterial;
+    [SerializeField] private Color encroachmentWarningColor = Color.white;
     [SerializeField] private Transform encroachmentWarningPoint;
     [SerializeField] private float encroachmentTelegraphDuration = 5f;
     [SerializeField] private Vector2 encroachmentSealCheckSize = new Vector2(2f, 2f);
@@ -208,6 +210,8 @@ public class Water : BossBase
                     warningPoint.rotation
                 );
 
+                ApplyEncroachmentWarningVisibility(encroachmentWarningInstance);
+
                 MatchWarningAnimationToTelegraph(
                     encroachmentWarningInstance,
                     encroachmentTelegraphDuration
@@ -282,6 +286,21 @@ public class Water : BossBase
         {
             Destroy(encroachmentWarningInstance);
             encroachmentWarningInstance = null;
+        }
+    }
+
+    private void ApplyEncroachmentWarningVisibility(GameObject warningInstance)
+    {
+        if (warningInstance == null)
+            return;
+
+        SpriteRenderer[] renderers = warningInstance.GetComponentsInChildren<SpriteRenderer>(true);
+        foreach (SpriteRenderer targetRenderer in renderers)
+        {
+            if (encroachmentWarningMaterial != null)
+                targetRenderer.sharedMaterial = encroachmentWarningMaterial;
+
+            targetRenderer.color = encroachmentWarningColor;
         }
     }
 

@@ -50,13 +50,13 @@ MonoBehaviour:
   pullPower: 3
   lifeTime: 5
   delay: 0.5
-  targetScale: 1.5
+  targetScale: 2.5
   growDuration: 0.5
   warningPrefab: {fileID: 5429567737852955018, guid: b7cea0486d6561f4097e2dd06d6e7106, type: 3}
   warningClip: {fileID: 7400000, guid: a6cf047b9da82f3488c5d97e9c93bde5, type: 2}
+  warningOffset: {x: 0, y: -0.5, z: 0}
   stormVisual: {fileID: 1990347867340377171}
   damage: 5
-  KnockBack: 20
   damageInterval: 1
   player: {fileID: 0}
   hitCollider: {fileID: 7500790481496373090}
