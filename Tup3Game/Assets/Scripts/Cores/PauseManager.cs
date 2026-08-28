@@ -8,6 +8,9 @@ using UnityEngine.SceneManagement;
 public class PauseManager : Singleton<PauseManager>
 {
     public static bool IsPaused { get; private set; }
+    public static bool IsPauseBlocked => blockCount > 0;
+
+    static int blockCount;
 
     const string StartSceneName = "Start";
     const string PrologueSceneName = "Prologue";
@@ -26,7 +29,18 @@ public class PauseManager : Singleton<PauseManager>
     static void Bootstrap()
     {
         IsPaused = false;
+        blockCount = 0;
         _ = Instance;
+    }
+
+    public static void BlockPause()
+    {
+        blockCount++;
+    }
+
+    public static void UnblockPause()
+    {
+        blockCount = Mathf.Max(0, blockCount - 1);
     }
 
     protected override void OnAwake()
@@ -42,6 +56,8 @@ public class PauseManager : Singleton<PauseManager>
 
     void OnActiveSceneChanged(Scene previous, Scene next)
     {
+        blockCount = 0;
+
         if (IsPaused) ForceResetPauseState();
         else if (optionsOpen) CloseOptionsSilently();
     }
@@ -55,6 +71,7 @@ public class PauseManager : Singleton<PauseManager>
     void HandleEscape()
     {
         if (SceneController.IsTransitioning) return;
+        if (IsPauseBlocked && !IsPaused) return;
 
         string sceneName = SceneManager.GetActiveScene().name;
 
@@ -106,6 +123,17 @@ public class PauseManager : Singleton<PauseManager>
         UnfreezeWorld();
         IsPaused = false;
         VolumeSettings.SaveIfDirty();
+    }
+
+    public void QuitGame()
+    {
+        VolumeSettings.SaveIfDirty();
+
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 
     public void ToggleOptionsOnly()
@@ -178,6 +206,7 @@ public class PauseManager : Singleton<PauseManager>
             }
             menuView.ResumeRequested += Resume;
             menuView.OptionsRequested += OpenOptionsFromMenu;
+            menuView.QuitRequested += QuitGame;
             menuView.Hide();
         }
 
@@ -295,16 +324,37 @@ public class PauseManager : Singleton<PauseManager>
  *      타이틀 연출(트윈/타이머)이 계속 돈다.
  *    - 그 외 씬(Lobby, Boss_ 4종, Styx, Ending) : ESC = 일시정지 토글.
  *      일시정지 중 옵션이 열려 있으면 ESC 는 "옵션 닫기(메뉴로 복귀)"로 동작한다.
+ *    - 일시정지 차단 중(IsPauseBlocked) : 무시. 단 이미 정지 상태라면 ESC 로 해제는 계속 되게 두어
+ *      차단 플래그가 잘못 남아도 플레이어가 갇히지 않는다.
  *
- * 4) 볼륨 저장 시점
+ * 3-1) 일시정지 차단 (BlockPause / UnblockPause / IsPauseBlocked)
+ *    "이 구간에서는 멈출 수 없다"를 표현하는 카운터. 중첩을 고려해 bool 이 아니라 참조 카운트다.
+ *    반드시 짝을 맞춰 호출하고, 호출자 쪽에서도 중복 방지 플래그를 두는 것을 권장한다
+ *    (BossRoom.SetPauseBlocked 참고).
+ *    현재 사용처 : BossRoom 의 패배 컷씬 구간(RoomState.DefeatCutscene) — 2026-08-28 유저 요청.
+ *    씬이 바뀌면 activeSceneChanged 에서 카운터를 0 으로 리셋하므로, 차단한 오브젝트가
+ *    Unblock 을 못 부르고 파괴돼도 다음 씬까지 차단이 새지 않는다.
+ *    주의 : 차단은 "정지 진입"만 막는다. 이미 IsPaused 인 상태를 강제로 풀지는 않는다.
+ *
+ * 4) 게임 종료 (QuitGame)
+ *    일시정지 메뉴의 "게임 종료" 버튼(PauseMenuView.QuitRequested)을 구독해 실행한다.
+ *    에디터에서는 Application.Quit() 가 무시되므로 EditorApplication.isPlaying=false 로 분기한다.
+ *    종료 직전 저장은 VolumeSettings.SaveIfDirty() 하나만 호출한다.
+ *      - 진행도(보스 클리어/스틱스/엔딩/씬 전환)는 이미 각 지점에서 SaveAsync 로 즉시 기록되므로
+ *        종료 시점에 새로 저장할 진행 상태가 없다. 미저장으로 남을 수 있는 건 옵션 슬라이더 값뿐이다.
+ *      - LocalSaveBackend.SaveAsync 는 File.WriteAllText 후 Task.CompletedTask 를 돌려주는
+ *        동기 구현이라 fire-and-forget(_ = SaveAsync()) 이라도 호출이 끝난 시점에 디스크 기록이
+ *        완료돼 있다. 즉 종료로 인해 저장이 유실될 위험이 없다(Resume 과 완전히 같은 경로).
+ *
+ * 5) 볼륨 저장 시점
  *    슬라이더 조작은 VolumeSettings 가 SettingsData + AudioManager 믹서에 즉시 반영하고,
  *    옵션 패널이 닫히거나(뒤로/ESC) 일시정지가 해제될 때 SaveIfDirty 로 디스크 저장한다.
  *
- * 5) 안전장치
+ * 6) 안전장치
  *    일시정지 중 씬이 바뀌는 경우(이론상 없지만) activeSceneChanged 에서 ForceResetPauseState 로
  *    상태를 정리한다. WaitWhilePaused() 는 코루틴에서 일시정지 대기가 필요할 때 쓰는 공용 헬퍼.
  *
- * 6) 알려진 한계(목표: "일시정지 중 피해·진행 없음", 프레임 단위 완전 정지는 목표 아님)
+ * 7) 알려진 한계(목표: "일시정지 중 피해·진행 없음", 프레임 단위 완전 정지는 목표 아님)
  *    - WaitForSeconds / Invoke / Destroy(obj, t) / PoolManager 지연 반납 타이머는 계속 흐른다.
  *      → 일시정지 중 투사체가 수명이 다해 사라질 수 있다(플레이어에게 불리하지 않음).
  *    - 스킬 버프 지속시간·쿨타임(WaitForSeconds 기반)도 실시간으로 흐른다.

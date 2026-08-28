@@ -13,6 +13,12 @@ public class Electric_ball : MonoBehaviour
     [SerializeField] private float finalScale = 1f;
     [SerializeField] private float damage = 10f;
 
+    [Header("사운드")]
+    [SerializeField] private float skillVolume = 0.8f;
+    [SerializeField] private float skillMinInterval = 0.12f;
+
+    private const string SkillSound = "Water_Skill";
+
     private Transform player;
     private Vector3 moveDirection;
     private bool isLaunched;
@@ -120,6 +126,7 @@ public class Electric_ball : MonoBehaviour
                 (player.position - transform.position).normalized;
 
             isLaunched = true;
+            BossSound.PlayThrottled(SkillSound, skillVolume, skillMinInterval);
             Destroy(gameObject, lifeTime);
         }
         else
@@ -138,3 +145,12 @@ public class Electric_ball : MonoBehaviour
         damage = Mathf.Max(0f, damage);
     }
 }
+
+/* [파일 노트]
+ * 사운드 Water_Skill : 충전(ChargeAndLaunch)이 끝나고 플레이어를 조준해 발사되는 순간에 재생한다.
+ * "Water_Skill = 그 외 수보스 스킬" 을 전기 구체에 배정한 근거 : 수보스의 남은 패턴 중
+ * 분출(Water_Sprout)·고드름(Water_IceBullet)·토네이도(Water_Tornado)·수위 상승(Water_Rising)은
+ * 전용 이름이 이미 있고, 이름이 없는 패턴은 전기 구체(패턴4) 하나뿐이다.
+ * skillMinInterval(기본 0.12초) 스로틀 : 구체는 ChargeDuration 간격으로 3개가 순차 발사되므로
+ * 보통은 전부 울리지만, 충전 시간을 0 에 가깝게 줄여도 소리가 뭉치지 않게 한다.
+ */

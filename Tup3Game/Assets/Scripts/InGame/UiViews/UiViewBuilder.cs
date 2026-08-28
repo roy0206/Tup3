@@ -8,7 +8,18 @@ public static class UiViewBuilder
     {
         var canvas = root.GetComponent<Canvas>();
         if (canvas == null) canvas = root.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+
+        var cam = Camera.main;
+        if (cam != null)
+        {
+            canvas.renderMode = RenderMode.ScreenSpaceCamera;
+            canvas.worldCamera = cam;
+            canvas.planeDistance = 1f;
+        }
+        else
+        {
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        }
         canvas.sortingOrder = sortingOrder;
 
         var scaler = root.GetComponent<CanvasScaler>();

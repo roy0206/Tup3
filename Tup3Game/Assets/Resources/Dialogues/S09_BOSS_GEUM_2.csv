@@ -11,5 +11,6 @@ geum2_09,주인공,…,,,"도입 대사의 마지막 행. next 가 비어 있어
 geum2_win,주인공,(그의 힘을 받아들일 것인가),,힘을 받아들인다:geum2_win_geuk/거절한다:geum2_win_saeng,"승리 확정 후 BossRoom 이 이 행부터 재생한다(victoryStartId=geum2_win). 패배했을 때는 S13_BATTLE_LOSE 를 재생한다."
 geum2_win_geuk,금보스,자 가던 길 마저 가라구.,geum2_skill,,"극(剋) 승리 경로 — 보스의 힘을 받아들인다."
 geum2_skill,시스템,금 스킬을 획득하였습니다,,,"BossRoom 이 이 행 도달을 감지해 실제로 스킬을 지급하고 세이브한다."
-geum2_win_saeng,금보스,(작성중) 생(生)으로 승리 시 대사,geum2_coin,,"생(生) 승리 경로 — 스킬을 거절한다."
+geum2_win_saeng,금보스,끝내 받지 않는군. 죽음을 빌리지 않고 죽겠다는 건가.,geum2_win_saeng_02,,"생(生) 승리 경로 — 스킬을 거절한다."
+geum2_win_saeng_02,금보스,고집이군. 하지만 그 고집이 네가 아직 있다는 유일한 증거겠지.,geum2_coin,,
 geum2_coin,시스템,의지 코인 5개를 얻었다,,,"BossRoom 이 이 행 도달을 감지해 의지 코인 5개를 지급하고 세이브한다."

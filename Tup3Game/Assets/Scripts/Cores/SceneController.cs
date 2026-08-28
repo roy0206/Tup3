@@ -11,6 +11,11 @@ public class SceneController : Singleton<SceneController>
     [Tooltip("프로젝트에서 사용하는 모든 SceneSO 를 등록하세요.")]
     [SerializeField] private List<SceneSO> sceneConfigs;
 
+    [Header("전환 사운드")]
+    [SerializeField, Range(0f, 1f)] private float transitionVolume = 0.9f;
+
+    private const string SoundSceneTransition = "UI_SceneTransition";
+
     public static float LoadingProgress { get; private set; }
 
     public static bool IsTransitioning { get; private set; }
@@ -99,6 +104,8 @@ public class SceneController : Singleton<SceneController>
 
         NotifySceneExit(SceneManager.GetActiveScene().name);
         UserDataManager.Instance.SaveAsync();
+
+        AudioManager.Instance.PlaySound(SoundSceneTransition, transitionVolume);
 
 
 
@@ -204,6 +211,16 @@ public class SceneController : Singleton<SceneController>
 public interface ISceneEventListener
 {
     public void OnSceneLoadComplete(string sceneName);
-    
+
     public void OnSceneExit(string sceneName);
 }
+
+/* [파일 노트]
+ * 효과음 배선 (UI_SceneTransition)
+ *  재생 지점은 LoadSceneRoutine 안에서 NotifySceneExit 바로 다음, exitTransition 페이드 시작 직전이다.
+ *  AudioManager 도 ISceneEventListener 라서 NotifySceneExit → AudioManager.OnSceneExit 에서
+ *  재생 중인 SFX 채널을 전부 정지시킨다. 그 앞에서 재생하면 통지에 곧바로 잘려 나가므로
+ *  반드시 통지 이후에 재생해야 한다.
+ *  AudioManager 와 SceneController 는 모두 Singleton<T>(DontDestroyOnLoad)이고 SFX 채널은
+ *  AudioManager 의 자식으로 생성되므로, 씬이 언로드돼도 전환음은 끊기지 않고 끝까지 재생된다.
+ */

@@ -10,7 +10,9 @@ public enum RoomState
     Battle,
     PostCutscene,
     PostDialogue,
-    Clear
+    Clear,
+    DefeatCutscene,
+    GameOver
 }
 
 public enum BattleOutcome
@@ -54,14 +56,19 @@ public class BossRoom : MonoBehaviour, ISceneEventListener
 
     [Header("보상")]
     [SerializeField] private int saengWillCoinReward = 5;
-    [SerializeField] private int defeatWillCoinPenalty = 1;
     [SerializeField] private int geukWillCoinCost = 1;
+
+    [Header("패배 연출")]
+    [SerializeField] private DefeatCutscene defeatCutscene;
+    [SerializeField] private float defeatCutsceneTimeout = 20f;
+    [SerializeField] private GameOverView gameOverView;
 
     [Header("옵션")]
     [SerializeField] private bool allowManualAdvance = true;
     [SerializeField] private bool lockMovementDuringDialogue = false;
     [SerializeField] private bool restoreHealthOnDefeat = true;
     [SerializeField] private string defeatReturnScene = "Lobby";
+    [SerializeField] private string titleSceneName = "Start";
 
     private int resolvedSkillIndex = -1;
 
@@ -76,7 +83,10 @@ public class BossRoom : MonoBehaviour, ISceneEventListener
     private bool isCleared;
     private bool skillGranted;
     private bool coinGranted;
-    private bool returningToLobby;
+    private bool leavingRoom;
+    private bool defeatCutsceneDone;
+    private bool gameOverSubscribed;
+    private bool pauseBlocked;
 
     public RoomState CurrentRoomState { get; private set; } = RoomState.None;
     public BattleOutcome Outcome { get; private set; } = BattleOutcome.None;
@@ -121,6 +131,7 @@ public class BossRoom : MonoBehaviour, ISceneEventListener
 
         if (DM == null) DM = DialogueManager.Current;
         if (bossBehaviour == null) bossBehaviour = FindObjectOfType<BossBase>();
+        if (defeatCutscene == null) defeatCutscene = FindObjectOfType<DefeatCutscene>(true);
         resolvedSkillIndex = skillIndex >= 0 ? skillIndex : DefaultSkillIndex(boss);
     }
 
@@ -162,10 +173,18 @@ public class BossRoom : MonoBehaviour, ISceneEventListener
             DM.OnDialogueEnd -= HandleDialogueEnd;
             DM.OnEntryShown -= HandleEntryShown;
         }
+
+        if (gameOverSubscribed && gameOverView != null)
+        {
+            gameOverView.ContinueRequested -= ReturnToLobby;
+            gameOverView.TitleRequested -= ReturnToTitle;
+        }
+        gameOverSubscribed = false;
     }
 
     private void OnDestroy()
     {
+        SetPauseBlocked(false);
         Unsubscribe();
     }
 
@@ -180,7 +199,9 @@ public class BossRoom : MonoBehaviour, ISceneEventListener
             case RoomState.Dialogue: StopRunningDialogue(); break;
             case RoomState.Battle: break;
             case RoomState.PostCutscene: break;
+            case RoomState.DefeatCutscene: StopDefeatCutscene(); break;
             case RoomState.PostDialogue: StopRunningDialogue(); break;
+            case RoomState.GameOver: break;
             case RoomState.Clear: break;
         }
 
@@ -214,12 +235,20 @@ public class BossRoom : MonoBehaviour, ISceneEventListener
                 stateTimer = Outcome == BattleOutcome.Victory ? victoryDelay : defeatDelay;
                 break;
 
+            case RoomState.DefeatCutscene:
+                StartDefeatCutscene();
+                break;
+
             case RoomState.PostDialogue:
                 SetBossActive(false);
                 if (Outcome == BattleOutcome.Victory)
                     PlayDialogue(victoryDialogueFile, victoryStartId);
                 else
-                    EnterDefeatDialogue();
+                    PlayDialogue(defeatDialogueFile, null);
+                break;
+
+            case RoomState.GameOver:
+                ShowGameOver();
                 break;
 
             case RoomState.Clear:
@@ -253,11 +282,21 @@ public class BossRoom : MonoBehaviour, ISceneEventListener
                 break;
 
             case RoomState.PostCutscene:
-                if (TickTimer()) ChangeState(RoomState.PostDialogue);
+                if (TickTimer())
+                    ChangeState(Outcome == BattleOutcome.Defeat
+                        ? RoomState.DefeatCutscene
+                        : RoomState.PostDialogue);
+                break;
+
+            case RoomState.DefeatCutscene:
+                TickDefeatCutscene();
                 break;
 
             case RoomState.PostDialogue:
                 if (!dialogueRunning) FinishBattleResult();
+                break;
+
+            case RoomState.GameOver:
                 break;
 
             case RoomState.Clear:
@@ -393,17 +432,58 @@ public class BossRoom : MonoBehaviour, ISceneEventListener
         }
     }
 
-    private void EnterDefeatDialogue()
+    private void StartDefeatCutscene()
     {
-        var data = UserDataManager.Instance.Data;
-        if (data != null && data.Play != null)
+        defeatCutsceneDone = false;
+        stateTimer = defeatCutsceneTimeout;
+        SetPauseBlocked(true);
+
+        if (defeatCutscene == null)
         {
-            data.Play.willCoins = Mathf.Max(0, data.Play.willCoins - defeatWillCoinPenalty);
-            UserDataManager.Instance.SaveAsync();
-            Debug.Log($"[BossRoom] 패배 — 의지 코인 {defeatWillCoinPenalty}개 차감 (보유 {data.Play.willCoins}개)");
+            defeatCutsceneDone = true;
+            return;
         }
 
-        PlayDialogue(defeatDialogueFile, null);
+        defeatCutscene.Play(HandleDefeatCutsceneComplete);
+    }
+
+    private void SetPauseBlocked(bool blocked)
+    {
+        if (pauseBlocked == blocked) return;
+        pauseBlocked = blocked;
+
+        if (blocked) PauseManager.BlockPause();
+        else PauseManager.UnblockPause();
+    }
+
+    private void HandleDefeatCutsceneComplete()
+    {
+        if (CurrentRoomState != RoomState.DefeatCutscene) return;
+        defeatCutsceneDone = true;
+    }
+
+    private void TickDefeatCutscene()
+    {
+        if (defeatCutsceneDone)
+        {
+            ChangeState(RoomState.PostDialogue);
+            return;
+        }
+
+        if (defeatCutsceneTimeout <= 0f) return;
+
+        stateTimer -= Time.deltaTime;
+        if (stateTimer > 0f) return;
+
+        Debug.LogWarning($"[BossRoom] 패배 컷씬이 {defeatCutsceneTimeout}초 안에 완료 콜백을 호출하지 않아 다음 단계로 넘어갑니다 — {boss}");
+        ChangeState(RoomState.PostDialogue);
+    }
+
+    private void StopDefeatCutscene()
+    {
+        defeatCutsceneDone = false;
+        SetPauseBlocked(false);
+        if (defeatCutscene != null) defeatCutscene.Stop();
     }
 
     private void FinishBattleResult()
@@ -414,18 +494,62 @@ public class BossRoom : MonoBehaviour, ISceneEventListener
             return;
         }
 
-        ReturnToLobby();
+        ChangeState(RoomState.GameOver);
+    }
+
+    private void ShowGameOver()
+    {
+        EnsureGameOverView();
+
+        if (gameOverView == null)
+        {
+            Debug.LogError($"[BossRoom] GameOverView 를 준비하지 못해 곧바로 복귀합니다 — {boss}");
+            ReturnToLobby();
+            return;
+        }
+
+        gameOverView.Show();
+    }
+
+    private void EnsureGameOverView()
+    {
+        if (gameOverView == null) gameOverView = FindObjectOfType<GameOverView>(true);
+
+        if (gameOverView == null)
+        {
+            var go = new GameObject("GameOverView");
+            go.transform.SetParent(transform, false);
+            gameOverView = go.AddComponent<GameOverView>();
+        }
+
+        if (gameOverSubscribed) return;
+        gameOverSubscribed = true;
+
+        gameOverView.ContinueRequested += ReturnToLobby;
+        gameOverView.TitleRequested += ReturnToTitle;
     }
 
     private void ReturnToLobby()
     {
-        if (returningToLobby) return;
-        returningToLobby = true;
+        LeaveRoom(defeatReturnScene);
+    }
+
+    private void ReturnToTitle()
+    {
+        LeaveRoom(titleSceneName);
+    }
+
+    private void LeaveRoom(string sceneName)
+    {
+        if (leavingRoom) return;
+        leavingRoom = true;
+
+        if (gameOverView != null) gameOverView.Hide();
 
         if (restoreHealthOnDefeat && playerHealth != null)
             playerHealth.SetHealth(playerHealth.MaxHealth);
 
-        SceneController.Instance.LoadScene(defeatReturnScene);
+        SceneController.Instance.LoadScene(sceneName);
     }
 
     private void MarkCleared()
@@ -479,17 +603,35 @@ public class BossRoom : MonoBehaviour, ISceneEventListener
  *                  · 승리 → victoryDialogueFile 을 victoryStartId 행부터 재생.
  *                    그 행이 "받아들인다 / 거절한다" 선택지 행이고, 선택 결과로 _skill 또는 _coin 행에 도달한다.
  *                    도달 감지는 DialogueManager.OnEntryShown 으로 하고 거기서 실제 지급이 일어난다.
- *                  · 패배 → 의지 코인을 먼저 차감하고 defeatDialogueFile(S13) 재생.
+ *                  · 패배 → defeatDialogueFile(S13) 재생. 코인은 건드리지 않는다.
+ *   Clear        : clearedBosses 에 이 보스 플래그를 기록하고 즉시 SaveAsync.
+ *                  플레이어 조작을 돌려주고, 이후 퇴장은 기존 BossExit 상호작용에 맡긴다.
+ *
+ * ── 패배 흐름 (2026-08-28 유저 확정) ──────────────────────────────────────────
+ *   Battle(패배) → PostCutscene(defeatDelay) → DefeatCutscene → PostDialogue(S13) → GameOver
+ *
+ *   DefeatCutscene : defeatCutscene(추상 DefeatCutscene 컴포넌트).Play(onComplete) 를 한 번 호출하고
+ *                    onComplete 를 기다린다. 필드가 비어 있으면 씬에서 자동으로 찾고, 그래도 없으면
+ *                    이 구간을 건너뛴다. 콜백이 안 오면 defeatCutsceneTimeout(기본 20초) 후 경고 로그와
+ *                    함께 강제로 넘어간다(소프트락 방지). 연출 내용은 DefeatCutscene 을 상속해 DOTween 으로 작성.
+ *                    이 구간에는 PauseManager.BlockPause() 로 일시정지를 막는다(2026-08-28 유저 요청).
+ *                    진입 시 Block, 상태를 벗어날 때 Unblock 하며 SetPauseBlocked 가 중복 호출을 막는다.
+ *                    OnDestroy 에서도 해제하고, 씬이 바뀌면 PauseManager 가 카운터를 리셋한다.
+ *                    차단은 컷씬 구간에만 걸린다 — 이어지는 S13 대사와 GameOver UI 에서는 ESC 가 정상 동작한다.
+ *   GameOver       : GameOverView 를 띄우고 플레이어 선택을 기다린다. 여기서 자동 전이는 없다.
+ *                    · "마지막 지점에서 다시" → defeatReturnScene(기본 "Lobby")
+ *                      로비 좌표/체력/스킬은 Lobby.OnSceneLoadComplete 가 세이브에서 복원한다.
+ *                    · "시작 화면으로"       → titleSceneName(기본 "Start")
+ *                    두 경로 모두 LeaveRoom() 을 거치며 restoreHealthOnDefeat 이면 체력을 최대로 되돌린 뒤
+ *                    씬을 로드한다(OnSceneExit 이 그 체력을 저장하므로 0 으로 저장되는 일이 없다).
+ *                    이탈 경로에 별도 SaveAsync 를 넣지 않는다 — 진행 상태 저장은 로비 씬의 책임이다.
+ *   GameOverView 는 씬에 배치돼 있으면 그것을 쓰고, 없으면 이 오브젝트의 자식으로 코드 생성한다.
  *
  * ── 의지 코인 경제 (PlayData.willCoins, 항상 0 미만 금지) ─────────────────────
  *   극(剋) 승리(스킬 획득) : -geukWillCoinCost (기본 1)
  *   생(生) 승리(스킬 거절) : +saengWillCoinReward (기본 5)
- *   패배                  : -defeatWillCoinPenalty (기본 1)
- *   시작값은 0. 잔여 코인은 나중에 엔딩 분기에 사용될 예정(기획: 최종보스 재도전/배드엔딩).
- *   Clear        : clearedBosses 에 이 보스 플래그를 기록하고 즉시 SaveAsync.
- *                  플레이어 조작을 돌려주고, 이후 퇴장은 기존 BossExit 상호작용에 맡긴다.
- *
- *   패배 대사가 끝나면 상태를 바꾸지 않고 ReturnToLobby() 로 defeatReturnScene(기본 "Lobby") 을 로드한다.
+ *   패배                  : 변동 없음. 차감은 극 승리에서만 일어난다(2026-08-28 유저 정정).
+ *   시작값은 PlayData 기본값 4. 잔여 코인은 최종보스 결과와 함께 엔딩 분기에 쓰인다.
  *
  * ── 클리어 판정 버그 수정 ──────────────────────────────────────────────────────
  *   기존 OnSceneExit 은 씬을 나가기만 하면 무조건 clearedBosses 를 기록했다(= 입장 후 그냥 나가도 클리어).

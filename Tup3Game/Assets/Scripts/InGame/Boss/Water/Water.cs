@@ -58,6 +58,14 @@ public class Water : BossBase
     [SerializeField] private RisingWaterPhase risingWaterPhase;
     [SerializeField, Range(0f, 1f)] private float encroachmentHpRatio = 0.5f;
 
+    [Header("사운드")]
+    [SerializeField] private float roarSoundVolume = 1f;
+
+    private const string RoarSound = "Water_Roar";
+
+    private bool hasPlayedIntroRoar;
+    private bool hasPlayedEncroachmentRoar;
+
     [Header("잠식 전조 및 파훼")]
     [SerializeField] private GameObject encroachmentWarningPrefab;
     [SerializeField] private Transform encroachmentWarningPoint;
@@ -119,6 +127,12 @@ public class Water : BossBase
     {
         if (PauseManager.IsPaused || DialogueManager.IsDialogueActive) return;
 
+        if (!hasPlayedIntroRoar && !IsDead)
+        {
+            hasPlayedIntroRoar = true;
+            BossSound.Play(RoarSound, roarSoundVolume);
+        }
+
         for (int i = 0; i < curTimes.Count; i++)
         {
             curTimes[i] -= Time.deltaTime;
@@ -173,6 +187,12 @@ public class Water : BossBase
             curTimes[0] = 0f;
             hasStartedWaterRise = false;
             encroachmentTelegraphRemaining = encroachmentTelegraphDuration;
+
+            if (!hasPlayedEncroachmentRoar)
+            {
+                hasPlayedEncroachmentRoar = true;
+                BossSound.Play(RoarSound, roarSoundVolume);
+            }
 
             Transform warningPoint = encroachmentWarningPoint != null
                 ? encroachmentWarningPoint
@@ -567,4 +587,16 @@ public class Water : BossBase
  * 얼음총알·분수·스톰 소환 예약(DOVirtual.DelayedCall)과 수위 상승 트윈(RisingWaterPhase)은
  * DOTween.PauseAll 로 함께 멈추고, 전기 구체 연속 소환 코루틴은 루프마다 WaitWhilePaused 로 대기한다.
  * Water_eye 의 수명 타이머(Invoke)는 실시간으로 흘러 일시정지 중 만료될 수 있다(플레이어에게 불리하지 않음).
+ *
+ * 사운드 Water_Roar (등장 / 포효) — 두 지점에서 각각 1회씩만 울린다.
+ *   1) 등장 : Update 의 일시정지·대사 게이트를 처음 통과하는 프레임. 수보스에는 별도의 등장 연출
+ *      메서드가 없고, BossRoom 이 도입 대사 동안 DialogueManager 로 이 Update 를 막아 두므로
+ *      "게이트를 처음 통과한 순간 = 전투가 실제로 시작된 순간"이다. hasPlayedIntroRoar 로 1회 고정.
+ *   2) 잠식 전조 진입(EnterEncroachmentPhase 의 최초 진입 블록) : 체력 절반에서 수위 상승을 예고하는
+ *      페이즈 전환 순간이라 같은 포효를 다시 쓴다. hasPlayedEncroachmentRoar 로 1회 고정 —
+ *      전조가 STOP 으로 파훼되면 currentPhase 가 Normal 로 돌아가지만 이 플래그는 유지되므로
+ *      (hasAttemptedEncroachment 와 마찬가지로) 재시도 시 포효가 다시 울리지는 않는다.
+ * 나머지 수보스 소리는 전부 소환물 쪽에 있다 :
+ *   Water_Sprout(Water_Sprout.cs) / Water_IceBullet(Ice_Bullet.cs) / Water_Tornado(Storm.cs) /
+ *   Water_Skill(Electric_ball.cs) / Water_Rising · Water_Splash(RisingWaterPhase.cs).
  */

@@ -7,6 +7,7 @@ using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.U2D;
 using UnityEngine.UI;
 
 public static class FinalBossSceneBuilder
@@ -37,6 +38,12 @@ public static class FinalBossSceneBuilder
 
     private const string SquareSpriteGuid = "311925a002f4447b3a28927169b83ea6";
     private const string HealthRedSpriteGuid = "e1a07fe9b17c0ce48847131f88a041a7";
+
+    private const string SpriteShapeProfilePath =
+        "Packages/com.unity.2d.spriteshape/Editor/ObjectMenuCreation/DefaultAssets/Sprite Shape Profiles/Sprite Shape Profile.asset";
+    private const string SpriteLitDefaultMaterialPath =
+        "Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Lit-Default.mat";
+    private const float WaterSurfaceLocalY = 0.5f;
 
     private const string AddressableGroupName = "Final";
     private const string SourceGroupName = "Gold";
@@ -87,6 +94,7 @@ public static class FinalBossSceneBuilder
             boss = BuildFinalBossInScene(scene);
         }
         BuildFinalBossRoom(scene, boss);
+        BuildShallowWater(scene);
         EnsureDialogueUI(scene);
         CleanupLegacyObjects(scene);
 
@@ -994,6 +1002,104 @@ public static class FinalBossSceneBuilder
         return null;
     }
 
+    private static void BuildShallowWater(Scene scene)
+    {
+        GameObject square = FindInSceneNoCreate(scene, "Square");
+        var groundCol = square != null ? square.GetComponent<BoxCollider2D>() : null;
+
+        float surfaceY = -3f;
+        float width = 20f;
+        float centerX = 0f;
+        if (square != null && groundCol != null)
+        {
+            surfaceY = square.transform.position.y
+                + (groundCol.offset.y + groundCol.size.y * 0.5f) * Mathf.Abs(square.transform.lossyScale.y);
+            width = groundCol.size.x * Mathf.Abs(square.transform.lossyScale.x);
+            centerX = square.transform.position.x + groundCol.offset.x * square.transform.lossyScale.x;
+        }
+
+        bool created;
+        GameObject root = FindInScene(scene, "ShallowWater", out created);
+        root.transform.position = new Vector3(centerX, surfaceY, 0f);
+        root.transform.localScale = Vector3.one;
+
+        var rb = EnsureComponent<Rigidbody2D>(root);
+        rb.bodyType = RigidbodyType2D.Kinematic;
+        rb.simulated = true;
+
+        var zoneCol = EnsureComponent<BoxCollider2D>(root);
+        zoneCol.isTrigger = true;
+        zoneCol.size = new Vector2(width, 0.9f);
+        zoneCol.offset = new Vector2(0f, 0.15f);
+
+        var zone = EnsureComponent<ShallowWaterZone>(root);
+        var zoneSo = new SerializedObject(zone);
+        var surfaceProp = zoneSo.FindProperty("surfaceLocalY");
+        if (surfaceProp != null)
+        {
+            surfaceProp.floatValue = WaterSurfaceLocalY;
+            zoneSo.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        RemoveLegacyWaterVisuals(root);
+        BuildWaterSim(root, width);
+
+        report.Add(created
+            ? "얕은 물(ShallowWater) 생성 — 감속 존 + 물리 기반 수면 시뮬(SimWater) (삼도천)"
+            : "얕은 물(ShallowWater) 갱신 — 임시 물 레이어를 물리 기반 수면 시뮬(SimWater)로 교체");
+    }
+
+    private static void RemoveLegacyWaterVisuals(GameObject root)
+    {
+        var ocean = root.GetComponent<Ocean_animation>();
+        if (ocean != null) Object.DestroyImmediate(ocean);
+
+        foreach (string legacyName in new[] { "WaterBack", "WaterFront" })
+        {
+            Transform legacy = root.transform.Find(legacyName);
+            if (legacy != null) Object.DestroyImmediate(legacy.gameObject);
+        }
+    }
+
+    private static void BuildWaterSim(GameObject root, float width)
+    {
+        bool created;
+        GameObject sim = EnsureChild(root, "WaterSim", out created);
+        sim.transform.localPosition = new Vector3(0f, WaterSurfaceLocalY, 0f);
+        sim.transform.localScale = Vector3.one;
+
+        var rb = EnsureComponent<Rigidbody2D>(sim);
+        rb.bodyType = RigidbodyType2D.Kinematic;
+        rb.simulated = true;
+        rb.useFullKinematicContacts = true;
+
+        var poly = EnsureComponent<PolygonCollider2D>(sim);
+        poly.isTrigger = true;
+
+        var controller = EnsureComponent<SpriteShapeController>(sim);
+        controller.autoUpdateCollider = false;
+        var profile = AssetDatabase.LoadAssetAtPath<UnityEngine.U2D.SpriteShape>(SpriteShapeProfilePath);
+        if (profile != null) controller.spriteShape = profile;
+        else report.Add($"경고: 기본 SpriteShape 프로파일({SpriteShapeProfilePath})을 찾지 못했습니다.");
+
+        var renderer = sim.GetComponent<SpriteShapeRenderer>();
+        var material = AssetDatabase.LoadAssetAtPath<Material>(SpriteLitDefaultMaterialPath);
+        if (renderer != null && material != null)
+            renderer.sharedMaterials = new[] { material, material };
+        if (renderer != null)
+        {
+            renderer.color = new Color(0.22f, 0.30f, 0.42f, 0.45f);
+            renderer.sortingOrder = 30;
+        }
+
+        var water = EnsureComponent<SimWater.Water>(sim);
+        var waterSo = new SerializedObject(water);
+        waterSo.FindProperty("size").vector2Value = new Vector2(width + 0.6f, 0.9f);
+        waterSo.FindProperty("useSurface").boolValue = true;
+        waterSo.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(water);
+    }
+
     private static Sprite LoadSpriteByGuid(string guid)
     {
         string path = AssetDatabase.GUIDToAssetPath(guid);
@@ -1206,6 +1312,17 @@ public static class FinalBossSceneBuilder
  *   Assets/AddressableAssets/Final/SoilWave.prefab 저장 후 Addressables 자동 등록 —
  *   그룹 "Final"(없으면 Gold 스키마 복사), 주소 "SoilWave", 라벨 Pool/BossAsset.
  *   PoolManager 는 라벨 "Pool" 프리로드 + 프리팹 "이름"이 키이므로 이름은 "SoilWave" 여야 한다.
+ *
+ * 얕은 물(BuildShallowWater) — 물리 기반 수면 시뮬(SimWater, Tavern_Gamejam_CAU_SSU 이식) 통합:
+ *   - ShallowWater 루트(감속 존 ShallowWaterZone + Kinematic RB + 트리거 박스)는 유지하되
+ *     구 임시 물(WaterBack/WaterFront 쿼드 + Ocean_animation)은 발견 시 제거(교체).
+ *   - 자식 "WaterSim": Kinematic Rigidbody2D(useFullKinematicContacts — RB 없는 플레이어/보스의
+ *     정적 콜라이더와도 트리거 접촉 생성) + PolygonCollider2D(trigger) + SpriteShapeController
+ *     (기본 프로파일, Sprite-Lit-Default 머티리얼 2슬롯, color 반투명 남색, order 30) + SimWater.Water.
+ *   - 수면 = 바닥 Square 실측 상단 + WaterSurfaceLocalY(0.5, 발목 높이), 폭 = 바닥 실측 + 0.6,
+ *     깊이 0.9. ShallowWaterZone.surfaceLocalY 도 0.5 로 동기화(물튀김 파티클 높이).
+ *   - 출렁임 입력: ShallowWaterZone 이 Playermovement/FinalBoss 에 SimWater.WaterBody 를
+ *     런타임 AddComponent (씬/프리팹 무수정). WaterSettings 는 Assets/Resources/WaterSettings.asset.
  *
  * 멱등성 규칙: 오브젝트는 이름으로 찾고 없을 때만 생성, 위치/스케일/틴트 등 "유저가 만질 값"은
  * 생성 시에만 초기화한다. 참조 배선(SerializedObject)은 매번 다시 적용한다.

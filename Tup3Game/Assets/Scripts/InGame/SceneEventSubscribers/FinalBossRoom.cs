@@ -22,6 +22,10 @@ public class FinalBossRoom : MonoBehaviour, ISceneEventListener
     [SerializeField] private string victoryNoCoinEndingId = "Ending4";
     [SerializeField] private string defeatEndingId = "Ending1";
 
+    [Header("패배 연출")]
+    [SerializeField] private DefeatCutscene defeatCutscene;
+    [SerializeField] private float defeatCutsceneTimeout = 20f;
+
     [Header("옵션")]
     [SerializeField] private bool allowManualAdvance = true;
     [SerializeField] private bool lockMovementDuringDialogue = false;
@@ -35,6 +39,8 @@ public class FinalBossRoom : MonoBehaviour, ISceneEventListener
     private bool dialogueRunning;
     private bool subscribed;
     private bool endingResolved;
+    private bool defeatCutsceneDone;
+    private bool pauseBlocked;
 
     public RoomState CurrentRoomState { get; private set; } = RoomState.None;
     public BattleOutcome Outcome { get; private set; } = BattleOutcome.None;
@@ -70,6 +76,7 @@ public class FinalBossRoom : MonoBehaviour, ISceneEventListener
 
         if (DM == null) DM = DialogueManager.Current;
         if (bossBehaviour == null) bossBehaviour = FindObjectOfType<BossBase>();
+        if (defeatCutscene == null) defeatCutscene = FindObjectOfType<DefeatCutscene>(true);
     }
 
     private void Subscribe()
@@ -94,6 +101,7 @@ public class FinalBossRoom : MonoBehaviour, ISceneEventListener
 
     private void OnDestroy()
     {
+        SetPauseBlocked(false);
         Unsubscribe();
     }
 
@@ -102,6 +110,7 @@ public class FinalBossRoom : MonoBehaviour, ISceneEventListener
         if (CurrentRoomState == newState) return;
 
         if (CurrentRoomState == RoomState.Dialogue) StopRunningDialogue();
+        if (CurrentRoomState == RoomState.DefeatCutscene) StopDefeatCutscene();
 
         CurrentRoomState = newState;
         stateTimer = 0f;
@@ -132,6 +141,10 @@ public class FinalBossRoom : MonoBehaviour, ISceneEventListener
                 if (Outcome == BattleOutcome.Defeat) SetBossActive(false);
                 stateTimer = Outcome == BattleOutcome.Victory ? victoryDelay : defeatDelay;
                 break;
+
+            case RoomState.DefeatCutscene:
+                StartDefeatCutscene();
+                break;
         }
     }
 
@@ -159,9 +172,69 @@ public class FinalBossRoom : MonoBehaviour, ISceneEventListener
                 break;
 
             case RoomState.PostCutscene:
-                if (TickTimer()) ResolveEnding();
+                if (!TickTimer()) break;
+                if (Outcome == BattleOutcome.Defeat) ChangeState(RoomState.DefeatCutscene);
+                else ResolveEnding();
+                break;
+
+            case RoomState.DefeatCutscene:
+                TickDefeatCutscene();
                 break;
         }
+    }
+
+    private void StartDefeatCutscene()
+    {
+        defeatCutsceneDone = false;
+        stateTimer = defeatCutsceneTimeout;
+        SetPauseBlocked(true);
+
+        if (defeatCutscene == null)
+        {
+            defeatCutsceneDone = true;
+            return;
+        }
+
+        defeatCutscene.Play(HandleDefeatCutsceneComplete);
+    }
+
+    private void HandleDefeatCutsceneComplete()
+    {
+        if (CurrentRoomState != RoomState.DefeatCutscene) return;
+        defeatCutsceneDone = true;
+    }
+
+    private void TickDefeatCutscene()
+    {
+        if (defeatCutsceneDone)
+        {
+            ResolveEnding();
+            return;
+        }
+
+        if (defeatCutsceneTimeout <= 0f) return;
+
+        stateTimer -= Time.deltaTime;
+        if (stateTimer > 0f) return;
+
+        Debug.LogWarning($"[FinalBossRoom] 패배 컷씬이 {defeatCutsceneTimeout}초 안에 완료 콜백을 호출하지 않아 엔딩으로 넘어갑니다");
+        ResolveEnding();
+    }
+
+    private void StopDefeatCutscene()
+    {
+        defeatCutsceneDone = false;
+        SetPauseBlocked(false);
+        if (defeatCutscene != null) defeatCutscene.Stop();
+    }
+
+    private void SetPauseBlocked(bool blocked)
+    {
+        if (pauseBlocked == blocked) return;
+        pauseBlocked = blocked;
+
+        if (blocked) PauseManager.BlockPause();
+        else PauseManager.UnblockPause();
     }
 
     private bool TickTimer()
@@ -231,6 +304,7 @@ public class FinalBossRoom : MonoBehaviour, ISceneEventListener
     {
         if (endingResolved) return;
         endingResolved = true;
+        SetPauseBlocked(false);
 
         var data = UserDataManager.Instance.Data;
         int coins = data != null && data.Play != null ? data.Play.willCoins : 0;
@@ -276,7 +350,15 @@ public class FinalBossRoom : MonoBehaviour, ISceneEventListener
  *   Battle       : 보스/플레이어 활성. BossBase.OnDeath → Victory, PlayerHealth.OnDeath → Defeat.
  *                  이벤트 누락 대비 IsDead 폴링(DetectBattleOutcome) 병행.
  *   PostCutscene : 공격/스킬 재잠금. 승리면 보스를 켠 채 victoryDelay(사망 연출),
- *                  패배면 보스 즉시 정지 후 defeatDelay. 시간이 다 되면 ResolveEnding.
+ *                  패배면 보스 즉시 정지 후 defeatDelay.
+ *                  시간이 다 되면 승리는 곧바로 ResolveEnding, 패배는 DefeatCutscene 으로 간다.
+ *   DefeatCutscene : (2026-08-28 신설) defeatCutscene.Play(onComplete) 를 한 번 호출하고 콜백을 기다린 뒤
+ *                  ResolveEnding 으로 간다. 즉 패배 흐름은 사망 → 컷씬 → (씬 전환 페이드) → 엔딩 씬 이다.
+ *                  필드가 비어 있으면 씬에서 DefeatCutscene 을 찾고, 그래도 없으면 구간을 건너뛴다.
+ *                  콜백이 오지 않으면 defeatCutsceneTimeout(기본 20초) 후 경고 로그와 함께 강제 진행한다.
+ *                  이 구간에는 PauseManager.BlockPause() 로 일시정지를 막는다(BossRoom 과 동일 정책).
+ *                  컷씬 구현체는 PlayerDeathCutscene(카메라 포커스 + 비네트 + 혼백 파티클 + 소멸).
+ *                  화면 페이드는 컷씬이 아니라 SceneController 의 씬 전환 효과가 담당한다.
  *
  * ── 결과 처리 (승리 선택지·보상·재도전 없음, 즉시 엔딩 분기) ──────────────────
  *   PlayData.willCoins 판독:
