@@ -1,4 +1,3 @@
-﻿using System;
 using UnityEngine;
 using CleverCrow.Fluid.BTs.Tasks;
 using CleverCrow.Fluid.BTs.Trees;
@@ -16,7 +15,6 @@ public enum BossPhase
 public class Water : BossBase
 {
     private List<float> curTimes;
-    private GameObject player;
 
     [Header("분수 시작점")]
     [SerializeField] private Water_Sprout_Zone watersproutzone;
@@ -31,8 +29,8 @@ public class Water : BossBase
 
     [Header("얼음총알 패턴")]
     [SerializeField] private int iceBullet_SpawnCount = 3;
-    [SerializeField] private int iceBullet_DelayTime = 3;
-    [SerializeField] private int iceBullet_CoolTime = 6;
+    [SerializeField] private float iceBulletTelegraphTime = 1f;
+    [SerializeField] private float iceBullet_CoolTime = 3f;
 
     [Header("Water Eye 소환")]
     [SerializeField] private GameObject eyePrefab;
@@ -52,6 +50,7 @@ public class Water : BossBase
     [SerializeField] private Electric_ball electricBallPrefab;
     [SerializeField] private Transform electricBallSpawnPoint;
     [SerializeField] private float electricBallSpawnDelay = 0.5f;
+    [SerializeField] private float electricEyeOpenDuration = 0.35f;
     [SerializeField] private float electricBallPatternDuration = 1.5f;
     [SerializeField] private float electricBallCoolTime = 30f;
 
@@ -72,7 +71,6 @@ public class Water : BossBase
     private bool hasAttemptedEncroachment;
     private bool hasStartedWaterRise;
     private GameObject encroachmentWarningInstance;
-    private Water_eye encroachmentEye;
     private bool hasCleanedUpDeath;
 
     new void Awake()
@@ -114,7 +112,6 @@ public class Water : BossBase
         };
 
         animationController = GetComponent<AnimationController>();
-        player = GameObject.FindGameObjectWithTag("Player");
         encroachmentTriggerHp = Hp * encroachmentHpRatio;
     }
 
@@ -135,14 +132,11 @@ public class Water : BossBase
 
         if (!hasCleanedUpDeath)
         {
+            StopAllCoroutines();
             CleanupEncroachmentWarning();
+            CleanupActiveHazards();
             risingWaterPhase?.StopAndHide();
-
-            foreach (Water_eye eye in activeEyes)
-            {
-                if (eye != null)
-                    eye.ExpireByTime();
-            }
+            ExpireAllEyes();
 
             WaterBossAbsorption absorption = GetComponent<WaterBossAbsorption>();
             if (absorption != null)
@@ -172,15 +166,13 @@ public class Water : BossBase
         {
             hasAttemptedEncroachment = true;
             currentPhase = BossPhase.EncroachmentTelegraph;
+            StopAllCoroutines();
+            CleanupActiveHazards();
+            ExpireAllEyes();
             isPatternSetup = false;
+            curTimes[0] = 0f;
             hasStartedWaterRise = false;
             encroachmentTelegraphRemaining = encroachmentTelegraphDuration;
-
-            encroachmentEye = SpawnEye(
-                2,
-                encroachmentTelegraphDuration + 5f,
-                true
-            );
 
             Transform warningPoint = encroachmentWarningPoint != null
                 ? encroachmentWarningPoint
@@ -199,10 +191,9 @@ public class Water : BossBase
         if (!hasStartedWaterRise && IsEncroachmentSealed())
         {
             CleanupEncroachmentWarning();
-            if (encroachmentEye != null)
-                encroachmentEye.ExpireByTime();
 
             currentPhase = BossPhase.Normal;
+            isPatternSetup = false;
             return TaskStatus.Success;
         }
 
@@ -267,6 +258,39 @@ public class Water : BossBase
         }
     }
 
+    private void ExpireAllEyes()
+    {
+        for (int i = activeEyes.Count - 1; i >= 0; i--)
+        {
+            Water_eye eye = activeEyes[i];
+            if (eye != null)
+                eye.ExpireByTime();
+        }
+
+        activeEyes.Clear();
+    }
+
+    private void CleanupActiveHazards()
+    {
+        DeactivateAndDestroyAll<Water_Sprout>();
+        DeactivateAndDestroyAll<Ice_Bullet>();
+        DeactivateAndDestroyAll<Storm>();
+        DeactivateAndDestroyAll<Electric_ball>();
+    }
+
+    private static void DeactivateAndDestroyAll<T>() where T : MonoBehaviour
+    {
+        T[] hazards = FindObjectsByType<T>(FindObjectsSortMode.None);
+        foreach (T hazard in hazards)
+        {
+            if (hazard == null)
+                continue;
+
+            hazard.gameObject.SetActive(false);
+            Destroy(hazard.gameObject);
+        }
+    }
+
     private TaskStatus PatternStarter(int num)
     {
         if (currentPhase == BossPhase.EncroachmentTelegraph)
@@ -281,7 +305,12 @@ public class Water : BossBase
 
     private bool isPatternSetup;
 
-    private Water_eye SpawnEye(int eyeIndex, float lifeTime, bool damageable = true)
+    private Water_eye SpawnEye(
+        int eyeIndex,
+        float lifeTime,
+        bool damageable = true,
+        bool startClosed = false
+    )
     {
         if (eyePrefab == null)
             return null;
@@ -309,8 +338,14 @@ public class Water : BossBase
                 ? Scale[eyeIndex]
                 : 1f;
 
-            eye.Init(this, lifeTime, eyeScale, damageable);
+            eye.Init(this, lifeTime, eyeScale, damageable, startClosed);
+            activeEyes.RemoveAll(activeEye => activeEye == null);
             activeEyes.Add(eye);
+        }
+        else
+        {
+            Debug.LogError("Water: Eye Prefab에 Water_eye 컴포넌트가 없습니다.", eyeObject);
+            Destroy(eyeObject);
         }
 
         return eye;
@@ -321,24 +356,27 @@ public class Water : BossBase
         if (IsDead) return TaskStatus.Failure;
         if (!isPatternSetup)
         {
-            curTimes[1] = iceBullet_DelayTime + iceBullet_CoolTime;
-            curTimes[0] = iceBullet_DelayTime; // TODO: 패턴 총 지속시간 (애니메이션 길이에 맞춰서)
+            IceBulletSpawnZone chosenZone = null;
+            if (iceBulletSpawnZones != null && iceBulletSpawnZones.Length > 0)
+                chosenZone = iceBulletSpawnZones[UnityEngine.Random.Range(0, iceBulletSpawnZones.Length)];
+
+            float patternDuration = chosenZone != null
+                ? chosenZone.GetPatternDuration(iceBulletTelegraphTime)
+                : iceBulletTelegraphTime;
+
+            curTimes[1] = patternDuration + iceBullet_CoolTime;
+            curTimes[0] = patternDuration;
             isPatternSetup = true;
             
             // 얼음 발사는 눈2가 담당한다.
             SpawnEye(1, normalEyeOpenTime);
             
-            if (iceBulletSpawnZones != null && iceBulletSpawnZones.Length > 0)
+            if (chosenZone != null)
             {
-                IceBulletSpawnZone chosenZone = iceBulletSpawnZones[UnityEngine.Random.Range(0, iceBulletSpawnZones.Length)];
-                if (chosenZone != null)
-                {
-                    DOVirtual.DelayedCall(0.3f, () =>
-                    {
-                        if (!IsDead)
-                            chosenZone.SpawnIceBullets(iceBullet_SpawnCount);
-                    }).SetLink(gameObject, LinkBehaviour.KillOnDestroy);
-                }
+                chosenZone.SpawnIceBullets(
+                    iceBullet_SpawnCount,
+                    iceBulletTelegraphTime
+                );
             }
 
             // 잠식 이후에는 눈1 분출과 눈2 얼음발사가 함께 발동될 수 있다.
@@ -348,7 +386,7 @@ public class Water : BossBase
                 SpawnEye(0, normalEyeOpenTime);
                 DOVirtual.DelayedCall(0.5f, () =>
                 {
-                    if (!IsDead)
+                    if (!IsDead && currentPhase == BossPhase.Encroached)
                         watersproutzone.SpawnWaterBullets(WaterSprout_SpawnCount);
                 }).SetLink(gameObject, LinkBehaviour.KillOnDestroy);
             }
@@ -377,7 +415,7 @@ public class Water : BossBase
             {
                 DOVirtual.DelayedCall(0.5f, () =>
                 {
-                    if (!IsDead)
+                    if (!IsDead && currentPhase != BossPhase.EncroachmentTelegraph)
                         watersproutzone.SpawnWaterBullets(WaterSprout_SpawnCount);
                 }).SetLink(gameObject, LinkBehaviour.KillOnDestroy);
             }
@@ -403,7 +441,7 @@ public class Water : BossBase
             SpawnEye(2, stormPatternDuration);
             DOVirtual.DelayedCall(stormSpawnDelay, () =>
             {
-                if (IsDead)
+                if (IsDead || currentPhase != BossPhase.Encroached)
                     return;
 
                 if (stormPrefab != null && stormSpawnPoint != null)
@@ -431,8 +469,13 @@ public class Water : BossBase
             curTimes[4] = electricBallPatternDuration + electricBallCoolTime;
             curTimes[0] = electricBallPatternDuration;
             isPatternSetup = true;
-            SpawnEye(3, normalEyeOpenTime, false);
-            StartCoroutine(SpawnElectricBalls());
+            Water_eye electricEye = SpawnEye(
+                3,
+                normalEyeOpenTime,
+                false,
+                true
+            );
+            StartCoroutine(SpawnElectricBalls(electricEye));
         }
 
         if (curTimes[0] > 0) return TaskStatus.Continue;
@@ -441,9 +484,18 @@ public class Water : BossBase
         return TaskStatus.Success;
     }
 
-    private IEnumerator SpawnElectricBalls()
+    private IEnumerator SpawnElectricBalls(Water_eye electricEye)
     {
         yield return new WaitForSeconds(electricBallSpawnDelay);
+
+        if (IsDead || currentPhase != BossPhase.Encroached)
+            yield break;
+
+        if (electricEye != null)
+            electricEye.OpenEye();
+
+        if (electricEyeOpenDuration > 0f)
+            yield return new WaitForSeconds(electricEyeOpenDuration);
 
         if (electricBallPrefab == null || electricBallSpawnPoint == null)
             yield break;
@@ -477,6 +529,36 @@ public class Water : BossBase
 
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireCube(warningPoint.position, encroachmentSealCheckSize);
+    }
+
+    private void OnValidate()
+    {
+        WaterSprout_SpawnCount = Mathf.Clamp(WaterSprout_SpawnCount, 1, 5);
+        WaterSprout_DelayTime = Mathf.Max(0, WaterSprout_DelayTime);
+        WaterSprout_CoolTime = Mathf.Max(0, WaterSprout_CoolTime);
+
+        iceBullet_SpawnCount = Mathf.Clamp(iceBullet_SpawnCount, 1, 5);
+        iceBulletTelegraphTime = Mathf.Max(0f, iceBulletTelegraphTime);
+        iceBullet_CoolTime = Mathf.Max(0, iceBullet_CoolTime);
+
+        normalEyeOpenTime = Mathf.Max(0.1f, normalEyeOpenTime);
+        stormSpawnDelay = Mathf.Max(0f, stormSpawnDelay);
+        stormPatternDuration = Mathf.Max(0.1f, stormPatternDuration);
+        stormCoolTime = Mathf.Max(0f, stormCoolTime);
+
+        electricBallSpawnDelay = Mathf.Max(0f, electricBallSpawnDelay);
+        electricEyeOpenDuration = Mathf.Max(0f, electricEyeOpenDuration);
+        electricBallPatternDuration = Mathf.Max(0.1f, electricBallPatternDuration);
+        electricBallCoolTime = Mathf.Max(0f, electricBallCoolTime);
+
+        encroachmentTelegraphDuration = Mathf.Max(0f, encroachmentTelegraphDuration);
+        encroachmentSealCheckSize.x = Mathf.Max(0.1f, encroachmentSealCheckSize.x);
+        encroachmentSealCheckSize.y = Mathf.Max(0.1f, encroachmentSealCheckSize.y);
+    }
+
+    private void OnDestroy()
+    {
+        CleanupEncroachmentWarning();
     }
 }
 

@@ -2,8 +2,16 @@ using UnityEngine;
 using System.Collections;
 
 
-public class Water_Sprout: MonoBehaviour
+public class Water_Sprout : MonoBehaviour
 {
+    private enum SproutState
+    {
+        Waiting,
+        Growing,
+        Active,
+        Ending
+    }
+
     [Header("딜레이")]
     [SerializeField] private float lifeTime = 2f;
     [SerializeField] private float startDelay = 0.4f;
@@ -23,6 +31,7 @@ public class Water_Sprout: MonoBehaviour
     [SerializeField] private float pathLength = 15f;
     [SerializeField] private float pathWidth = 0.2f; // SetTargetWidth로 덮어씀
     [SerializeField] private float pathFadeDuration = 0.4f;
+    [SerializeField] private int minimumSortingOrder = 10;
     private const float spriteNativeHeight = 5.6f; // waterspout_2 스프라이트 실제 높이(유닛), 피벗은 좌하단
 
 
@@ -32,34 +41,41 @@ public class Water_Sprout: MonoBehaviour
     private float targetPosX;    // SetTargetLength에서 계산된 최종 localPosition.x 캐싱
 
 
-    private Vector2 direction;
-    private float delayElapsed = 0f;
-    private bool hasHit;
-    private bool isGrowing = false;
-    private float growTimer = 0f;
-    private Animator Watersprout_Anmimation;
+    private float delayElapsed;
+    private float growTimer;
+    private Animator watersproutAnimator;
+    private SproutState state = SproutState.Ending;
     [SerializeField] private Transform Watersprout_render;
 
 
     private void Awake()
     {
+        if (pathCollider == null)
+            pathCollider = GetComponent<BoxCollider2D>();
+
         if (pathCollider != null)
             baseOffsetY = pathCollider.offset.y; // 원래 위치(높이) 저장
-        Watersprout_Anmimation = GetComponentInChildren<Animator>();
-        Watersprout_Anmimation.SetBool("On", false);
+
+        watersproutAnimator = GetComponentInChildren<Animator>();
+        if (watersproutAnimator != null)
+            watersproutAnimator.SetBool("On", false);
+
+        ApplySortingOrder();
     }
 
     private void Update()
     {
         if (PauseManager.IsPaused) return;
 
-        if (!isGrowing)
+        if (state == SproutState.Waiting)
         {
             delayElapsed += Time.deltaTime;
 
             if (Watersprout_render != null)
             {
-                float growT = Mathf.Clamp01(delayElapsed / startDelay);
+                float growT = startDelay <= 0f
+                    ? 1f
+                    : Mathf.Clamp01(delayElapsed / startDelay);
                 float scaleT = growCurve.Evaluate(growT);
                 Watersprout_render.localScale = new Vector3(pathWidth, targetScaleY * scaleT, 1f);
                 Watersprout_render.localPosition = new Vector3(targetPosX * scaleT, 0f, 0f);
@@ -67,38 +83,48 @@ public class Water_Sprout: MonoBehaviour
 
             if (delayElapsed >= startDelay)
             {
-                isGrowing = true;
-                Watersprout_Anmimation.SetBool("On", true);
+                state = SproutState.Growing;
+                growTimer = 0f;
+                if (watersproutAnimator != null)
+                    watersproutAnimator.SetBool("On", true);
             }
         }
-        if (isGrowing)
+
+        if (state == SproutState.Growing)
         {
             growTimer += Time.deltaTime;
-            float t = Mathf.Clamp01(growTimer / growDuration);
+            float t = growDuration <= 0f
+                ? 1f
+                : Mathf.Clamp01(growTimer / growDuration);
 
             float growingX = Mathf.Lerp(0f, targetSize.x, t);
 
-            pathCollider.size = new Vector2(growingX, targetSize.y);
-            pathCollider.offset = new Vector2(growingX * 0.5f, baseOffsetY);
+            if (pathCollider != null)
+            {
+                pathCollider.size = new Vector2(growingX, targetSize.y);
+                pathCollider.offset = new Vector2(growingX * 0.5f, baseOffsetY);
+            }
 
             if (t >= 1f)
-            {
-                isGrowing = false;
-            }
+                state = SproutState.Active;
         }
     }
 
     public void Launch(Vector2 dir)
     {
         // 재사용(풀링) 대비: 이전 상태 초기화
-        StopAllCoroutines();  
-        hasHit = false;
-        isGrowing = false;
+        StopAllCoroutines();
+        state = SproutState.Waiting;
         delayElapsed = 0f;
         growTimer = 0f;
 
-        direction = dir.normalized;
-        transform.right = direction;
+        Vector2 launchDirection = dir.sqrMagnitude > 0f ? dir.normalized : Vector2.up;
+        transform.right = launchDirection;
+
+        if (pathCollider != null)
+            pathCollider.enabled = true;
+        if (watersproutAnimator != null)
+            watersproutAnimator.SetBool("On", false);
 
         StartCoroutine(LifeTimeRoutine());
         ShowPathPreview();
@@ -106,18 +132,23 @@ public class Water_Sprout: MonoBehaviour
 
     private IEnumerator LifeTimeRoutine()
     {
-        yield return new WaitForSeconds(lifeTime);
-        
-        Watersprout_Anmimation.SetBool("On", false);
+        yield return new WaitForSeconds(Mathf.Max(0f, lifeTime));
+
+        state = SproutState.Ending;
+        if (watersproutAnimator != null)
+            watersproutAnimator.SetBool("On", false);
         
         if (pathCollider != null)
             pathCollider.enabled = false;
         
         yield return null;
-        
-        float exitAnimLength = Watersprout_Anmimation.GetCurrentAnimatorStateInfo(0).length;
-        
-        yield return new WaitForSeconds(exitAnimLength);
+
+        float exitAnimLength = watersproutAnimator != null
+            ? watersproutAnimator.GetCurrentAnimatorStateInfo(0).length
+            : 0f;
+
+        if (exitAnimLength > 0f)
+            yield return new WaitForSeconds(exitAnimLength);
         
         Destroy(gameObject);
     }
@@ -134,15 +165,18 @@ public class Water_Sprout: MonoBehaviour
 
     private void TryDamage(Collider2D other)
     {
-        if (other.TryGetComponent(out PlayerKnockBack playerKnockback))
+        if (hitMask.value != 0 && (hitMask.value & (1 << other.gameObject.layer)) == 0)
+            return;
+
+        PlayerKnockBack playerKnockback = other.GetComponentInParent<PlayerKnockBack>();
+        if (playerKnockback != null)
         {
-            playerKnockback.TakeHit(this.transform.position, 0f, (int)damage);
+            playerKnockback.TakeHit(transform.position, 0f, Mathf.RoundToInt(damage));
         }
     }
 
     private void ShowPathPreview()
     {
-        Debug.Log("ShowPathPreview 호출됨. pathSprite null? " + (pathSprite == null));
         if (pathSprite == null) return;
         pathSprite.gameObject.SetActive(true);
 
@@ -173,18 +207,24 @@ public class Water_Sprout: MonoBehaviour
 
     private IEnumerator FadePathSprite()
     {
+        if (pathSprite == null)
+            yield break;
+
         float t = 0f;
         Color start = pathSprite.color;
-        while (t < pathFadeDuration)
+        float duration = Mathf.Max(pathFadeDuration, 0.0001f);
+        while (t < duration)
         {
             t += Time.deltaTime;
-            float alpha = Mathf.Lerp(start.a, 0f, t / pathFadeDuration);
+            float alpha = Mathf.Lerp(start.a, 0f, t / duration);
             Color c = pathSprite.color;
             c.a = alpha;
             pathSprite.color = c;
             yield return null;
         }
-        pathSprite.gameObject.SetActive(false);
+
+        if (pathSprite != null)
+            pathSprite.gameObject.SetActive(false);
     }
 
     // dir이 Vector2.up일 때 transform.right = direction으로 인해
@@ -192,20 +232,44 @@ public class Water_Sprout: MonoBehaviour
     // 그래서 "가로로 꽉 채우기"는 targetSize.y / pathWidth 쪽에 반영해야 합니다.
     public void SetTargetWidth(float width)
     {
-        Debug.Log($"SetTargetWidth 호출됨. 전달받은 width = {width}");
-        targetSize.y = width;
-        pathWidth = width;
+        pathWidth = Mathf.Max(0.01f, width);
+        targetSize.y = pathWidth;
     }
 
     public void SetTargetLength(float length)
     {
-        Debug.Log($"SetTargetLength 호출됨. 전달받은 width = {length}");
-        targetSize.x = length;
-        pathLength = length;
-        targetScaleY = length / spriteNativeHeight * 0.7f;
-        targetPosX = length / spriteNativeHeight * 3.5f * 0.7f;
-        Watersprout_render.localScale = new Vector3(pathWidth, length / spriteNativeHeight * 0.7f, 1f);
-        Watersprout_render.localPosition = new Vector3((length / spriteNativeHeight * 3.5f * 0.7f), 0, 0);
+        pathLength = Mathf.Max(0.01f, length);
+        targetSize.x = pathLength;
+        targetScaleY = pathLength / spriteNativeHeight * 0.7f;
+        targetPosX = pathLength / spriteNativeHeight * 3.5f * 0.7f;
+
+        if (Watersprout_render != null)
+        {
+            Watersprout_render.localScale = new Vector3(pathWidth, targetScaleY, 1f);
+            Watersprout_render.localPosition = new Vector3(targetPosX, 0f, 0f);
+        }
+    }
+
+    private void ApplySortingOrder()
+    {
+        if (Watersprout_render != null)
+        {
+            foreach (SpriteRenderer renderer in Watersprout_render.GetComponentsInChildren<SpriteRenderer>(true))
+                renderer.sortingOrder = Mathf.Max(renderer.sortingOrder, minimumSortingOrder);
+        }
+
+        if (pathSprite != null)
+            pathSprite.sortingOrder = Mathf.Max(pathSprite.sortingOrder, minimumSortingOrder + 1);
+    }
+
+    private void OnValidate()
+    {
+        lifeTime = Mathf.Max(0f, lifeTime);
+        startDelay = Mathf.Max(0f, startDelay);
+        growDuration = Mathf.Max(0f, growDuration);
+        pathFadeDuration = Mathf.Max(0f, pathFadeDuration);
+        pathWidth = Mathf.Max(0.01f, pathWidth);
+        pathLength = Mathf.Max(0.01f, pathLength);
     }
 
     private void OnDrawGizmos()

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using Unity.Burst.Intrinsics;
 using Unity.VisualScripting;
@@ -43,7 +44,9 @@ public class Playermovement : MonoBehaviour
     public float jumpCutMultiplier = 0.5f;
 
     [Header("미끄러운 바닥")]
-    public float slipperyAcceleration = 10f;
+    [SerializeField] private float slipperyStartAcceleration = 20f;
+    [SerializeField] private float slipperyStopDeceleration = 28f;
+    [SerializeField] private float slipperyTurnAcceleration = 36f;
     private bool isOnSlippery = false;
 
     [Header("Water Swim Settings")]
@@ -53,6 +56,8 @@ public class Playermovement : MonoBehaviour
     [SerializeField] private float waterFastDescendSpeed = 8f;
     [SerializeField] private KeyCode waterDescendKey = KeyCode.DownArrow;
     [SerializeField] private float waterGravityMultiplier = 0.3f;
+    private bool legacyWaterState;
+    private readonly HashSet<int> activeWaterSources = new HashSet<int>();
 
     private BoxCollider2D col;
     private Vector2 velocity;
@@ -99,6 +104,7 @@ public class Playermovement : MonoBehaviour
         skills = GetComponent<Skills>();
         if (animator == null) animator = GetComponent<Animator>();
         if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
+        legacyWaterState = isInWater;
     }
 
     void Update()
@@ -115,7 +121,8 @@ public class Playermovement : MonoBehaviour
             facingDirection = horizontalInput > 0 ? 1f : -1f;
             if (isDashing)
             {
-                dashEffectController.Change_direction(facingDirection);
+                if (dashEffectController != null)
+                    dashEffectController.Change_direction(facingDirection);
             }
         }
 
@@ -143,9 +150,19 @@ public class Playermovement : MonoBehaviour
             {
                 float targetVelocityX = isLunging ? 0f : horizontalInput * moveSpeed;
 
-                velocity.x = isOnSlippery
-                    ? Mathf.MoveTowards(velocity.x, targetVelocityX, slipperyAcceleration * Time.deltaTime)
-                    : targetVelocityX;
+                if (isOnSlippery)
+                {
+                    float response = GetSlipperyResponse(targetVelocityX);
+                    velocity.x = Mathf.MoveTowards(
+                        velocity.x,
+                        targetVelocityX,
+                        response * Time.deltaTime
+                    );
+                }
+                else
+                {
+                    velocity.x = targetVelocityX;
+                }
             }
             if (isInWater)
             {
@@ -376,6 +393,19 @@ public class Playermovement : MonoBehaviour
                (target.CompareTag("ChangeablePlatform") || target.CompareTag("Slippery"));
     }
 
+    private float GetSlipperyResponse(float targetVelocityX)
+    {
+        if (Mathf.Abs(targetVelocityX) < 0.01f)
+            return slipperyStopDeceleration;
+
+        bool isTurning = Mathf.Abs(velocity.x) > 0.01f &&
+                         Mathf.Sign(velocity.x) != Mathf.Sign(targetVelocityX);
+
+        return isTurning
+            ? slipperyTurnAcceleration
+            : slipperyStartAcceleration;
+    }
+
     private void UpdateRaycastOrigins()
     {
         Bounds bounds = col.bounds;
@@ -431,17 +461,43 @@ public class Playermovement : MonoBehaviour
 
     public void SetInWater(bool value)
     {
-        isInWater = value;
-        if (value)
-        {
-            velocity.y = 0f;
-            
-            if (animator != null)
-            {
-                animator.SetBool("IsGround", false);
-            }
+        legacyWaterState = value;
+        RefreshWaterState();
+    }
 
-        }// 물 진입 시 기존 속도 초기화 (자연스러운 진입감)
+    public void SetInWater(Object source, bool value)
+    {
+        if (ReferenceEquals(source, null))
+        {
+            SetInWater(value);
+            return;
+        }
+
+        int sourceId = source.GetInstanceID();
+        if (value)
+            activeWaterSources.Add(sourceId);
+        else
+            activeWaterSources.Remove(sourceId);
+
+        RefreshWaterState();
+    }
+
+    private void RefreshWaterState()
+    {
+        bool nextState = legacyWaterState || activeWaterSources.Count > 0;
+        if (isInWater == nextState)
+            return;
+
+        isInWater = nextState;
+        if (!isInWater)
+            return;
+
+        velocity.y = 0f;
+
+        if (animator != null)
+            animator.SetBool("IsGround", false);
+
+        // 물 진입 시 기존 수직 속도를 한 번만 초기화한다.
     }
 
     private void HandleWaterMovement()
@@ -507,6 +563,14 @@ public class Playermovement : MonoBehaviour
         horizontalRayCount = Mathf.Max(2, horizontalRayCount);
         verticalRayCount = Mathf.Max(2, verticalRayCount);
         skinWidth = Mathf.Max(0.001f, skinWidth);
+        slipperyStartAcceleration = Mathf.Max(0f, slipperyStartAcceleration);
+        slipperyStopDeceleration = Mathf.Max(0f, slipperyStopDeceleration);
+        slipperyTurnAcceleration = Mathf.Max(0f, slipperyTurnAcceleration);
+        moveSpeed = Mathf.Max(0.01f, moveSpeed);
+        waterFlapForce = Mathf.Max(0f, waterFlapForce);
+        waterMaxFallSpeed = Mathf.Max(0f, waterMaxFallSpeed);
+        waterFastDescendSpeed = Mathf.Max(0f, waterFastDescendSpeed);
+        waterGravityMultiplier = Mathf.Max(0f, waterGravityMultiplier);
     }
 
     public bool IsDashing() => isDashing;

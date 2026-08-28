@@ -24,7 +24,6 @@ public class Storm : MonoBehaviour
 
     [Header("피해 설정")]
     [SerializeField] private int damage;
-    [SerializeField] private float KnockBack = 20f;
     [SerializeField] private float damageInterval = 1f;
     
     [Header("참조")]
@@ -69,12 +68,26 @@ public class Storm : MonoBehaviour
     {
         if (PauseManager.IsPaused) return;
 
-        if (!isAlive || player == null)
+        if (!isAlive)
             return;
+
+        if (player == null)
+            FindPlayer();
+
+        if (player == null)
+            return;
+
         player.ApplyGravityPull(
                 transform.position,
                 pullPower
             );
+    }
+
+    private void FindPlayer()
+    {
+        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+        if (playerObject != null)
+            player = playerObject.GetComponent<Playermovement>();
     }
 
     private IEnumerator SpawnStorm()
@@ -233,17 +246,14 @@ public class Storm : MonoBehaviour
         if (!isAlive)
             return;
 
-        if (!other.CompareTag("Player"))
-            return;
-
         if (Time.time < nextDamageTime)
             return;
 
-        nextDamageTime = Time.time + damageInterval;
-        PlayerKnockBack damageReceiver = other.GetComponent<PlayerKnockBack>();
+        PlayerKnockBack damageReceiver = other.GetComponentInParent<PlayerKnockBack>();
 
         if (damageReceiver != null)
         {
+            nextDamageTime = Time.time + damageInterval;
             damageReceiver.TakeHit(transform.position, 0f, damage);
         }
     }
@@ -273,5 +283,16 @@ public class Storm : MonoBehaviour
         {
             Destroy(warningInstance);
         }
+    }
+
+    private void OnValidate()
+    {
+        pullPower = Mathf.Max(0f, pullPower);
+        lifeTime = Mathf.Max(0f, lifeTime);
+        delay = Mathf.Max(0f, delay);
+        targetScale = Mathf.Max(0.01f, targetScale);
+        growDuration = Mathf.Max(0f, growDuration);
+        damage = Mathf.Max(0, damage);
+        damageInterval = Mathf.Max(0.05f, damageInterval);
     }
 }

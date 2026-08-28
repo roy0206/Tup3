@@ -17,7 +17,12 @@ public class WaterBossAbsorption : InteractionBase
 
         Skills skills = FindFirstObjectByType<Skills>();
         if (skills != null)
-            skills.OptainSkill(recoverySkillIndex);
+        {
+            if (recoverySkillIndex >= 0 && recoverySkillIndex < skills.IsSkillEquiped.Count)
+                skills.OptainSkill(recoverySkillIndex);
+            else
+                Debug.LogError($"WaterBossAbsorption: 회복 스킬 인덱스 {recoverySkillIndex}가 유효하지 않습니다.", this);
+        }
 
         if (UserDataManager.Instance != null)
         {
@@ -29,7 +34,7 @@ public class WaterBossAbsorption : InteractionBase
             {
                 data.Play.skills[recoverySkillIndex] = true;
                 data.Play.clearedBosses |= BossFlag.Water;
-                UserDataManager.Instance.SaveAsync();
+                _ = UserDataManager.Instance.SaveAsync();
             }
         }
 
