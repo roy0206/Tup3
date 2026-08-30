@@ -299,7 +299,6 @@ MonoBehaviour:
   introDelay: 0.5
   victoryDelay: 2
   defeatDelay: 1.5
-  saengWillCoinReward: 5
   geukWillCoinCost: 1
   defeatCutscene: {fileID: 0}
   defeatCutsceneTimeout: 20
@@ -527,7 +526,9 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 7680443984615359650, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
+    - {fileID: 9152751980912906243, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
