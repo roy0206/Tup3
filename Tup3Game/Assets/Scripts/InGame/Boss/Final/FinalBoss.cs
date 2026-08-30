@@ -102,6 +102,7 @@ public class FinalBoss : BossBase
     [SerializeField] private float fireRushBodyRadius = 0.5f;
     [SerializeField] private float fireRushMaxDistance = 40f;
     [SerializeField] private float fireRushWallMargin = 1f;
+    [SerializeField] private LayerMask wallDepenetrationMask = 1 << 10;
     [SerializeField] private float fireRushDamage = 20f;
     [SerializeField] private float fireRushKnockBackForce = 1f;
     [SerializeField] private float fireRushHitWidth = 1.5f;
@@ -422,7 +423,35 @@ public class FinalBoss : BossBase
         movedThisFrame = false;
         behaviorTree.Tick();
         ApplyGravity();
+        ResolveWallPenetration();
         UpdateAnimatorMotion();
+    }
+
+    // 매 프레임, 몸통 콜라이더가 벽(layer 10)과 겹쳐 있으면 수평으로 밀어낸다.
+    // 이동이 전부 transform 기반(Move 의 Translate / 돌진 DOMoveX)이라 물리가 벽 침투를 막아 주지
+    // 않으므로, 원인이 무엇이든 "벽에 박힌 채 굳는" 최종 상태를 여기서 항상 해소한다.
+    private void ResolveWallPenetration()
+    {
+        if (IsDead) return;
+
+        Collider2D body = boxColliders.Count > 0 ? boxColliders[0] : GetComponent<BoxCollider2D>();
+        if (body == null || !body.enabled) return;
+
+        Bounds b = body.bounds;
+        foreach (Collider2D col in Physics2D.OverlapBoxAll(b.center, b.size, 0f, wallDepenetrationMask))
+        {
+            if (col == null || col.isTrigger) continue;
+            if (col.transform.IsChildOf(transform)) continue;
+
+            // col.Distance(body) 방향이어야 normal*distance 가 "몸을 벽 밖으로" 미는 벡터가 된다.
+            ColliderDistance2D d = col.Distance(body);
+            if (!d.isOverlapped) continue;
+
+            // 수평 성분만 민다 — 수직은 ApplyGravity 가 담당하고, 코너에서 위로 튀는 것을 막는다.
+            float pushX = d.normal.x * d.distance;
+            if (Mathf.Approximately(pushX, 0f)) continue;
+            transform.Translate(new Vector3(pushX, 0f, 0f), Space.World);
+        }
     }
 
     private void UpdateAnimatorMotion()
@@ -2509,6 +2538,13 @@ public class FinalBoss : BossBase
  *   fireRushWallMargin   : 벽에서 이만큼 앞에 멈춘다 (기본 1 — 2026-08-31 0.1 에서 상향.
  *                          콜라이더(1.75폭)보다 넓은 스프라이트가 벽에 시각적으로 파묻히는 것까지
  *                          감안한 값. Styx 벽 안쪽 면 ±8.06 기준 보스 중심은 최대 ±6.2 근처에서 멈춘다)
+ *
+ * 벽 끼임 2차 조치 (2026-08-31, 조사 에이전트 결과 반영) :
+ *   ① ResolveWallPenetration — 매 프레임 몸통과 벽(wallDepenetrationMask, 기본 layer 10)의 겹침을
+ *      ColliderDistance2D 로 검사해 수평으로 밀어낸다. 이동이 전부 transform 기반이라 물리가
+ *      침투를 막아 주지 않으므로, 어떤 경로로 박혔든 최종 상태를 여기서 해소한다.
+ *      (col.Distance(body) 방향이어야 normal*distance 가 몸을 밖으로 미는 벡터다 — 반대로 하면 더 파고든다.)
+ *   (스프라이트 폭 기준 정지도 시도했으나 의미 없어 되돌림 — 2026-08-31 유저 확인)
  *
  * 벽에 끼던 문제 (2026-08-31 유저 보고) : 캐스트 반지름(fireRushBodyRadius 0.5)이 실제 몸통
  * 반폭(콜라이더 0.875 × 스케일 2 ≒ 0.9)보다 작아 몸이 벽에 파묻힌 채 멈췄다. 이제 반지름을
