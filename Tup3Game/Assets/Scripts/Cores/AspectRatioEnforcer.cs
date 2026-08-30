@@ -95,9 +95,31 @@ public class AspectRatioEnforcer : Singleton<AspectRatioEnforcer>
         keepOverlayIds.Remove(canvas.GetInstanceID());
     }
 
+    private Camera ResolveUiCamera()
+    {
+        Camera main = Camera.main;
+        if (main != null && main != letterboxCamera) return main;
+
+        Camera best = null;
+        foreach (var cam in Camera.allCameras)
+        {
+            if (cam == null || cam == letterboxCamera) continue;
+            if (best == null || cam.depth > best.depth) best = cam;
+        }
+
+        if (best != null)
+        {
+            Debug.LogWarning(
+                $"[AspectRatioEnforcer] MainCamera 태그가 붙은 카메라가 없어 '{best.name}' 을(를) UI 카메라로 씁니다. " +
+                "씬의 카메라에 MainCamera 태그를 달아 주세요.", best);
+        }
+
+        return best;
+    }
+
     private void ConvertOverlayCanvases()
     {
-        var cam = Camera.main;
+        var cam = ResolveUiCamera();
         if (cam == null) return;
 
         foreach (var canvas in FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None))
@@ -160,4 +182,12 @@ public class AspectRatioEnforcer : Singleton<AspectRatioEnforcer>
  *   대가: 그 캔버스는 16:9 레터박스 밖(검은 띠)까지 그릴 수 있다. 자막은 화면 중앙·하단
  *   안전 영역에 있어 실질적인 문제가 없다고 판단했다. 넓은 UI 에는 쓰지 말 것.
  * - 대상 비율을 바꾸려면 TargetAspect 상수를 수정.
- */
+  *
+ * ── Camera.main 이 null 이면 UI 가 통째로 Overlay 로 남던 문제 (2026-08-29) ──
+ * ConvertOverlayCanvases 는 Camera.main 이 없으면 맨 위에서 return 했다. Boss_Fire/Boss_Gold/
+ * Boss_Soil/Lobby 씬의 카메라가 Untagged 라 그 네 씬에서는 변환이 한 번도 일어나지 않았고,
+ * 대사 UI 를 포함한 모든 캔버스가 Overlay 로 남아 화면비가 16:9 가 아니면 레터박스를 무시하고
+ * 늘어났다. 씬의 카메라에 MainCamera 태그를 붙여 근본 원인을 고쳤고,
+ * ResolveUiCamera 로 안전망을 뒀다 — 태그가 다시 빠지면 레터박스 카메라를 제외한 카메라 중
+ * depth 가 가장 높은 것을 쓰고 경고를 남긴다. 조용히 아무 일도 안 하는 것보다 낫다.
+*/

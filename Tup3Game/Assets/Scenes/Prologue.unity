@@ -1494,7 +1494,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "ESC / SPACE \u2014 \uC2A4\uD0B5"
+  m_text: "V \uB97C 2\uCD08 \uAE38\uAC8C \uB204\uB974\uAE30 \u2014 \uC2A4\uD0B5"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 79e969622f3adc84fb392ab60d9732d5, type: 2}
   m_sharedMaterial: {fileID: 7624298119989804378, guid: 79e969622f3adc84fb392ab60d9732d5, type: 2}
@@ -1866,7 +1866,7 @@ MonoBehaviour:
   playerRadiusEnd: 9
   monologueLineCount: 36
   nextSceneName: Lobby
-  skipKeys: 1b000000200000000d000000
+  skipGaugeSprite: {fileID: 21300000, guid: ae9cb6d2771b03e44a927677b2ef87cc, type: 3}
 --- !u!4 &1840025907
 Transform:
   m_ObjectHideFlags: 0

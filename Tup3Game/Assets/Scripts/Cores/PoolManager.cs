@@ -80,6 +80,11 @@ public class PoolManager : Singleton<PoolManager>, ISceneEventListener
         return component;
     }
     
+    public bool IsPooled(GameObject instance)
+    {
+        return instance != null && _owner.ContainsKey(instance);
+    }
+
     public void Release(GameObject instance)
     {
         if (instance == null) return;
