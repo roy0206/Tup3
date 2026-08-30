@@ -297,6 +297,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - Sound
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bc59c2c25b39e364495721970d7c978e
+    m_Address: Assets/AddressableAssets/Sounds/SFX/Player_Land.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Sound
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: bc8826d1f29c5a943940208611d6464f
     m_Address: Fire_RushHit2
     m_ReadOnly: 0
@@ -317,12 +323,6 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d1c0a97ddcbb13b409db4f3d9a0c8d62
     m_Address: Water_Rising
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Sound
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: dc22b18ad11eafc42afec48f99781730
-    m_Address: Player_Land
     m_ReadOnly: 0
     m_SerializedLabels:
     - Sound
