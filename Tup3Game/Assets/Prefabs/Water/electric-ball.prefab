@@ -129,12 +129,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6674f50ee9198c744a2d4f310c22db9f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Electric_ball
-  moveSpeed: 6
+  moveSpeed: 10
   lifeTime: 8
-  chargeDuration: 0.8
+  chargeDuration: 0.6
   startScale: 0.1
-  finalScale: 1
+  finalScale: 1.5
   damage: 10
+  skillVolume: 0.8
+  skillMinInterval: 0.12
 --- !u!58 &8274261118166123513
 CircleCollider2D:
   m_ObjectHideFlags: 0
