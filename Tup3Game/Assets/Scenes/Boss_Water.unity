@@ -629,7 +629,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FreezablePlatform
   freezeDuration: 3
-  frozenColor: {r: 0, g: 0, b: 1, a: 1}
+  frozenColor: {r: 0, g: 0.45882353, b: 1, a: 1}
 --- !u!1 &559845533
 GameObject:
   m_ObjectHideFlags: 0
@@ -1058,7 +1058,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FreezablePlatform
   freezeDuration: 3
-  frozenColor: {r: 0, g: 0, b: 1, a: 1}
+  frozenColor: {r: 0, g: 0.45882353, b: 1, a: 1}
 --- !u!1 &636207157
 GameObject:
   m_ObjectHideFlags: 0
@@ -1479,7 +1479,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FreezablePlatform
   freezeDuration: 3
-  frozenColor: {r: 0, g: 0, b: 1, a: 1}
+  frozenColor: {r: 0, g: 0.45882353, b: 1, a: 1}
 --- !u!1 &841782012
 GameObject:
   m_ObjectHideFlags: 0
@@ -1969,7 +1969,7 @@ Transform:
   m_GameObject: {fileID: 976582237}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4.66, y: -3.26, z: 0}
+  m_LocalPosition: {x: 4.66, y: -4.03, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2079,7 +2079,7 @@ Transform:
   m_GameObject: {fileID: 1057779393}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -10.2912, y: -3.6107302, z: 0}
+  m_LocalPosition: {x: -11.5, y: -3.6107302, z: 0}
   m_LocalScale: {x: 2.25, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2119,7 +2119,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.37630916, y: 0.21725065}
+  m_Offset: {x: 0.3763092, y: 0.21725065}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -2182,7 +2182,7 @@ SpriteRenderer:
   m_MaskInteraction: 0
   m_Sprite: {fileID: 4551283920298981390, guid: 2e0e035994355f6498cb6a5dc31b07b0, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_FlipX: 0
+  m_FlipX: 1
   m_FlipY: 0
   m_DrawMode: 0
   m_Size: {x: 1, y: 1}
@@ -2203,7 +2203,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FreezablePlatform
   freezeDuration: 3
-  frozenColor: {r: 0, g: 0, b: 1, a: 1}
+  frozenColor: {r: 0, g: 0.45882353, b: 1, a: 1}
 --- !u!1 &1146329988
 GameObject:
   m_ObjectHideFlags: 0
@@ -2333,7 +2333,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Water
   boxColliders: []
-  maxHp: 200
+  maxHp: 160
   enableHitFlash: 1
   hitFlashColor: {r: 1, g: 1, b: 1, a: 1}
   hitFlashDuration: 0.12
@@ -2357,7 +2357,7 @@ MonoBehaviour:
   - 1.2
   - 1.2
   - 1.75
-  - 1.2
+  - 2.5
   eyeSpawnPoints:
   - {fileID: 2092540026}
   - {fileID: 1654437364}
@@ -2917,7 +2917,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FreezablePlatform
   freezeDuration: 3
-  frozenColor: {r: 0, g: 0, b: 1, a: 1}
+  frozenColor: {r: 0, g: 0.45882353, b: 1, a: 1}
 --- !u!1 &1654437363
 GameObject:
   m_ObjectHideFlags: 0
@@ -3101,7 +3101,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FreezablePlatform
   freezeDuration: 3
-  frozenColor: {r: 0, g: 0, b: 1, a: 1}
+  frozenColor: {r: 0, g: 0.45882353, b: 1, a: 1}
 --- !u!1 &1790726243
 GameObject:
   m_ObjectHideFlags: 0
@@ -3342,7 +3342,7 @@ Transform:
   m_GameObject: {fileID: 1940936974}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 7.7088003, y: -3.6107302, z: 0}
+  m_LocalPosition: {x: 8.5, y: -3.6107302, z: 0}
   m_LocalScale: {x: 2.25, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3382,7 +3382,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.3576597, y: 0.21656466}
+  m_Offset: {x: -0.3576597, y: 0.21656466}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -3445,7 +3445,7 @@ SpriteRenderer:
   m_MaskInteraction: 0
   m_Sprite: {fileID: 4551283920298981390, guid: 2e0e035994355f6498cb6a5dc31b07b0, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_FlipX: 1
+  m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
   m_Size: {x: 1, y: 1}
@@ -3466,7 +3466,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FreezablePlatform
   freezeDuration: 3
-  frozenColor: {r: 0, g: 0, b: 1, a: 1}
+  frozenColor: {r: 0, g: 0.45882353, b: 1, a: 1}
 --- !u!1 &2002017498
 GameObject:
   m_ObjectHideFlags: 0
@@ -3910,7 +3910,7 @@ PrefabInstance:
       objectReference: {fileID: 2044486295}
     - target: {fileID: 5130523561765730001, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
       propertyPath: waterFlapForce
-      value: 4
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5130523561765730001, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
       propertyPath: waterSinkSpeed
