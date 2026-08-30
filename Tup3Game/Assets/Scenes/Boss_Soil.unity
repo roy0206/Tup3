@@ -207,7 +207,6 @@ MonoBehaviour:
   introDelay: 0.5
   victoryDelay: 2
   defeatDelay: 1.5
-  saengWillCoinReward: 5
   geukWillCoinCost: 1
   defeatCutscene: {fileID: 0}
   defeatCutsceneTimeout: 20
@@ -248,6 +247,8 @@ MonoBehaviour:
   autoAdvanceDelay: 1.6
   dialogueRoot: {fileID: 425556855}
   charDelay: 0.04
+  speakerColorOverrides: []
+  lightPanelColor: {r: 0.96, g: 0.96, b: 0.96, a: 0.9}
   selectVolume: 0.8
 --- !u!1 &307287601
 GameObject:
@@ -617,11 +618,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8660705831248484078, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -4.18056
+      value: 6.3
       objectReference: {fileID: 0}
     - target: {fileID: 8660705831248484078, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 4.45313
+      value: -1.52
       objectReference: {fileID: 0}
     - target: {fileID: 8660705831248484078, guid: 73bd9c259ecfbb441aea76f4a8642488, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2544,6 +2545,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2224125408933805939, guid: c657d678756c46843851e723059b0e57, type: 3}
+      propertyPath: m_Size.x
+      value: 3.8928576
+      objectReference: {fileID: 0}
+    - target: {fileID: 2224125408933805939, guid: c657d678756c46843851e723059b0e57, type: 3}
+      propertyPath: m_Size.y
+      value: 4.8985567
+      objectReference: {fileID: 0}
+    - target: {fileID: 2224125408933805939, guid: c657d678756c46843851e723059b0e57, type: 3}
+      propertyPath: m_Offset.x
+      value: 0.88642883
+      objectReference: {fileID: 0}
+    - target: {fileID: 2224125408933805939, guid: c657d678756c46843851e723059b0e57, type: 3}
+      propertyPath: m_Offset.y
+      value: 0.8392787
+      objectReference: {fileID: 0}
     - target: {fileID: 3084238539775324272, guid: c657d678756c46843851e723059b0e57, type: 3}
       propertyPath: m_LocalPosition.x
       value: 4.75
@@ -2606,19 +2623,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4478469698651995214, guid: c657d678756c46843851e723059b0e57, type: 3}
       propertyPath: m_Size.x
-      value: 3
+      value: 5.0180407
       objectReference: {fileID: 0}
     - target: {fileID: 4478469698651995214, guid: c657d678756c46843851e723059b0e57, type: 3}
       propertyPath: m_Size.y
-      value: 3
+      value: 5.112342
       objectReference: {fileID: 0}
     - target: {fileID: 4478469698651995214, guid: c657d678756c46843851e723059b0e57, type: 3}
       propertyPath: m_Offset.x
-      value: 0
+      value: 1.0090203
       objectReference: {fileID: 0}
     - target: {fileID: 4478469698651995214, guid: c657d678756c46843851e723059b0e57, type: 3}
       propertyPath: m_Offset.y
-      value: -1
+      value: 0.05617094
       objectReference: {fileID: 0}
     - target: {fileID: 4478469698651995214, guid: c657d678756c46843851e723059b0e57, type: 3}
       propertyPath: m_SpriteTilingProperty.pivot.x
@@ -2657,12 +2674,20 @@ PrefabInstance:
       value: 0.41
       objectReference: {fileID: 0}
     - target: {fileID: 4939791737120185622, guid: c657d678756c46843851e723059b0e57, type: 3}
+      propertyPath: m_Size.x
+      value: 3.7539997
+      objectReference: {fileID: 0}
+    - target: {fileID: 4939791737120185622, guid: c657d678756c46843851e723059b0e57, type: 3}
+      propertyPath: m_Size.y
+      value: 4.3583436
+      objectReference: {fileID: 0}
+    - target: {fileID: 4939791737120185622, guid: c657d678756c46843851e723059b0e57, type: 3}
       propertyPath: m_Offset.x
-      value: 0
+      value: 0.87699986
       objectReference: {fileID: 0}
     - target: {fileID: 4939791737120185622, guid: c657d678756c46843851e723059b0e57, type: 3}
       propertyPath: m_Offset.y
-      value: 2
+      value: 2.1791718
       objectReference: {fileID: 0}
     - target: {fileID: 4939791737120185622, guid: c657d678756c46843851e723059b0e57, type: 3}
       propertyPath: m_SpriteTilingProperty.pivot.x
