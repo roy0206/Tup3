@@ -101,7 +101,7 @@ public class FinalBoss : BossBase
     [SerializeField] private LayerMask fireRushObstacleMask = (1 << 6) | (1 << 10);
     [SerializeField] private float fireRushBodyRadius = 0.5f;
     [SerializeField] private float fireRushMaxDistance = 40f;
-    [SerializeField] private float fireRushWallMargin = 0.1f;
+    [SerializeField] private float fireRushWallMargin = 1f;
     [SerializeField] private float fireRushDamage = 20f;
     [SerializeField] private float fireRushKnockBackForce = 1f;
     [SerializeField] private float fireRushHitWidth = 1.5f;
@@ -1158,7 +1158,14 @@ public class FinalBoss : BossBase
     {
         Vector2 start = transform.position;
         Vector2 direction = dir >= 0f ? Vector2.right : Vector2.left;
-        float radius = Mathf.Max(0.01f, fireRushBodyRadius);
+        // 캐스트 반지름이 실제 몸통 반폭보다 작으면 벽 안으로 파고들어 끼므로 콜라이더 크기로 보정한다.
+        // bounds 는 스케일(최종보스 2배)이 반영된 월드 크기라 프리팹/씬 스케일이 바뀌어도 유효하다.
+        float bodyHalfWidth = 0f;
+        Collider2D body = boxColliders.Count > 0 ? boxColliders[0] : GetComponent<BoxCollider2D>();
+        // 0.95 배 : 원이 발밑 바닥과 겹치면 (바닥·벽이 한 타일맵 콜라이더일 때) 겹침 히트(distance 0)로
+        // 필터링돼 벽을 못 보게 되므로, 바닥에 닿지 않을 만큼만 줄인다. 남는 침투분은 wallMargin 이 흡수한다.
+        if (body != null) bodyHalfWidth = body.bounds.extents.x * 0.95f;
+        float radius = Mathf.Max(0.01f, fireRushBodyRadius, bodyHalfWidth);
         float distance = Mathf.Max(0f, fireRushMaxDistance);
 
         RaycastHit2D[] hits = Physics2D.CircleCastAll(start, radius, direction, distance, fireRushObstacleMask);
@@ -2499,7 +2506,15 @@ public class FinalBoss : BossBase
  *   fireRushObstacleMask : 기본 ground(6) | wall(10) — 화보스 rushObstacleMask 와 같은 값
  *   fireRushBodyRadius   : 캐스트 반지름. 몸통이 벽에 파묻히지 않게 한다
  *   fireRushMaxDistance  : 아무것도 안 맞았을 때의 상한
- *   fireRushWallMargin   : 벽에서 이만큼 앞에 멈춘다
+ *   fireRushWallMargin   : 벽에서 이만큼 앞에 멈춘다 (기본 1 — 2026-08-31 0.1 에서 상향.
+ *                          콜라이더(1.75폭)보다 넓은 스프라이트가 벽에 시각적으로 파묻히는 것까지
+ *                          감안한 값. Styx 벽 안쪽 면 ±8.06 기준 보스 중심은 최대 ±6.2 근처에서 멈춘다)
+ *
+ * 벽에 끼던 문제 (2026-08-31 유저 보고) : 캐스트 반지름(fireRushBodyRadius 0.5)이 실제 몸통
+ * 반폭(콜라이더 0.875 × 스케일 2 ≒ 0.9)보다 작아 몸이 벽에 파묻힌 채 멈췄다. 이제 반지름을
+ * max(fireRushBodyRadius, 몸통 콜라이더 bounds.extents.x × 0.95) 로 잡아 몸 전체가 벽 앞에서
+ * 멈춘다. ×0.95 는 원이 발밑 바닥과 겹치는 것을 막기 위한 여유 — 바닥·벽이 한 타일맵
+ * 콜라이더면 시작부터 겹친 콜라이더는 겹침 히트(distance 0)로 필터링돼 벽 자체를 못 보게 된다.
  *
  * 자기 콜라이더 제외를 두 겹으로 막았다 — 보스 루트가 ground 레이어라 캐스트가 자기 몸을
  * 먼저 잡을 수 있다. transform.IsChildOf 로 걸러내고, 캐스트 시작점 안쪽 히트(distance <= 0.2)도

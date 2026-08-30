@@ -910,7 +910,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossExit
   interactionDistance: 2
-  interactionDuration: 0
+  interactionDuration: 1
   interactOnce: 1
   hideInteractionObjects: 1
   interactionText: 

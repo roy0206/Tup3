@@ -6,6 +6,7 @@ using DG.Tweening;
 public class FlyingSword : MonoBehaviour
 {
     [SerializeField] private float speed;
+    [SerializeField] private float aimLerpSpeed = 3f;
 
     [Header("쳐내기 / 반사")]
     [SerializeField] private float parryDetectRadius = 0.6f;
@@ -111,16 +112,12 @@ public class FlyingSword : MonoBehaviour
         var vec = PlayerAimPoint - transform.position;
         if (!isFixed)
         {
+            // LerpAngle 을 써야 한다 — eulerAngles.z 는 0~360 으로 읽히므로 음수 목표각(아래 조준)을
+            // 일반 Lerp 로 섞으면 조준이 목표보다 위에서 수렴한다(최종보스처럼 높은 곳에서
+            // 아래로 조준할수록 오차가 커지던 버그).
             var angle = Mathf.Atan2(vec.y, vec.x) * Mathf.Rad2Deg;
-            if (angle > transform.eulerAngles.y)
-            {
-                transform.rotation = Quaternion.Euler(0,0, Mathf.Lerp(transform.eulerAngles.z,angle, Time.fixedDeltaTime));
-            }
-            else
-            {
-                transform.rotation = Quaternion.Euler(0,0, Mathf.Lerp(angle, transform.eulerAngles.z, Time.fixedDeltaTime));
-            }
-
+            float smoothed = Mathf.LerpAngle(transform.eulerAngles.z, angle, aimLerpSpeed * Time.fixedDeltaTime);
+            transform.rotation = Quaternion.Euler(0, 0, smoothed);
         }
         UpdateLaunchThreatHitbox();
         if (Timer <= 0f && !isStoped)
@@ -163,6 +160,12 @@ public class FlyingSword : MonoBehaviour
     private void Launch()
     {
         isFixed = true;
+
+        // 발사 순간 조준각을 정확히 스냅 — 보간이 덜 수렴했어도 조준점(콜라이더 중심)을 지나가게 보장.
+        // 보간이 이미 수렴한 정상 상황에서는 사실상 변화가 없다.
+        Vector3 vec = PlayerAimPoint - transform.position;
+        transform.rotation = Quaternion.Euler(0, 0, Mathf.Atan2(vec.y, vec.x) * Mathf.Rad2Deg);
+
         if (launchThreatVisual != null) launchThreatVisual.Hide();
         if (hitbox != null) hitbox.enabled = true;
     }

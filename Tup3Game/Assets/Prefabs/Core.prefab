@@ -93,6 +93,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 14c8bb80b062f08418746608755a9596, type: 2}
   - {fileID: 11400000, guid: 83fc30a96d060bd48aa207e9b8c87e45, type: 2}
   - {fileID: 11400000, guid: b6eb76238d9837048a81a1a7165ee9f0, type: 2}
+  - {fileID: 11400000, guid: 559a91f4349141b459903b3e4dfca242, type: 2}
+  transitionVolume: 0.9
 --- !u!114 &2202116559012019449
 MonoBehaviour:
   m_ObjectHideFlags: 0

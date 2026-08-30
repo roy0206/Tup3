@@ -30,6 +30,9 @@ public abstract class InteractionBase : MonoBehaviour
     
 
     private float hold = 0;
+
+    /// <summary>false 면 InteractionManager 가 이 상호작용을 후보에서 제외해 UI(홀드 아이콘)도 뜨지 않는다.</summary>
+    public virtual bool IsInteractionVisible => true;
     
     protected virtual void Start()
     {
@@ -46,7 +49,7 @@ public abstract class InteractionBase : MonoBehaviour
     public virtual bool OnInteract() //Call First
     {
         hold += Time.deltaTime;
-        view.SetFill(hold/interactionDuration);
+        if (view != null) view.SetFill(hold/interactionDuration); // 씬 전환 중 파괴된 뷰 방어
         if(hold < interactionDuration) return false;
         hold = 0;
         if (!CanInteract())

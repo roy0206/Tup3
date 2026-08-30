@@ -33,6 +33,8 @@ public class PlayData
 
     public bool lobbyIntroDone = false;
 
+    public bool styxIntroDone = false;
+
     public string endingId = "";
 }
 
@@ -72,6 +74,12 @@ public class SettingsData
  * PlayData 는 UserDataManager.ClearPlayData() 에서 통째로 새로 생성되므로,
  * "새 게임"에서는 자동으로 false 가 되어 도입부가 다시 재생되고 "이어하기"에서는 저장된 값이 유지된다.
  * 세이브 JSON 에 없던 필드라 기존 세이브를 불러오면 기본값 false 로 들어온다(= 도입부를 한 번 더 보게 됨).
+ *
+ * PlayData.styxIntroDone : 최종보스 첫 조우(StyxIntro 씬)를 마쳤는지 여부 (2026-08-31 추가).
+ * false 면 로비의 Styx 포탈이 StyxIntro 씬으로 연결되고(StyxEnterence), 토보스 게이트 벽 2개가 닫혀 있다(Lobby).
+ * StyxIntro 씬이 대사 종료 시 true 로 저장하며, 이때 lobbyIntroDone 도 같이 true 가 된다
+ * (도입부 대사 S03_LOBBY 를 조우 씬에서 이미 봤으므로). 새 게임(ClearPlayData)에서는 false 로 초기화.
+ * 세이브 JSON 에 없던 필드라 기존 세이브는 false 로 들어온다(= 조우 씬을 한 번 보게 됨).
  *
  * PlayData.willCoins : 의지 코인 보유량. 시작값 4 (새 게임 = ClearPlayData 로 새 PlayData 생성 시 적용).
  * 보스전 결과로만 움직이며 BossRoom 이 0 밑으로 내려가지 않게 clamp 한다.

@@ -168,6 +168,15 @@ public class Gold : BossBase
     public bool IsPattern4Casting => isPattern4Casting;
     public bool IsPattern4ParryOpen => isPattern4ParryOpen;
 
+    [Header("사망 페이드")]
+    [SerializeField] private bool fadeOnDeath = true;
+    [SerializeField] private float deathFadeDelay = 0.6f;
+    [SerializeField] private float deathFadeDuration = 1.2f;
+    [SerializeField] private Ease deathFadeEase = Ease.InQuad;
+
+    private Sequence deathFadeSequence;
+    private bool deathFadeStarted;
+
     new void Awake()
     {
         base.Awake();
@@ -222,6 +231,42 @@ public class Gold : BossBase
         ClearPattern4Visual();
         HidePattern1Effect();
         HideMeleeThreatHitbox();
+
+        OnDeath += PlayDeathFade;
+    }
+
+    private void OnDestroy()
+    {
+        OnDeath -= PlayDeathFade;
+
+        if (deathFadeSequence == null) return;
+        Sequence seq = deathFadeSequence;
+        deathFadeSequence = null;
+        seq.Kill();
+    }
+
+    // 사망 페이드 — Soil.PlayDeathFade 와 동일한 방식 (구동은 BT Dead() 가 아니라 OnDeath 구독:
+    // 승리 대사가 시작되면 Update 의 Tick 이 멈추므로 체력 0 시점에 정확히 1회 오는 OnDeath 를 쓴다).
+    // deathFadeDelay 동안 사망 애니메이션(IsDead)이 보인 뒤 자식 SpriteRenderer 전부의 알파를 0 으로 내린다.
+    private void PlayDeathFade()
+    {
+        if (!fadeOnDeath || deathFadeStarted) return;
+        deathFadeStarted = true;
+
+        SpriteRenderer[] renderers = GetComponentsInChildren<SpriteRenderer>(true);
+        if (renderers.Length == 0) return;
+
+        float delay = Mathf.Max(0f, deathFadeDelay);
+        float duration = Mathf.Max(0.01f, deathFadeDuration);
+
+        deathFadeSequence = DOTween.Sequence().SetTarget(this);
+        foreach (SpriteRenderer sr in renderers)
+        {
+            if (sr == null) continue;
+            deathFadeSequence.Insert(delay, sr.DOFade(0f, duration).SetEase(deathFadeEase));
+        }
+
+        deathFadeSequence.OnComplete(() => deathFadeSequence = null);
     }
 
     private void Update()

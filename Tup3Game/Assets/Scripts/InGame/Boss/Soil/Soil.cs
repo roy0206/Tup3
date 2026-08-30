@@ -104,11 +104,13 @@ public class Soil : BossBase
         if (!snappedToGround) StartCoroutine(SnapToGroundWhenReady());
 
         OnDeath += PlayDeathFade;
+        OnDeath += DisableCollidersOnDeath;
     }
 
     private void OnDestroy()
     {
         OnDeath -= PlayDeathFade;
+        OnDeath -= DisableCollidersOnDeath;
 
         if (deathFadeSequence == null) return;
         Sequence seq = deathFadeSequence;
@@ -135,6 +137,16 @@ public class Soil : BossBase
         }
 
         deathFadeSequence.OnComplete(() => deathFadeSequence = null);
+    }
+
+    // 사망 시 몸통·히트박스 콜라이더 전부 비활성 — 시체가 플레이어 이동을 막지 않게 한다.
+    // 컴포넌트(enabled)만 끄므로 패턴의 지연 DelayedCall 이 히트박스 오브젝트를 SetActive(true)
+    // 해도 콜라이더는 살아나지 않는다. 접지 검사는 bodyCollider 의 size/offset 을 직접 계산해
+    // 비활성 상태에서도 유효하다(ApplyGravity 참고).
+    private void DisableCollidersOnDeath()
+    {
+        foreach (Collider2D col in GetComponentsInChildren<Collider2D>(true))
+            col.enabled = false;
     }
 
     private IEnumerator SnapToGroundWhenReady()
