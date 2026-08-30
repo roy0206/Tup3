@@ -141,7 +141,7 @@ public class Skills : MonoBehaviour, ISceneEventListener
 
         GameObject effect = new GameObject(objectName);
         effect.transform.SetParent(transform, false);
-        effect.transform.localPosition = backgroundEffectOffset;
+        effect.transform.localPosition = backgroundEffectOffset + new Vector2(0, 0.2f);
         effect.transform.localScale = Vector3.one * Mathf.Max(0.01f, backgroundEffectScale);
 
         SpriteRenderer renderer = effect.AddComponent<SpriteRenderer>();
