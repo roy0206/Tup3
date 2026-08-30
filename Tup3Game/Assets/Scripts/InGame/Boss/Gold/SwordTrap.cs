@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
@@ -9,6 +10,16 @@ public class SwordTrap : MonoBehaviour
     [SerializeField] private Color flashColor = Color.white;
     [SerializeField] private float flashDuration = 0.2f;
     [SerializeField] private Ease flashEase = Ease.OutQuad;
+
+    [Header("활성화 전 위협 히트박스")]
+    [SerializeField] private bool showThreatHitbox = true;
+    [SerializeField] private float activationDelay = 1f;
+    [SerializeField] private Color threatColor = new Color(1f, 0.08f, 0.02f, 0.4f);
+    [Range(0f, 1f)]
+    [SerializeField] private float threatFillAlpha = 0.7f;
+    [SerializeField] private float threatInset = 0.12f;
+    [SerializeField] private float threatPulseSpeed = 20f;
+    [SerializeField] private int threatSortingOrderOffset = -1;
 
     [Header("소멸")]
     [SerializeField] private float lifeTime = 3f;
@@ -22,6 +33,12 @@ public class SwordTrap : MonoBehaviour
     private readonly List<Collider2D> damageColliders = new();
 
     private Sequence lifeSequence;
+    private ThreatHitboxVisual threatVisual;
+    private Action activatedCallback;
+    private Func<bool> activationGuard;
+    private bool isTelegraphing;
+
+    public bool IsTelegraphing => isTelegraphing;
 
     private void Awake()
     {
@@ -43,24 +60,102 @@ public class SwordTrap : MonoBehaviour
         {
             if (col != null) damageColliders.Add(col);
         }
+
+        threatVisual = GetComponent<ThreatHitboxVisual>();
+        if (threatVisual == null) threatVisual = gameObject.AddComponent<ThreatHitboxVisual>();
+        threatVisual.Configure(
+            renderers.Length > 0 ? renderers[0] : null,
+            threatColor,
+            threatFillAlpha,
+            threatInset,
+            threatPulseSpeed,
+            threatSortingOrderOffset);
     }
 
     private void OnEnable()
     {
-        ResetVisualState();
-
-        PlaySpawnFlash();
-
-        ScheduleDespawn();
+        Arm(activationDelay);
     }
 
     private void OnDisable()
     {
         KillLifeSequence();
+        activatedCallback = null;
+        activationGuard = null;
+        isTelegraphing = false;
+        if (threatVisual != null) threatVisual.Hide();
         foreach (SpriteRenderer renderer in renderers)
         {
             if (renderer != null) renderer.DOKill();
         }
+    }
+
+    public void Arm(float delay, Action onActivated = null, Func<bool> canActivate = null)
+    {
+        ResetVisualState();
+        activatedCallback = onActivated;
+        activationGuard = canActivate;
+
+        float warning = Mathf.Max(0f, delay);
+        float life = Mathf.Max(0f, lifeTime);
+        float fade = Mathf.Max(0f, fadeDuration);
+
+        bool hasThreatBounds = TryGetThreatLocalBox(out Vector2 threatSize, out Vector2 threatOffset);
+        SetDamageEnabled(false);
+        SetRenderersEnabled(false);
+        isTelegraphing = warning > 0f;
+
+        lifeSequence = DOTween.Sequence().SetTarget(this);
+        if (warning > 0f)
+        {
+            if (showThreatHitbox && threatVisual != null && hasThreatBounds)
+            {
+                threatVisual.ShowLocalBox(
+                    threatSize,
+                    threatOffset,
+                    ThreatFillDirection.CenterOutHorizontal);
+            }
+
+            lifeSequence.Append(DOVirtual.Float(0f, 1f, warning, progress =>
+            {
+                if (threatVisual != null) threatVisual.SetProgress(progress, progress * warning);
+            }).SetEase(Ease.Linear));
+        }
+
+        lifeSequence.AppendCallback(ActivateTrap);
+        lifeSequence.AppendInterval(life);
+        lifeSequence.AppendCallback(() =>
+        {
+            if (disableDamageOnFade) SetDamageEnabled(false);
+        });
+
+        if (fade > 0f)
+        {
+            float fadeStart = warning + life;
+            for (int i = 0; i < renderers.Length; i++)
+            {
+                if (renderers[i] == null) continue;
+                lifeSequence.Insert(fadeStart, renderers[i].DOFade(0f, fade).SetEase(fadeEase));
+            }
+        }
+
+        lifeSequence.OnComplete(Despawn);
+    }
+
+    public bool CancelTelegraph()
+    {
+        if (!isTelegraphing) return false;
+
+        KillLifeSequence();
+        isTelegraphing = false;
+        activatedCallback = null;
+        activationGuard = null;
+        if (threatVisual != null) threatVisual.Hide();
+        SetDamageEnabled(false);
+
+        if (PoolManager.Instance != null) PoolManager.Instance.Release(gameObject);
+        else gameObject.SetActive(false);
+        return true;
     }
 
     private void PlaySpawnFlash()
@@ -77,48 +172,103 @@ public class SwordTrap : MonoBehaviour
     private void ResetVisualState()
     {
         KillLifeSequence();
+        activatedCallback = null;
+        activationGuard = null;
+        isTelegraphing = false;
+        if (threatVisual != null) threatVisual.Hide();
 
         for (int i = 0; i < renderers.Length; i++)
         {
             if (renderers[i] == null) continue;
             renderers[i].DOKill();
             renderers[i].color = baseColors[i];
+            renderers[i].enabled = true;
         }
 
         SetDamageEnabled(true);
     }
 
-    private void ScheduleDespawn()
+    private void ActivateTrap()
     {
-        float life = Mathf.Max(0f, lifeTime);
-        float fade = Mathf.Max(0f, fadeDuration);
-
-        lifeSequence = DOTween.Sequence().SetTarget(this);
-        lifeSequence.AppendInterval(life);
-
-        lifeSequence.AppendCallback(() =>
+        if (activationGuard != null && !activationGuard())
         {
-            if (disableDamageOnFade) SetDamageEnabled(false);
-        });
-
-        if (fade > 0f)
-        {
-            for (int i = 0; i < renderers.Length; i++)
-            {
-                if (renderers[i] == null) continue;
-                lifeSequence.Insert(life, renderers[i].DOFade(0f, fade).SetEase(fadeEase));
-            }
+            ReleaseImmediately();
+            return;
         }
 
-        lifeSequence.OnComplete(Despawn);
+        isTelegraphing = false;
+        activationGuard = null;
+        if (threatVisual != null) threatVisual.Hide();
+        SetRenderersEnabled(true);
+        SetDamageEnabled(true);
+        PlaySpawnFlash();
+
+        Action callback = activatedCallback;
+        activatedCallback = null;
+        callback?.Invoke();
     }
 
     private void Despawn()
     {
         lifeSequence = null;
+        activatedCallback = null;
+        activationGuard = null;
+        isTelegraphing = false;
+        if (threatVisual != null) threatVisual.Hide();
 
         if (PoolManager.Instance != null) PoolManager.Instance.Release(gameObject);
         else gameObject.SetActive(false);
+    }
+
+    private void ReleaseImmediately()
+    {
+        KillLifeSequence();
+        activatedCallback = null;
+        activationGuard = null;
+        isTelegraphing = false;
+        if (threatVisual != null) threatVisual.Hide();
+        SetDamageEnabled(false);
+
+        if (PoolManager.Instance != null) PoolManager.Instance.Release(gameObject);
+        else gameObject.SetActive(false);
+    }
+
+    private bool TryGetThreatLocalBox(out Vector2 size, out Vector2 offset)
+    {
+        size = Vector2.zero;
+        offset = Vector2.zero;
+        bool found = false;
+        Bounds combinedBounds = default;
+
+        foreach (Collider2D col in damageColliders)
+        {
+            if (col == null || !col.enabled) continue;
+            if (!found)
+            {
+                combinedBounds = col.bounds;
+                found = true;
+            }
+            else
+            {
+                combinedBounds.Encapsulate(col.bounds);
+            }
+        }
+
+        if (!found) return false;
+
+        float scaleX = Mathf.Max(0.0001f, Mathf.Abs(transform.lossyScale.x));
+        float scaleY = Mathf.Max(0.0001f, Mathf.Abs(transform.lossyScale.y));
+        size = new Vector2(combinedBounds.size.x / scaleX, combinedBounds.size.y / scaleY);
+        offset = transform.InverseTransformPoint(combinedBounds.center);
+        return true;
+    }
+
+    private void SetRenderersEnabled(bool value)
+    {
+        foreach (SpriteRenderer renderer in renderers)
+        {
+            if (renderer != null) renderer.enabled = value;
+        }
     }
 
     private void SetDamageEnabled(bool value)
@@ -148,12 +298,20 @@ public class SwordTrap : MonoBehaviour
  *
  * 금보스 패턴2 가 소환하는 검 함정. PoolManager 로 꺼내 쓰므로 모든 상태를 OnEnable 에서 초기화한다.
  *
+ * ── 활성화 전 위협 히트박스 ──────────────────────────────────────────────────
+ * OnEnable 즉시 실제 PolygonCollider2D 들의 합친 bounds 를 구하고 원본 스프라이트·Hitbox·Collider2D 를
+ * 끈다. activationDelay 동안 붉은 외곽선 내부가 중앙에서 양옆으로 차오른 뒤에만 ActivateTrap 이
+ * 원본 외형과 피해 판정을 켠다. Gold 는 Arm(pattern2TrapDelay, ...) 로 코드 타이밍과 정확히 맞춘다.
+ * 전조 중 쳐내기/사망이면 CancelTelegraph 또는 activationGuard 가 풀에 즉시 반납한다.
+ * ThreatHitboxVisual 은 Awake 의 원본 렌더러/콜라이더 캐시가 끝난 뒤 추가하므로 전조용 렌더러가
+ * 피해 콜라이더나 페이드 대상에 섞이지 않는다.
+ *
  * ── 이전 상태 ────────────────────────────────────────────────────────────────
  * 내용이 통째로 주석 처리돼 있어 **소환된 함정이 영원히 사라지지 않았다**(풀 반납 경로 없음).
  * Gold.Pattern2 도 Release 를 예약하지 않으므로 수명 관리는 이 클래스의 책임이다.
  *
  * ── 등장 플래시 (2026-08-29 유저 요청) ───────────────────────────────────────
- * SpriteFlashGroup.GetOrAdd(gameObject).Flash(...) 로 자식 SpriteRenderer 전부를 한 트윈으로
+ * 활성화가 확정되는 순간 SpriteFlashGroup.GetOrAdd(gameObject).Flash(...) 로 자식 SpriteRenderer 전부를 한 트윈으로
  * 흰색까지 물들였다 되돌린다. color 를 곱하는 방식이 아니라 셰이더 _FlashAmount 를 쓰므로
  * 원래 색이 흰색이어도 제대로 밝아진다.
  * ※ 확장 메서드 gameObject.DOFlashAll(...) 을 쓰지 않는다 — 정의는 SpriteFlashExtensions 에
@@ -163,7 +321,7 @@ public class SwordTrap : MonoBehaviour
  *   없으면 SpriteFlash 가 경고 1회만 남기고 조용히 넘어가므로 함정 동작 자체에는 지장이 없다.
  *
  * ── 소멸 ─────────────────────────────────────────────────────────────────────
- * lifeTime(3초) 유지 → fadeDuration(0.5초) 동안 알파 0 으로 페이드 → 풀 반납.
+ * 활성화 후 lifeTime(3초) 유지 → fadeDuration(0.5초) 동안 알파 0 으로 페이드 → 풀 반납.
  * 페이드가 시작되는 순간 disableDamageOnFade 로 Hitbox 와 Collider2D 를 꺼서, 사라지는 중인
  * 함정에 맞는 상황을 막는다(끄고 싶지 않으면 인스펙터에서 해제).
  * 알파를 건드리므로 풀에서 다시 꺼낼 때 ResetVisualState 가 원래 색을 복원하고 판정을 되살린다.

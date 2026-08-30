@@ -1,16 +1,19 @@
-using System;
-using Unity.VisualScripting;
 using UnityEngine;
+
 public class Hitbox : MonoBehaviour
 {
     [SerializeField] private int damage;
     [SerializeField] private float knockbackForce;
+
     private void OnTriggerStay2D(Collider2D other)
     {
-        if (other.TryGetComponent(out PlayerKnockBack playerHealth))
-        {
-            playerHealth.TakeHit(transform.position, knockbackForce, damage);
-        }
+        // 공격/이펙트용 자식 콜라이더는 Player 레이어를 공유할 수 있다.
+        // 부모를 탐색하지 않고 실제 플레이어 본체 콜라이더만 피해 대상으로 인정한다.
+        if (!other.CompareTag("Player") ||
+            !other.TryGetComponent(out PlayerKnockBack playerKnockBack))
+            return;
+
+        playerKnockBack.TakeHit(transform.position, knockbackForce, damage);
     }
     
     private void OnDrawGizmos()

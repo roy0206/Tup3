@@ -13,6 +13,17 @@ public class FlyingSword : MonoBehaviour
     [SerializeField] private float reflectedLifeTime = 4f;
     [SerializeField] private float bossHitRadius = 1f;
 
+    [Header("발사 경로 위협 히트박스")]
+    [SerializeField] private bool showLaunchThreatHitbox = true;
+    [SerializeField] private float launchThreatLength = 20f;
+    [SerializeField] private float launchThreatWidth;
+    [SerializeField] private Color launchThreatColor = new Color(1f, 0.08f, 0.02f, 0.4f);
+    [Range(0f, 1f)]
+    [SerializeField] private float launchThreatFillAlpha = 0.7f;
+    [SerializeField] private float launchThreatInset = 0.05f;
+    [SerializeField] private float launchThreatPulseSpeed = 20f;
+    [SerializeField] private int launchThreatSortingOrderOffset = -1;
+
     [Header("사운드")]
     [SerializeField] private float clashVolume = 1f;
     [SerializeField] private float clashMinInterval = 0.08f;
@@ -24,11 +35,14 @@ public class FlyingSword : MonoBehaviour
     private Gold boss;
     private FinalBoss finalBoss;
     private Hitbox hitbox;
+    private SpriteRenderer swordRenderer;
+    private ThreatHitboxVisual launchThreatVisual;
     BoxCollider2D bc;
     bool isStoped = false;
     bool isFixed = false;
     bool isReflected = false;
     float reflectedTimer;
+    float launchThreatDuration;
 
 
     public float Timer { get; set; }
@@ -40,8 +54,20 @@ public class FlyingSword : MonoBehaviour
         finalBoss = boss != null ? null : FindAnyObjectByType<FinalBoss>();
         bc = GetComponent<BoxCollider2D>();
         hitbox = GetComponent<Hitbox>();
-        if (hitbox != null) hitbox.enabled = true;
-        bc.enabled = true;
+        if (swordRenderer == null) swordRenderer = GetComponentInChildren<SpriteRenderer>(true);
+        launchThreatVisual = GetComponent<ThreatHitboxVisual>();
+        if (launchThreatVisual == null)
+            launchThreatVisual = gameObject.AddComponent<ThreatHitboxVisual>();
+        launchThreatVisual.Configure(
+            swordRenderer,
+            launchThreatColor,
+            launchThreatFillAlpha,
+            launchThreatInset,
+            launchThreatPulseSpeed,
+            launchThreatSortingOrderOffset);
+
+        if (hitbox != null) hitbox.enabled = false;
+        if (bc != null) bc.enabled = true;
         isStoped = false;
         isFixed = false;
         isReflected = false;
@@ -52,11 +78,14 @@ public class FlyingSword : MonoBehaviour
         Vector3 targetPos = transform.position + new Vector3(randLength * Mathf.Cos(randAngle *  Mathf.Deg2Rad), randLength * Mathf.Sin(randAngle *  Mathf.Deg2Rad));
         transform.DOMove(targetPos, 1f);
         Timer = UnityEngine.Random.Range(3f, 5f);
+        launchThreatDuration = Timer;
+        ShowLaunchThreatHitbox();
     }
 
     private void OnDisable()
     {
         transform.DOKill();
+        if (launchThreatVisual != null) launchThreatVisual.Hide();
     }
 
     private void FixedUpdate()
@@ -93,12 +122,49 @@ public class FlyingSword : MonoBehaviour
             }
 
         }
+        UpdateLaunchThreatHitbox();
         if (Timer <= 0f && !isStoped)
         {
             CheckGround();
-            isFixed = true;
+            if (isStoped) return;
+            if (!isFixed) Launch();
             transform.Translate(Vector2.right * speed * Time.fixedDeltaTime, Space.Self);
         }
+    }
+
+    private void ShowLaunchThreatHitbox()
+    {
+        if (!showLaunchThreatHitbox || launchThreatVisual == null || bc == null) return;
+
+        float length = Mathf.Max(0.01f, launchThreatLength);
+        float width = launchThreatWidth > 0f ? launchThreatWidth : bc.size.y;
+        float startX = bc.offset.x + bc.size.x * 0.5f;
+        launchThreatVisual.ShowLocalBox(
+            new Vector2(length, Mathf.Max(0.01f, width)),
+            new Vector2(startX + length * 0.5f, bc.offset.y),
+            ThreatFillDirection.LeftToRight);
+    }
+
+    private void UpdateLaunchThreatHitbox()
+    {
+        if (launchThreatVisual == null || !launchThreatVisual.IsVisible) return;
+        if (Timer <= 0f || launchThreatDuration <= 0f)
+        {
+            launchThreatVisual.Hide();
+            return;
+        }
+
+        float elapsed = launchThreatDuration - Timer;
+        launchThreatVisual.SetProgress(
+            Mathf.Clamp01(elapsed / launchThreatDuration),
+            Mathf.Max(0f, elapsed));
+    }
+
+    private void Launch()
+    {
+        isFixed = true;
+        if (launchThreatVisual != null) launchThreatVisual.Hide();
+        if (hitbox != null) hitbox.enabled = true;
     }
 
     void CheckGround()
@@ -151,6 +217,7 @@ public class FlyingSword : MonoBehaviour
         isStoped = false;
         reflectedTimer = reflectedLifeTime;
         transform.DOKill();
+        if (launchThreatVisual != null) launchThreatVisual.Hide();
         if (hitbox != null) hitbox.enabled = false;
         if (bc != null) bc.enabled = true;
         AimAtBoss();
@@ -204,7 +271,8 @@ public class FlyingSword : MonoBehaviour
     {
         isReflected = false;
         transform.DOKill();
-        if (hitbox != null) hitbox.enabled = true;
+        if (launchThreatVisual != null) launchThreatVisual.Hide();
+        if (hitbox != null) hitbox.enabled = false;
 
         if (PoolManager.Instance != null) PoolManager.Instance.Release(gameObject);
         else gameObject.SetActive(false);
@@ -225,6 +293,9 @@ public class FlyingSword : MonoBehaviour
  *   1) 소환 직후엔 기존대로 랜덤 위치로 떠올랐다가(DOMove) Timer 가 끝나면 플레이어를 향해 직진한다.
  *      조준점은 플레이어 피벗(transform.position, 발밑)이 아니라 콜라이더 중심(bounds.center)이다.
  *      피벗을 조준하면 검이 몸통 앞 바닥에 먼저 박혀 데미지가 안 들어가는 경우가 있었다.
+ *      대기 중에는 실제 BoxCollider2D 높이의 발사 통로를 검 앞에서 launchThreatLength 만큼 펼치고,
+ *      Timer 진행률에 맞춰 검 쪽부터 플레이어 방향으로 채운다. 이 동안 Hitbox 는 꺼져 있어 떠오르는
+ *      검에 미리 닿아도 피해가 없고, 통로가 가득 차 Launch()가 호출될 때만 피해 판정을 켠다.
  *   2) 날아오는 도중(정확히는 땅에 박히기 전 언제든) 플레이어 공격 히트박스와 겹치면 쳐내기 성공.
  *      감지는 두 갈래다.
  *        - FixedUpdate 의 Physics2D.OverlapCircleAll(parryDetectRadius) → Attackhitbox 탐색

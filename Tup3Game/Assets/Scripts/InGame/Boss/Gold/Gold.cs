@@ -28,6 +28,7 @@ public class Gold : BossBase
     [SerializeField] private float counterHitDelay = 0.2f;
     [SerializeField] private float counterDamage = 20f;
     [SerializeField] private float counterKnockBackForce = 0.5f;
+    [SerializeField] private float counterHitRange = 3f;
 
     [Header("그로기 지속시간")]
     [SerializeField] private float pattern1GroggyTime = 5f;
@@ -43,16 +44,16 @@ public class Gold : BossBase
     [SerializeField] private float pattern1KnockBackForce = 1f;
     [SerializeField] private float pattern1HitRange = 3f;
 
-    [Header("패턴1 (근접) - 위협 히트박스")]
-    [SerializeField] private bool showPattern1ThreatHitbox = true;
-    [SerializeField] private Color pattern1ThreatColor = new Color(1f, 0.08f, 0.02f, 0.4f);
+    [Header("근접 공격 - 위협 히트박스")]
+    [SerializeField] private bool showMeleeThreatHitbox = true;
+    [SerializeField] private Color meleeThreatColor = new Color(1f, 0.08f, 0.02f, 0.4f);
     [Range(0f, 1f)]
-    [SerializeField] private float pattern1ThreatFillAlpha = 0.7f;
-    [SerializeField] private float pattern1ThreatHeight;
-    [SerializeField] private Vector2 pattern1ThreatOffset;
-    [SerializeField] private float pattern1ThreatInset = 0.12f;
-    [SerializeField] private float pattern1ThreatPulseSpeed = 20f;
-    [SerializeField] private int pattern1ThreatSortingOrderOffset = -1;
+    [SerializeField] private float meleeThreatFillAlpha = 0.7f;
+    [SerializeField] private float meleeThreatHeight;
+    [SerializeField] private Vector2 meleeThreatOffset;
+    [SerializeField] private float meleeThreatInset = 0.12f;
+    [SerializeField] private float meleeThreatPulseSpeed = 20f;
+    [SerializeField] private int meleeThreatSortingOrderOffset = -1;
 
     [Header("쳐내기 판정 - 패턴1 (근접)")]
     [SerializeField] private float pattern1ParryStart = 0.1f;
@@ -141,6 +142,7 @@ public class Gold : BossBase
     private bool isPatternSetup;
     private bool isCounterAttackReady;
     private bool isCounterAttacking;
+    private bool isCounterSetup;
     private bool isPattern4Casting;
     private bool isPattern4ParryOpen;
     private bool isPattern4Parried;
@@ -148,7 +150,6 @@ public class Gold : BossBase
     private bool playerAttackStarted;
     private bool warnedMissingPlayerRefs;
     private bool isPattern1EffectShown;
-    private bool isPattern1ThreatShown;
     private bool isFacingRight;
     private float patternElapsed;
     private int reflectedSwordHits;
@@ -158,13 +159,9 @@ public class Gold : BossBase
     private float pendingAnimTriggerTime;
     private float pendingAnimSpeed = 1f;
     private bool hasAnimSpeedParameter;
-    private GameObject pattern1ThreatHitbox;
-    private SpriteRenderer pattern1ThreatRenderer;
-    private SpriteRenderer pattern1ThreatFillRenderer;
-    private Texture2D pattern1ThreatTexture;
-    private Sprite pattern1ThreatSprite;
-    private Sprite pattern1ThreatFillSprite;
-    private Vector2 pattern1ThreatFillFullSize;
+    private ThreatHitboxVisual meleeThreatVisual;
+    private float meleeThreatDuration;
+    private SwordTrap pendingSwordTrap;
 
     public float GroggyTime => groggyTime;
     public bool IsGroggy => !IsDead && groggyTime > 0f;
@@ -206,7 +203,7 @@ public class Gold : BossBase
             .End()
             .Build();
 
-        curTimes = new List<float> { 0f, 0f, 10f, 60, pattern4Cooldown };
+        curTimes = new List<float> { 0f, 0f, 10f, 15f, pattern4Cooldown }; //금속성 3스킬 첫 발동시점을 10초로 했습니다!
         if (animator == null) animator = GetComponent<Animator>();
         if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
         hasAnimSpeedParameter = HasAnimatorParameter(AnimSpeedParameter);
@@ -221,10 +218,10 @@ public class Gold : BossBase
             if (playerMovement == null) playerMovement = player.GetComponentInChildren<Playermovement>(true);
         }
         bodyCollider = boxColliders.Count > 0 ? boxColliders[0] : GetComponent<BoxCollider2D>();
-        InitPattern1ThreatHitbox();
+        InitMeleeThreatVisual();
         ClearPattern4Visual();
         HidePattern1Effect();
-        HidePattern1ThreatHitbox();
+        HideMeleeThreatHitbox();
     }
 
     private void Update()
@@ -256,17 +253,12 @@ public class Gold : BossBase
     private void OnDisable()
     {
         CancelPattern4();
+        CancelPattern2Telegraph();
+        isCounterSetup = false;
         HidePattern1Effect();
-        HidePattern1ThreatHitbox();
+        HideMeleeThreatHitbox();
         SetCounterAuraShown(false);
         pendingAnimTrigger = null;
-    }
-
-    private void OnDestroy()
-    {
-        if (pattern1ThreatFillSprite != null) Destroy(pattern1ThreatFillSprite);
-        if (pattern1ThreatSprite != null) Destroy(pattern1ThreatSprite);
-        if (pattern1ThreatTexture != null) Destroy(pattern1ThreatTexture);
     }
 
     private bool HasAnimatorParameter(string parameterName)
@@ -414,153 +406,66 @@ public class Gold : BossBase
         pattern1SlashEffect.SetActive(false);
     }
 
-    private void InitPattern1ThreatHitbox()
+    private void InitMeleeThreatVisual()
     {
-        if (!showPattern1ThreatHitbox || pattern1ThreatHitbox != null) return;
+        if (!showMeleeThreatHitbox) return;
 
-        pattern1ThreatTexture = new Texture2D(3, 3, TextureFormat.RGBA32, false)
-        {
-            name = "Gold Pattern1 Threat Hitbox",
-            filterMode = FilterMode.Point,
-            wrapMode = TextureWrapMode.Clamp,
-            hideFlags = HideFlags.DontSave,
-        };
-
-        Color[] pixels = new Color[9];
-        for (int i = 0; i < pixels.Length; i++) pixels[i] = Color.white;
-        pixels[4] = new Color(1f, 1f, 1f, 0.35f);
-        pattern1ThreatTexture.SetPixels(pixels);
-        pattern1ThreatTexture.Apply();
-
-        pattern1ThreatSprite = Sprite.Create(
-            pattern1ThreatTexture,
-            new Rect(0f, 0f, 3f, 3f),
-            new Vector2(0.5f, 0.5f),
-            10f,
-            0,
-            SpriteMeshType.FullRect,
-            Vector4.one);
-        pattern1ThreatSprite.name = "Gold Pattern1 Threat Hitbox";
-        pattern1ThreatSprite.hideFlags = HideFlags.DontSave;
-        pattern1ThreatFillSprite = Sprite.Create(
-            pattern1ThreatTexture,
-            new Rect(1f, 1f, 1f, 1f),
-            new Vector2(0.5f, 0.5f),
-            10f);
-        pattern1ThreatFillSprite.name = "Gold Pattern1 Threat Fill";
-        pattern1ThreatFillSprite.hideFlags = HideFlags.DontSave;
-
-        pattern1ThreatHitbox = new GameObject("Pattern1 Threat Hitbox");
-        pattern1ThreatHitbox.hideFlags = HideFlags.DontSave;
-        pattern1ThreatHitbox.transform.SetParent(transform, false);
-
-        pattern1ThreatRenderer = pattern1ThreatHitbox.AddComponent<SpriteRenderer>();
-        pattern1ThreatRenderer.sprite = pattern1ThreatSprite;
-        pattern1ThreatRenderer.drawMode = SpriteDrawMode.Sliced;
-        pattern1ThreatRenderer.color = pattern1ThreatColor;
-
-        GameObject fill = new GameObject("Fill");
-        fill.hideFlags = HideFlags.DontSave;
-        fill.transform.SetParent(pattern1ThreatHitbox.transform, false);
-        pattern1ThreatFillRenderer = fill.AddComponent<SpriteRenderer>();
-        pattern1ThreatFillRenderer.sprite = pattern1ThreatFillSprite;
-        pattern1ThreatFillRenderer.drawMode = SpriteDrawMode.Sliced;
-
-        if (spriteRenderer != null)
-        {
-            pattern1ThreatFillRenderer.sortingLayerID = spriteRenderer.sortingLayerID;
-            pattern1ThreatFillRenderer.sortingOrder =
-                spriteRenderer.sortingOrder + pattern1ThreatSortingOrderOffset;
-            pattern1ThreatRenderer.sortingLayerID = spriteRenderer.sortingLayerID;
-            pattern1ThreatRenderer.sortingOrder =
-                pattern1ThreatFillRenderer.sortingOrder + 1;
-        }
-        else
-        {
-            pattern1ThreatFillRenderer.sortingOrder = pattern1ThreatSortingOrderOffset;
-            pattern1ThreatRenderer.sortingOrder = pattern1ThreatSortingOrderOffset + 1;
-        }
-
-        UpdatePattern1ThreatGeometry();
-        pattern1ThreatHitbox.SetActive(false);
+        meleeThreatVisual = GetComponent<ThreatHitboxVisual>();
+        if (meleeThreatVisual == null) meleeThreatVisual = gameObject.AddComponent<ThreatHitboxVisual>();
+        meleeThreatVisual.Configure(
+            spriteRenderer,
+            meleeThreatColor,
+            meleeThreatFillAlpha,
+            meleeThreatInset,
+            meleeThreatPulseSpeed,
+            meleeThreatSortingOrderOffset);
     }
 
-    private void ShowPattern1ThreatHitbox()
+    private void ShowMeleeThreatHitbox(float range, float duration)
     {
-        if (!showPattern1ThreatHitbox) return;
+        if (!showMeleeThreatHitbox) return;
 
-        InitPattern1ThreatHitbox();
-        if (pattern1ThreatHitbox == null) return;
-
-        UpdatePattern1ThreatGeometry();
-        isPattern1ThreatShown = true;
-        pattern1ThreatHitbox.SetActive(true);
-        UpdatePattern1ThreatVisual();
-    }
-
-    private void UpdatePattern1ThreatGeometry()
-    {
-        if (pattern1ThreatRenderer == null) return;
+        InitMeleeThreatVisual();
+        if (meleeThreatVisual == null) return;
 
         float scaleX = Mathf.Max(0.0001f, Mathf.Abs(transform.lossyScale.x));
         float scaleY = Mathf.Max(0.0001f, Mathf.Abs(transform.lossyScale.y));
-        float height = pattern1ThreatHeight > 0f
-            ? pattern1ThreatHeight
+        float height = meleeThreatHeight > 0f
+            ? meleeThreatHeight
             : bodyCollider != null ? bodyCollider.bounds.size.y : 1f;
-
-        Vector2 fullSize = new Vector2(
-            Mathf.Max(0.01f, pattern1HitRange * 2f) / scaleX,
-            Mathf.Max(0.01f, height) / scaleY);
-        pattern1ThreatRenderer.size = fullSize;
-
-        float inset = Mathf.Max(0f, pattern1ThreatInset);
-        pattern1ThreatFillFullSize = new Vector2(
-            Mathf.Max(0.01f, fullSize.x - inset * 2f / scaleX),
-            Mathf.Max(0.01f, fullSize.y - inset * 2f / scaleY));
-        if (pattern1ThreatFillRenderer != null)
-            pattern1ThreatFillRenderer.size = pattern1ThreatFillFullSize;
-
         float centerY = bodyCollider != null ? bodyCollider.bounds.center.y : transform.position.y;
         Vector3 worldCenter = new Vector3(
-            transform.position.x + pattern1ThreatOffset.x,
-            centerY + pattern1ThreatOffset.y,
+            transform.position.x + meleeThreatOffset.x,
+            centerY + meleeThreatOffset.y,
             transform.position.z);
-        pattern1ThreatHitbox.transform.localPosition = transform.InverseTransformPoint(worldCenter);
+
+        meleeThreatDuration = Mathf.Max(0f, duration);
+        meleeThreatVisual.ShowLocalBox(
+            new Vector2(
+                Mathf.Max(0.01f, range * 2f) / scaleX,
+                Mathf.Max(0.01f, height) / scaleY),
+            transform.InverseTransformPoint(worldCenter),
+            ThreatFillDirection.CenterOutHorizontal);
+        UpdateMeleeThreatVisual();
     }
 
-    private void UpdatePattern1ThreatVisual()
+    private void UpdateMeleeThreatVisual()
     {
-        if (!isPattern1ThreatShown || pattern1ThreatRenderer == null) return;
-
-        float warningDuration = Mathf.Max(0f, pattern1SlashStart);
-        if (warningDuration <= 0f || patternElapsed >= warningDuration)
+        if (meleeThreatVisual == null || !meleeThreatVisual.IsVisible) return;
+        if (meleeThreatDuration <= 0f || patternElapsed >= meleeThreatDuration)
         {
-            HidePattern1ThreatHitbox();
+            HideMeleeThreatHitbox();
             return;
         }
 
-        float progress = Mathf.Clamp01(patternElapsed / warningDuration);
-        float pulse = 0.9f + Mathf.Sin(patternElapsed * pattern1ThreatPulseSpeed) * 0.1f;
-        Color frameColor = pattern1ThreatColor;
-        frameColor.a = pattern1ThreatColor.a * pulse;
-        pattern1ThreatRenderer.color = frameColor;
-
-        if (pattern1ThreatFillRenderer == null) return;
-
-        pattern1ThreatFillRenderer.enabled = progress > 0f;
-        pattern1ThreatFillRenderer.size = new Vector2(
-            Mathf.Max(0.001f, pattern1ThreatFillFullSize.x * progress),
-            pattern1ThreatFillFullSize.y);
-
-        Color fillColor = pattern1ThreatColor;
-        fillColor.a = pattern1ThreatFillAlpha * pulse;
-        pattern1ThreatFillRenderer.color = fillColor;
+        meleeThreatVisual.SetProgress(
+            Mathf.Clamp01(patternElapsed / meleeThreatDuration),
+            patternElapsed);
     }
 
-    private void HidePattern1ThreatHitbox()
+    private void HideMeleeThreatHitbox()
     {
-        isPattern1ThreatShown = false;
-        if (pattern1ThreatHitbox != null) pattern1ThreatHitbox.SetActive(false);
+        if (meleeThreatVisual != null) meleeThreatVisual.Hide();
     }
 
     private void UpdatePlayerAttackDetection()
@@ -626,12 +531,14 @@ public class Gold : BossBase
     {
         if (patternIndex == 4) isPattern4Parried = true;
         CancelPattern4();
+        CancelPattern2Telegraph();
         HidePattern1Effect();
-        HidePattern1ThreatHitbox();
+        HideMeleeThreatHitbox();
 
         isPatternSetup = false;
         patternElapsed = 0f;
         isCounterAttacking = false;
+        isCounterSetup = false;
         if (curTimes != null) curTimes[0] = 0f;
         ResetPatternTriggers();
         groggyTime = groggyDuration;
@@ -667,8 +574,9 @@ public class Gold : BossBase
         if (!IsDead) return TaskStatus.Failure;
 
         CancelPattern4();
+        CancelPattern2Telegraph();
         HidePattern1Effect();
-        HidePattern1ThreatHitbox();
+        HideMeleeThreatHitbox();
         animator.SetBool("IsMoving", false);
         animator.SetBool("IsIdle", false);
         gameObject.layer = LayerMask.GetMask("Default");
@@ -689,17 +597,24 @@ public class Gold : BossBase
         if (IsDead || GroggyTime > 0)
         {
             isPatternSetup = false;
+            isCounterSetup = false;
+            HideMeleeThreatHitbox();
             return TaskStatus.Failure;
         }
         if(!isCounterAttacking) return  TaskStatus.Failure;
-        HidePattern1ThreatHitbox();
-        if (!isPatternSetup)
+        if (!isCounterSetup)
         {
+            CancelPattern4();
+            CancelPattern2Telegraph();
+            HidePattern1Effect();
+            HideMeleeThreatHitbox();
             curTimes[0] = counterDuration;
             patternElapsed = 0f;
             isPatternSetup = true;
+            isCounterSetup = true;
             animator.SetBool("IsMoving", false);
             animator.SetBool("IsIdle", false);
+            ShowMeleeThreatHitbox(counterHitRange, counterHitDelay);
             QueueAttackAnimation(
                 "CounterAttack", Cut1ClipLength, Cut1StrikeKeyTime, counterHitDelay, counterDuration);
 
@@ -708,13 +623,17 @@ public class Gold : BossBase
                 if (IsDead || GroggyTime > 0f) return;
 
                 BossSound.Play(SwingMeleeSound, swingSoundVolume);
+                if (player == null || HorizontalDistance > counterHitRange) return;
                 DamagePlayer(counterDamage, counterKnockBackForce);
             });
         }
 
+        UpdateMeleeThreatVisual();
         isCounterAttackReady = true;
         if (curTimes[0] > 0f) return TaskStatus.Continue;
+        HideMeleeThreatHitbox();
         isCounterAttacking = false;
+        isCounterSetup = false;
         isPatternSetup = false;
         return TaskStatus.Success;
     }
@@ -733,7 +652,7 @@ public class Gold : BossBase
         {
             isPatternSetup = false;
             HidePattern1Effect();
-            HidePattern1ThreatHitbox();
+            HideMeleeThreatHitbox();
             return TaskStatus.Failure;
         }
 
@@ -746,7 +665,7 @@ public class Gold : BossBase
             isPattern1EffectShown = false;
             animator.SetBool("IsMoving", false);
             animator.SetBool("IsIdle", false);
-            ShowPattern1ThreatHitbox();
+            ShowMeleeThreatHitbox(pattern1HitRange, pattern1SlashStart);
             QueueAttackAnimation(
                 "Pattern1", Cut1ClipLength, Cut1StrikeKeyTime,
                 Mathf.Max(0f, pattern1SlashStart), pattern1Duration);
@@ -763,14 +682,14 @@ public class Gold : BossBase
         if (curTimes[0] > 0f) return TaskStatus.Continue;
 
         HidePattern1Effect();
-        HidePattern1ThreatHitbox();
+        HideMeleeThreatHitbox();
         isPatternSetup = false;
         return TaskStatus.Success;
     }
 
     private void UpdatePattern1Effect()
     {
-        UpdatePattern1ThreatVisual();
+        UpdateMeleeThreatVisual();
 
         float slashStart = Mathf.Max(0f, pattern1SlashStart);
         float slashEnd = slashStart + Mathf.Max(0f, pattern1SlashDuration);
@@ -818,11 +737,13 @@ public class Gold : BossBase
         if (IsDead || GroggyTime > 0)
         {
             isPatternSetup = false;
+            CancelPattern2Telegraph();
             return TaskStatus.Failure;
         }
 
         if (!isPatternSetup)
         {
+            HideMeleeThreatHitbox();
             curTimes[0] = pattern2Duration;
             curTimes[2] = 10f;
             patternElapsed = 0f;
@@ -832,17 +753,27 @@ public class Gold : BossBase
             QueueAttackAnimation(
                 "Pattern2", Pattern2ClipLength, Pattern2PlantKeyTime, pattern2TrapDelay, pattern2Duration);
 
-            DOVirtual.DelayedCall(pattern2TrapDelay, () =>
+            GameObject trapObject = PoolManager.Instance.Get(
+                "SwordTrap",
+                new Vector3(transform.position.x, -1.8f, 0f),
+                Quaternion.Euler(0f, 180f, 0f));
+            SwordTrap spawnedTrap = trapObject != null ? trapObject.GetComponent<SwordTrap>() : null;
+            if (spawnedTrap == null)
             {
-                if (IsDead || GroggyTime > 0) return;
-
-                BossSound.Play(SwingMeleeSound, swingSoundVolume);
-
-                PoolManager.Instance.Get(
-                    "SwordTrap",
-                    new Vector3(transform.position.x, -1.8f, 0f),
-                    Quaternion.identity).transform.rotation = Quaternion.Euler(0f, 180, 0f);
-            });
+                Debug.LogError("[금 보스] SwordTrap 풀 오브젝트에 SwordTrap 컴포넌트가 없습니다.", trapObject);
+            }
+            else
+            {
+                pendingSwordTrap = spawnedTrap;
+                spawnedTrap.Arm(
+                    pattern2TrapDelay,
+                    () =>
+                    {
+                        if (pendingSwordTrap == spawnedTrap) pendingSwordTrap = null;
+                        BossSound.Play(SwingMeleeSound, swingSoundVolume);
+                    },
+                    () => !IsDead && GroggyTime <= 0f);
+            }
         }
 
         if (CheckPatternParry(pattern2ParryRange, pattern2ParryStart, pattern2ParryEnd))
@@ -857,6 +788,14 @@ public class Gold : BossBase
         return TaskStatus.Success;
     }
 
+    private void CancelPattern2Telegraph()
+    {
+        if (pendingSwordTrap == null) return;
+
+        pendingSwordTrap.CancelTelegraph();
+        pendingSwordTrap = null;
+    }
+
     private TaskStatus Pattern3()
     {
         if (IsDead || GroggyTime > 0)
@@ -867,8 +806,9 @@ public class Gold : BossBase
 
         if (!isPatternSetup)
         {
+            HideMeleeThreatHitbox();
             curTimes[0] = pattern3Duration;
-            curTimes[3] = 60f;
+            curTimes[3] = 60f; 
             patternElapsed = 0f;
             reflectedSwordHits = 0;
             isPatternSetup = true;
@@ -909,6 +849,7 @@ public class Gold : BossBase
 
         if (!isPatternSetup)
         {
+            HideMeleeThreatHitbox();
             float flashTime = Mathf.Max(0f, pattern4PrepareTime);
             float slashTime = flashTime + Mathf.Max(0f, pattern4SlashDelay);
             float endTime = slashTime + Mathf.Max(0f, pattern4RecoverTime);
@@ -1209,6 +1150,8 @@ public class Gold : BossBase
  * 참조를 찾고 그래도 없으면 에러 로그를 남기고 피해를 주지 않는다(조용한 실패 금지).
  * 카운터 반격도 이제 이 경로를 쓴다. 예전에는 player.GetComponent<PlayerKnockBack>().TakeHit 을
  * 직접 불러서 컴포넌트가 없으면 NRE 였고, 쳐내기로 캔슬된 뒤에도 0.2초 뒤 피해가 그대로 들어갔다.
+ * 반격 피해는 counterHitRange 안에서만 성립하며, 같은 범위가 counterHitDelay 동안 채워져 원거리의
+ * 플레이어에게 보이지 않는 전역 피해가 들어가지 않는다.
  *
  * ─────────────────────────────────────────────────────────────
  * 그로기 진입 = 쳐내기 성공
@@ -1261,13 +1204,20 @@ public class Gold : BossBase
  * 부호를 뒤집어 이펙트 방향을 맞춘다.
  * pattern1SlashEffect 가 비어 있어도 타이밍/데미지 로직은 그대로 돌아간다(연출만 생략).
  *
- * 위협 히트박스는 패턴 진입(t=0)부터 실제 타격(pattern1SlashStart) 직전까지만 표시된다.
+ * 근접 위협 히트박스는 패턴1 진입(t=0)부터 실제 타격(pattern1SlashStart) 직전까지, 반격 시작부터
+ * counterHitDelay 직전까지 표시된다.
  * 별도 Collider2D/Hitbox 없이 런타임 SpriteRenderer 로 만든 순수 연출이라 피해 판정에는 관여하지
- * 않는다. 가로 폭은 실제 판정의 좌우 범위(pattern1HitRange * 2), 세로 높이는 기본적으로 보스의
+ * 않는다. 가로 폭은 해당 공격의 실제 판정 범위 * 2, 세로 높이는 기본적으로 보스의
  * bodyCollider 높이를 그대로 사용한다. 붉은 외곽선 안쪽이 준비 시간의 진행률에 맞춰 중앙에서
  * 양옆으로 차오르고, 가득 찬 순간 실제 공격이 나가므로 남은 시간을 공간적으로 읽을 수 있다.
  * 실제 타격·쳐내기 성공·반격 전환·사망·오브젝트 비활성 시 즉시 숨긴다.
- * 아트가 없어도 항상 보이도록 3x3 슬라이스 스프라이트를 런타임 생성하며 OnDestroy 에서 정리한다.
+ * 공통 생성/채움 로직은 ThreatHitboxVisual 이 맡는다.
+ *
+ * 패턴2는 예전처럼 1초 뒤 함정을 갑자기 꺼내지 않는다. 패턴 시작 즉시 SwordTrap 을 풀에서 꺼내
+ * 실제 PolygonCollider2D bounds 크기의 위협 박스만 보여 주고, pattern2TrapDelay 동안 중앙에서
+ * 채운다. 가득 찬 뒤에만 함정 스프라이트·Hitbox·Collider2D 를 켠다. 활성화 전에 쳐내기/사망하면
+ * pendingSwordTrap 을 즉시 풀에 반납하므로 늦게 솟는 함정이 없다.
+ * 패턴3의 각 FlyingSword 는 자체 대기 시간 동안 발사 방향 통로를 채워 표시한다.
  *
  * ─────────────────────────────────────────────────────────────
  * 패턴4 "발도 참격" 타임라인 (t=0 은 패턴 진입 프레임)
@@ -1298,8 +1248,8 @@ public class Gold : BossBase
  * attackRange : [0]=미사용 [1]=패턴1 [2]=패턴2 [3]=패턴3 [4]=패턴4(무한) [5]=Move 정지 거리
  * curTimes    : [0]=현재 패턴 진행 타이머 [1~4]=각 패턴 쿨타임.
  *               curTimes[4] 는 Awake 에서 pattern4Cooldown 으로 초기화 → 전투 시작 30초 뒤 첫 발동.
- * 패턴2/3 의 소환 DelayedCall 은 실행 시점에 사망·그로기면 소환을 건너뛴다(쳐내기로 캔슬된 뒤
- * 뒤늦게 함정/검이 튀어나오는 것을 막기 위함).
+ * 패턴2 함정은 즉시 전조 상태로 소환되고 activationGuard 로 사망·그로기 시 활성화를 막는다.
+ * 패턴3 소환 DelayedCall 은 실행 시점에 사망·그로기면 검 소환을 건너뛴다.
  * 애니메이터 요구 파라미터는 기존 + Float AnimSpeed (아래 "애니메이션 동기화" 참고).
  * 쳐내기 캔슬 시 모든 패턴 트리거를 ResetTrigger 하고 IsGroggy 로 넘어간다.
  *
@@ -1350,7 +1300,8 @@ public class Gold : BossBase
  * 일시정지 대응
  * ─────────────────────────────────────────────────────────────
  * Update 첫 줄의 PauseManager.IsPaused 게이트로 BT/쿨타임/그로기 타이머/중력이 전부 멈춘다.
- * 패턴4 연출 시퀀스와 패턴2/3 의 소환 DelayedCall 은 PauseManager 의 DOTween.PauseAll 로 함께 멈추고,
+ * 패턴4 연출, 패턴2 함정의 전조/수명 시퀀스, 패턴3 소환 DelayedCall 은
+ * PauseManager 의 DOTween.PauseAll 로 함께 멈추고,
  * 카운터·패턴 데미지는 PlayerKnockBack.TakeHit 쪽 게이트가 차단한다.
  *
  * ─────────────────────────────────────────────────────────────

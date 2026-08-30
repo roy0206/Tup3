@@ -94,6 +94,16 @@ MonoBehaviour:
   reflectedSpeed: 16
   reflectedLifeTime: 4
   bossHitRadius: 1
+  showLaunchThreatHitbox: 1
+  launchThreatLength: 20
+  launchThreatWidth: 0
+  launchThreatColor: {r: 0.6, g: 0.6, b: 0.6, a: 1}
+  launchThreatFillAlpha: 0.7
+  launchThreatInset: 0.05
+  launchThreatPulseSpeed: 20
+  launchThreatSortingOrderOffset: -1
+  clashVolume: 1
+  clashMinInterval: 0.08
 --- !u!61 &7408564367723269728
 BoxCollider2D:
   m_ObjectHideFlags: 0

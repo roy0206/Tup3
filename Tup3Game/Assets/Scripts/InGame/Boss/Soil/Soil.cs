@@ -12,7 +12,6 @@ public class Soil : BossBase
     private List<float> curTimes;
     [SerializeField] List<Transform> hitboxTransforms = new List<Transform>();
     private GameObject player;
-    [SerializeField] private Transform visualRoot;
     private bool isFacingRight;
 
     [Header("이동")]
@@ -88,12 +87,18 @@ public class Soil : BossBase
         player = GameObject.FindGameObjectWithTag("Player");
         bodyCollider = boxColliders.Count > 0 ? boxColliders[0] : GetComponent<BoxCollider2D>();
 
-        if (visualRoot == null) visualRoot = transform.Find("Body");
+        bool initiallyFacingRight = transform.localScale.x < 0f ||
+            Mathf.Approximately(transform.rotation.eulerAngles.y, 180f);
+
+        Vector3 initialScale = transform.localScale;
+        initialScale.x = Mathf.Abs(initialScale.x);
+        transform.localScale = initialScale;
+
         if (Mathf.Approximately(transform.rotation.eulerAngles.y, 180f))
         {
             transform.rotation = Quaternion.identity;
-            SetFacing(true);
         }
+        SetFacing(initiallyFacingRight);
 
         SnapToGround();
         if (!snappedToGround) StartCoroutine(SnapToGroundWhenReady());
@@ -169,6 +174,9 @@ public class Soil : BossBase
         if (curTimes[num] > 0) return TaskStatus.Failure;
         if (HorizontalDistance > attackRange[num]) return TaskStatus.Failure;
 
+        // 패턴 선택은 Move/Stay보다 먼저 실행된다. 여기서 방향을 갱신하지 않으면
+        // 플레이어가 등 뒤로 넘어간 직후에도 이전 정면을 향해 공격을 시작한다.
+        FacePlayer();
         return TaskStatus.Success;
     }
 
@@ -200,7 +208,7 @@ public class Soil : BossBase
                 hitboxTransforms[2].gameObject.SetActive(true);
                 hitboxTransforms[2]
                     .DOMoveX(hitboxTransforms[2].transform.position.x + (isFacingRight ? 10f : -10f), 1f)
-                    .OnComplete(() =>{ hitboxTransforms[2].gameObject.SetActive(false);hitboxTransforms[2].localPosition = new Vector3(isFacingRight ? 2f : -2f, 2f, 0); });
+                    .OnComplete(() =>{ hitboxTransforms[2].gameObject.SetActive(false);hitboxTransforms[2].localPosition = new Vector3(-2f, 2f, 0f); });
             } );
             DOVirtual.DelayedCall(0.9f, () =>
             {
@@ -308,8 +316,14 @@ public class Soil : BossBase
     private TaskStatus Stay()
     {
         animationController.Play(4);
-        Face(Mathf.Sign(player.transform.position.x - transform.position.x));
+        FacePlayer();
         return TaskStatus.Success;
+    }
+
+    private void FacePlayer()
+    {
+        if (player == null) return;
+        Face(Mathf.Sign(player.transform.position.x - transform.position.x));
     }
     
     private void Face(float dir)
@@ -323,22 +337,9 @@ public class Soil : BossBase
         if (facingRight == isFacingRight) return;
 
         isFacingRight = facingRight;
-        if (visualRoot != null) MirrorChild(visualRoot);
-        foreach (var hitbox in hitboxTransforms)
-            MirrorChild(hitbox);
-    }
-
-    private static void MirrorChild(Transform t)
-    {
-        if (t == null) return;
-
-        Vector3 pos = t.localPosition;
-        pos.x = -pos.x;
-        t.localPosition = pos;
-
-        Vector3 scale = t.localScale;
-        scale.x = -scale.x;
-        t.localScale = scale;
+        Vector3 scale = transform.localScale;
+        scale.x = Mathf.Abs(scale.x) * (facingRight ? -1f : 1f);
+        transform.localScale = scale;
     }
 
     [SerializeField] private float fallRescueDepth = 12f;
@@ -464,12 +465,18 @@ public class Soil : BossBase
  * 접지 검사 박스는 bodyCollider 의 size/offset 을 스케일 반영해 직접 계산한다(비활성에도 유효).
  *
  * 좌우반전: 토보스는 본 리깅 캐릭터(Body 하위 다중 SpriteRenderer)라 flipX 로는 그래픽이 안
- * 뒤집힌다 — SetFacing 이 리그 루트(visualRoot, 기본 "Body" 자식, x=0 피봇)와 hitboxTransforms 의
- * localPosition.x / localScale.x 를 함께 미러링한다. 예전의 루트 Y축 180도 회전은 자식 체력바
- * 캔버스까지 카메라 반대편으로 뒤집어 안 보이게 만들었기 때문에 쓰지 않는다.
+ * 뒤집힌다. 애니메이션 클립이 Body 자체의 위치/회전도 구동하므로 Body.localScale.x 를 음수로
+ * 만들면 "애니메이션 회전 후 반전"이 되어 오른쪽 모션의 관절 궤적이 틀어진다. 대신 애니메이션
+ * 루트보다 한 단계 위인 보스 transform.localScale.x 를 반전해 Body 이하의 완성된 포즈 전체를
+ * 미러링한다. 같은 루트 아래의 히트박스도 자동으로 함께 뒤집히므로 개별 MirrorChild 는 쓰지 않는다.
+ * 예전의 루트 Y축 180도 회전은 자식 체력바 캔버스까지 카메라 반대편으로 뒤집어 안 보이게 했지만,
+ * 음수 X 스케일은 카메라 반대편으로 돌리지 않아 그 문제도 피한다.
  * 기본(스프라이트 원본)은 왼쪽 보기 = isFacingRight false 이고, 씬에 Y=180 으로 저장돼 있던 경우를
  * 위해 Awake 에서 회전을 identity 로 되돌리고 facing 상태로 변환한다. 패턴1의 전진 히트박스와
  * SoilDrop 낙하 방향도 회전 대신 isFacingRight 를 본다.
+ * BT는 패턴 선택을 Move/Stay보다 먼저 검사하므로 PatternStarter 성공 시 FacePlayer를 먼저 호출한다.
+ * 따라서 플레이어가 등 뒤로 넘어간 직후 패턴이 시작돼도 실제 위치를 향해 돌아본 뒤 공격하며,
+ * 패턴이 이미 시작된 뒤에는 방향을 다시 바꾸지 않아 공격 후방으로 넘어가는 회피는 유지된다.
  *
  * 사운드
  *   Soil_Smash  : 패턴1(내려치기). 패턴 시작이 아니라 기존 0.6초 DelayedCall — 즉 첫 히트박스가

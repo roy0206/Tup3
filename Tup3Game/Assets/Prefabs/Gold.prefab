@@ -204,6 +204,16 @@ MonoBehaviour:
   groundCheckDistance: 0.1
   animator: {fileID: 0}
   spriteRenderer: {fileID: 0}
+  pattern1Duration: 1
+  pattern2Duration: 3
+  pattern2TrapDelay: 1
+  pattern3Duration: 8
+  pattern3SummonDelay: 1
+  counterDuration: 1
+  counterHitDelay: 0.2
+  counterDamage: 20
+  counterKnockBackForce: 0.5
+  counterHitRange: 3
   pattern1GroggyTime: 1.5
   pattern2GroggyTime: 3
   pattern3GroggyTime: 5
@@ -214,6 +224,14 @@ MonoBehaviour:
   pattern1Damage: 20
   pattern1KnockBackForce: 1
   pattern1HitRange: 3
+  showMeleeThreatHitbox: 1
+  meleeThreatColor: {r: 0.6, g: 0.6, b: 0.6, a: 1}
+  meleeThreatFillAlpha: 0.7
+  meleeThreatHeight: 0
+  meleeThreatOffset: {x: 0, y: 0}
+  meleeThreatInset: 0.12
+  meleeThreatPulseSpeed: 20
+  meleeThreatSortingOrderOffset: -1
   pattern1ParryStart: 0.15
   pattern1ParryEnd: 0.35
   pattern1ParryRange: 4
