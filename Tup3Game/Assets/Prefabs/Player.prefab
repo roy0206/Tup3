@@ -4989,8 +4989,8 @@ MonoBehaviour:
   footstepMinSpeed: 0.5
   heavyLandFallSpeed: 22
   footstepVolume: 0.1
-  jumpVolume: 0.8
-  landVolume: 0.8
+  jumpVolume: 0.5
+  landVolume: 0.5
   landHeavyVolume: 1
   dashVolume: 0.9
 --- !u!61 &7619190873882549438
