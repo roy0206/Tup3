@@ -20,13 +20,6 @@ public static class UiViewBuilder
         {
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         }
-
-        // Screen Space - Camera 캔버스는 월드 SpriteRenderer와 정렬 레이어를 공유한다.
-        // 프로젝트 최상위 레이어(Player)에 올려 플레이어가 일시정지/모달 UI를 뚫지 못하게 한다.
-        SortingLayer[] sortingLayers = SortingLayer.layers;
-        if (sortingLayers.Length > 0)
-            canvas.sortingLayerID = sortingLayers[sortingLayers.Length - 1].id;
-
         canvas.sortingOrder = sortingOrder;
 
         var scaler = root.GetComponent<CanvasScaler>();
@@ -280,10 +273,7 @@ public static class UiViewBuilder
  * 일시정지/옵션 뷰가 공용으로 쓰는 코드 생성 uGUI 빌더 모음(정적 클래스, 상태 없음).
  * DialogueChoiceView 의 "코드로 만드는 플랫 UI" 관례를 따르며 스프라이트 없이 단색 Image 로만 구성한다.
  *
- * - SetupOverlayCanvas : ScreenSpaceCamera(카메라가 없으면 Overlay) 캔버스 +
- *                        CanvasScaler(1920x1080 기준) + GraphicRaycaster.
- *                        카메라 모드에서는 sortingOrder보다 Sorting Layer가 먼저 비교되므로,
- *                        프로젝트의 최상위 정렬 레이어를 자동 적용해 Player 레이어가 UI를 뚫지 못하게 한다.
+ * - SetupOverlayCanvas : ScreenSpaceOverlay 캔버스 + CanvasScaler(1920x1080 기준) + GraphicRaycaster.
  * - BuildDim           : 화면 전체 반투명 차단막. raycastTarget=true 라 뒤쪽 UI 클릭도 막는다.
  * - BuildCenterPanel   : 중앙 정렬 세로 레이아웃 패널(내용 크기에 맞춰 자동 확장).
  * - BuildButton        : Image + Button(ColorTint) + TMP 라벨. 트윈 없이 기본 틴트 전환만 쓴다.
